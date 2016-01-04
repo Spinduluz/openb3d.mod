@@ -21,46 +21,53 @@ using namespace std;
 class Camera;
 
 class Texture{
-
 public:
+
+	typedef unsigned char *(*LoadPixbuf)(const char *filename,int *width,int *height);
+	typedef void (*FreePixbuf)(unsigned char *buf);
+
+	static LoadPixbuf loadpixbuf;
+	static FreePixbuf freepixbuf;
+	static list<Texture*> tex_list;
 
 	unsigned int texture;
 
-	static list<Texture*> tex_list;
+	string file_name;
+	string file_abs;
+	size_t file_hash;
 
-	string file;
 	unsigned int* frames;
 
-	int flags,blend,coords;
-	float u_scale,v_scale,u_pos,v_pos,angle;
-	string file_abs;
-	int width,height; // returned by Name/Width/Height commands
+	int flags;
+	int blend;
+	int coords;
+
+	int format; // Added can be GL_RGBA8 or one of the DXT compressed ones
+
+	float u_scale;
+	float v_scale;
+	
+	float u_pos;
+	float v_pos;
+	float angle;
+
+	int width;
+	int height; // returned by Name/Width/Height commands
+
 	int no_frames;
 	unsigned int* framebuffer;
-	int cube_face,cube_mode;
+
+	int cube_face;
+	int cube_mode;
 	
-	int glTexEnv[3][12];//
 	int glTexEnv_count;//
+	int glTexEnv[3][12];//
 
-	Texture(){
-
-		//texture=NULL;
-		file="";
-		flags=0,blend=2,coords=0;
-		u_scale=1.0,v_scale=1.0,u_pos=0.0,v_pos=0.0,angle=0.0;
-		string file_abs="";
-		width=0,height=0; // returned by Name/Width/Height commands
-		no_frames=1;
-		framebuffer=0;
-		cube_face=0,cube_mode=1;
-		
-		glTexEnv_count=0;//
-
-	};
+	Texture();
 
 	static Texture* LoadTexture(string filename,int flags=0);
 	static Texture* LoadAnimTexture(string filename,int flags=0, int frame_width=0,int frame_height=0,int first_frame=0,int frame_count=1);
-	static Texture* CreateTexture(int width=256,int height=256,int flags=3, int frames=0);
+	static Texture* CreateTexture(int width=256,int height=256,int flags=3, int frames=0,string fname="noname");
 
 	void FreeTexture();
 	void DrawTexture(int x,int y);
@@ -75,6 +82,7 @@ public:
 	void CameraToTex(Camera* cam, int frames=0);
 	void DepthBufferToTex(Camera* cam);
 	string TextureName();
+	void SetTextureName(string name);
 	static void ClearTextureFilters();
 	static void AddTextureFilter(string text_match,int flags);
 	Texture* TexInList();

@@ -29,12 +29,18 @@ const int BONE=8;
 const int KEYS=9;
 
 Mesh* LoadAnimB3D(string f_name,Entity* parent_ent_ext){
-
-	// Start file reading
-
 	File* file;
 
 	file=File::ReadResourceFile(f_name);
+	if(!file) return NULL;
+	return LoadAnimB3D(file,parent_ent_ext);
+}
+
+Mesh* LoadAnimB3D(File* file,Entity* parent_ent_ext){
+
+	// Start file reading
+
+	
 
 	////if(file==NULL) RuntimeError("Could Not Find File");
 

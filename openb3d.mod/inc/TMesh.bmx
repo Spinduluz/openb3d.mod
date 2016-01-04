@@ -225,6 +225,20 @@ Type TMesh Extends TEntity
 		
 	End Function
 	
+	Function LoadAnimMeshFromStream:TMesh( file:TStream,format:Int,parent:TEntity=Null )
+		Local map:Byte Ptr=MapStream(file)
+		Local inst:Byte Ptr=LoadAnimMeshFromStream_( map,format,GetInstance(parent) )
+		Local mesh:TMesh=CreateObject(inst)
+		UnmapStream(map)
+		Return mesh
+	End Function
+	
+	Function LoadAnimMeshFromBuffer:TMesh( buf:Byte[],num:Int,format:Int,parent:TEntity=Null )
+		Local inst:Byte Ptr=LoadAnimMeshFromBuffer_( buf,num,format,GetInstance(parent) )
+		Local mesh:TMesh=CreateObject(inst)
+		Return mesh
+	End Function
+	
 	Function CreateCube:TMesh( parent:TEntity=Null )
 	
 		Local inst:Byte Ptr=CreateCube_( GetInstance(parent) )

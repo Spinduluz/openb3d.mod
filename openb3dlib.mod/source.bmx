@@ -75,6 +75,11 @@ Import "openb3d/src/x.cpp"
 
 Import "openb3d/src/collidetri.c"
 Import "openb3d/src/stb_image.c"
+?debug
+Import "openb3d/src/bmaxdebug.cpp"
+?
+Import "openb3d/src/unzip/unzip.c"
+Import "openb3d/src/unzip/ioapi.c"
 
 Import "methods.cpp" ' must be imported in this file on Mac
 Import "data.cpp"

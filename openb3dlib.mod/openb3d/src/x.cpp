@@ -295,11 +295,8 @@ list<XLoader_TreeNode*> XLoader_FindTreeElements(XLoader_TreeNode* tree, string 
 	
 }
 
-
-
-Mesh* LoadX(string URL, Entity* parent_ent){
-	Stream = File::ReadResourceFile(URL);
-	if (Stream == 0) return 0;
+Mesh* LoadX(File* Stream,Entity* parent_ent){
+	if(!Stream) return NULL;
 
 	string header = xReadString(Stream, 4);
 	string version = xReadString(Stream, 4);
@@ -619,4 +616,11 @@ Mesh* LoadX(string URL, Entity* parent_ent){
 	return Mesh::CreateCube();
 	
 }
+
+Mesh* LoadX(string URL,Entity* parent_ent){
+	Stream = File::ReadResourceFile(URL);
+	if(Stream == 0) return 0;
+	return LoadX(Stream,parent_ent);
+}
+
 }

@@ -37,6 +37,10 @@ ModuleInfo "History: 1.00 Initial Release"
 ?Win32
 ModuleInfo "CC_OPTS: -DGLEW_STATIC"
 ?
+ModuleInfo "CC_OPTS: -DBLITZMAX_BUILD"
+?debug
+ModuleInfo "CC_OPTS: -DBLITZMAX_DEBUG"
+?
 
 Import Pub.Glew ' imports Pub.OpenGL
 

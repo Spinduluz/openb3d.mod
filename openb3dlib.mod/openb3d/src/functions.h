@@ -1,5 +1,5 @@
-#ifndef __functions_h__
-#define __functions_h__
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
 
 
 #ifdef WIN32
@@ -10,6 +10,46 @@
  #endif
 #else
  #define DLL_EXPORT
+#endif
+
+#ifdef __cplusplus
+class Texture;
+class Brush;
+class Entity;
+class Mesh;
+class Surface;
+class Camera;
+class Terrain;
+class Light;
+class Pivot;
+class ShadowObject;
+class Sprite;
+class Stencil;
+class Shader;
+class VoxelSprite;
+class Geosphere;
+class Material;
+class OcTree;
+#else
+typedef struct Texture Texture;
+typedef struct Brush Brush;
+typedef struct Texture Texture;
+typedef struct Brush Brush;
+typedef struct Entity Entity;
+typedef struct Mesh Mesh;
+typedef struct Surface Surface;
+typedef struct Camera Camera;
+typedef struct Terrain Terrain;
+typedef struct Light Light;
+typedef struct Pivot Pivot;
+typedef struct ShadowObject ShadowObject;
+typedef struct Sprite Sprite;
+typedef struct Stencil Stencil;
+typedef struct Shader Shader;
+typedef struct VoxelSprite VoxelSprite;
+typedef struct Geosphere Geosphere;
+typedef struct Material Material;
+typedef struct OcTree OcTree;
 #endif
 
 #ifdef __cplusplus
@@ -1193,4 +1233,4 @@ void DLL_EXPORT AddToOctree(OcTree* octree, Mesh* mesh, int level, float X, floa
 } // extern "C"
 #endif
 
-#endif
+#endif // FUNCTIONS_H

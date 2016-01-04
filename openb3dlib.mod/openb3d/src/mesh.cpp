@@ -398,7 +398,36 @@ Mesh* Mesh::LoadMesh(string filename,Entity* parent_ent){
 	}
 
 	return mesh;
+}
 
+Mesh* Mesh::LoadMeshX(File* file,Entity* parent_ent){
+	return loadX::LoadX(file,parent_ent);
+}
+
+Mesh* Mesh::LoadMesh3DS(File* file,Entity* parent_ent){
+	return load3ds::Load3ds(file,parent_ent);
+}
+
+Mesh* Mesh::LoadMeshB3D(File* file,Entity* parent_ent){
+	Entity* ent=LoadAnimMeshB3D(file);
+	ent->HideEntity();
+	Mesh* mesh=dynamic_cast<Mesh*>(ent)->CollapseAnimMesh();
+	ent->FreeEntity();
+
+	mesh->class_name="Mesh";
+
+	mesh->AddParent(*parent_ent);
+	entity_list.push_back(mesh);
+
+	//update matrix
+	if(mesh->parent!=0){
+		mesh->mat.Overwrite(mesh->parent->mat);
+		mesh->UpdateMat();
+	}else{
+		mesh->UpdateMat(true);
+	}
+
+	return mesh;
 }
 
 Mesh* Mesh::LoadAnimMesh(string filename,Entity* parent_ent){
@@ -407,7 +436,18 @@ Mesh* Mesh::LoadAnimMesh(string filename,Entity* parent_ent){
 	if(Right(filename,4)==".md2") return loadMD2::LoadMD2(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
 
 	return LoadAnimB3D(filename,parent_ent);
+}
 
+Mesh* Mesh::LoadAnimMesh3DS(File* file,Entity* parent_ent){
+	return load3ds::Load3ds(file,parent_ent);
+}
+
+Mesh* Mesh::LoadAnimMeshMD2(File* file,Entity* parent_ent){
+	return loadMD2::LoadMD2(file,parent_ent);
+}
+
+Mesh* Mesh::LoadAnimMeshB3D(File* file,Entity* parent_ent){
+	return LoadAnimB3D(file,parent_ent);
 }
 
 Mesh* Mesh::CreateQuad(Entity* parent_ent){

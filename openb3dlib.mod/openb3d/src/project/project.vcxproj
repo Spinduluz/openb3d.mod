@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\3ds.cpp" />
+    <ClCompile Include="..\actions.cpp" />
+    <ClCompile Include="..\animation.cpp" />
+    <ClCompile Include="..\animation_keys.cpp" />
+    <ClCompile Include="..\bank.cpp" />
+    <ClCompile Include="..\bmaxdebug.cpp" />
+    <ClCompile Include="..\bone.cpp" />
+    <ClCompile Include="..\brush.cpp" />
+    <ClCompile Include="..\camera.cpp" />
+    <ClCompile Include="..\collision.cpp" />
+    <ClCompile Include="..\collision2.cpp" />
+    <ClCompile Include="..\csg.cpp" />
+    <ClCompile Include="..\dds.cpp" />
+    <ClCompile Include="..\entity.cpp" />
+    <ClCompile Include="..\file.cpp" />
+    <ClCompile Include="..\functions.cpp" />
+    <ClCompile Include="..\geom.cpp" />
+    <ClCompile Include="..\geosphere.cpp" />
+    <ClCompile Include="..\global.cpp" />
+    <ClCompile Include="..\isosurface.cpp" />
+    <ClCompile Include="..\light.cpp" />
+    <ClCompile Include="..\material.cpp" />
+    <ClCompile Include="..\maths_helper.cpp" />
+    <ClCompile Include="..\matrix.cpp" />
+    <ClCompile Include="..\md2.cpp" />
+    <ClCompile Include="..\mesh.cpp" />
+    <ClCompile Include="..\model.cpp" />
+    <ClCompile Include="..\octree.cpp" />
+    <ClCompile Include="..\particle.cpp" />
+    <ClCompile Include="..\physics.cpp" />
+    <ClCompile Include="..\pick.cpp" />
+    <ClCompile Include="..\pivot.cpp" />
+    <ClCompile Include="..\project.cpp" />
+    <ClCompile Include="..\quaternion.cpp" />
+    <ClCompile Include="..\shadow.cpp" />
+    <ClCompile Include="..\sprite.cpp" />
+    <ClCompile Include="..\sprite_batch.cpp" />
+    <ClCompile Include="..\stb_image.c" />
+    <ClCompile Include="..\stencil.cpp" />
+    <ClCompile Include="..\string_helper.cpp" />
+    <ClCompile Include="..\surface.cpp" />
+    <ClCompile Include="..\terrain.cpp" />
+    <ClCompile Include="..\texture.cpp" />
+    <ClCompile Include="..\texture_filter.cpp" />
+    <ClCompile Include="..\tilt.cpp" />
+    <ClCompile Include="..\touch.cpp" />
+    <ClCompile Include="..\tree.cpp" />
+    <ClCompile Include="..\voxel.cpp" />
+    <ClCompile Include="..\voxterrain.cpp" />
+    <ClCompile Include="..\x.cpp" />
+    <ClCompile Include="functions2.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\3ds.h" />
+    <ClInclude Include="..\actions.h" />
+    <ClInclude Include="..\animation.h" />
+    <ClInclude Include="..\animation_keys.h" />
+    <ClInclude Include="..\bank.h" />
+    <ClInclude Include="..\bmaxdebug.h" />
+    <ClInclude Include="..\bone.h" />
+    <ClInclude Include="..\brush.h" />
+    <ClInclude Include="..\camera.h" />
+    <ClInclude Include="..\collision.h" />
+    <ClInclude Include="..\collision2.h" />
+    <ClInclude Include="..\csg.h" />
+    <ClInclude Include="..\dds.h" />
+    <ClInclude Include="..\entity.h" />
+    <ClInclude Include="..\file.h" />
+    <ClInclude Include="..\functions.h" />
+    <ClInclude Include="..\geom.h" />
+    <ClInclude Include="..\geosphere.h" />
+    <ClInclude Include="..\global.h" />
+    <ClInclude Include="..\isosurface.h" />
+    <ClInclude Include="..\light.h" />
+    <ClInclude Include="..\material.h" />
+    <ClInclude Include="..\maths_helper.h" />
+    <ClInclude Include="..\matrix.h" />
+    <ClInclude Include="..\md2.h" />
+    <ClInclude Include="..\mesh.h" />
+    <ClInclude Include="..\model.h" />
+    <ClInclude Include="..\octree.h" />
+    <ClInclude Include="..\particle.h" />
+    <ClInclude Include="..\physics.h" />
+    <ClInclude Include="..\pick.h" />
+    <ClInclude Include="..\pivot.h" />
+    <ClInclude Include="..\project.h" />
+    <ClInclude Include="..\quaternion.h" />
+    <ClInclude Include="..\shadermat.h" />
+    <ClInclude Include="..\shaderobject.h" />
+    <ClInclude Include="..\shadow.h" />
+    <ClInclude Include="..\sprite.h" />
+    <ClInclude Include="..\sprite_batch.h" />
+    <ClInclude Include="..\stb_image.h" />
+    <ClInclude Include="..\stencil.h" />
+    <ClInclude Include="..\string_helper.h" />
+    <ClInclude Include="..\surface.h" />
+    <ClInclude Include="..\terrain.h" />
+    <ClInclude Include="..\texture.h" />
+    <ClInclude Include="..\texture_filter.h" />
+    <ClInclude Include="..\tilt.h" />
+    <ClInclude Include="..\touch.h" />
+    <ClInclude Include="..\tree.h" />
+    <ClInclude Include="..\voxel.h" />
+    <ClInclude Include="..\voxterrain.h" />
+    <ClInclude Include="..\x.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{819CDB8F-1F13-4EB5-A62A-584F891214D9}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>project</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD;BLITZMAX_DEBUG</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD;BLITZMAX_DEBUG</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

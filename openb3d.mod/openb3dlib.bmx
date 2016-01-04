@@ -29,11 +29,13 @@ Import BRL.PNGLoader		' imports BRL.Pixmap, PUB.LibPNG
 Import BRL.JPGLoader		' imports BRL.Pixmap, PUB.LibJPEG
 Import BRL.Retro			' imports BRL.Basic
 Import BRL.Map
+Import PUB.MapStream
 
 ' functions.cpp
 Extern
 
 	Function TextureGLTexEnv_( tex:Byte Ptr,target:Int,pname:Int,param:Int ) = "TextureGLTexEnv" ''
+	Function NameTexture_( tex:Byte Ptr, name:Byte Ptr ) = "NameTexture" ''
 	Function BrushGLColor_( brush:Byte Ptr,r:Float,g:Float,b:Float,a:Float ) = "BrushGLColor" ''
 	Function BrushGLBlendFunc_( brush:Byte Ptr,sfactor:Int,dfactor:Int ) = "BrushGLBlendFunc" ''
 	
@@ -158,6 +160,8 @@ Extern
 	Function LightRange_( light:Byte Ptr,Range:Float ) = "LightRange"
 	Function LinePick_:Byte Ptr( x:Float,y:Float,z:Float,dx:Float,dy:Float,dz:Float,radius:Float ) = "LinePick"
 	Function LoadAnimMesh_:Byte Ptr( file:Byte Ptr,parent:Byte Ptr ) = "LoadAnimMesh"
+	Function LoadAnimMeshFromStream_:Byte Ptr( stream:Byte Ptr,format:Int,parent:Byte Ptr ) = "LoadAnimMeshFromStream"
+	Function LoadAnimMeshFromBuffer_:Byte Ptr( buf:Byte Ptr,num:Int,format:Int,parent:Byte Ptr ) = "LoadAnimMeshFromBuffer"
 	Function LoadAnimTexture_:Byte Ptr( file:Byte Ptr,flags:Int,frame_width:Int,frame_height:Int,first_frame:Int,frame_count:Int ) = "LoadAnimTexture"
 	Function LoadBrush_:Byte Ptr( file:Byte Ptr,flags:Int,u_scale:Float,v_scale:Float ) = "LoadBrush"
 	Function LoadMesh_:Byte Ptr( file:Byte Ptr,parent:Byte Ptr ) = "LoadMesh"
@@ -201,6 +205,7 @@ Extern
 	Function SetAnimTime_( ent:Byte Ptr,time:Float,seq:Int ) = "SetAnimTime"
 	Function SetCubeFace_( tex:Byte Ptr,face:Int ) = "SetCubeFace"
 	Function SetCubeMode_( tex:Byte Ptr,Mode:Int ) = "SetCubeMode"
+	Function SetPixbufReader_( loader:Byte Ptr( filename:Byte Ptr,width:Int Var,height:Int Var), free( buf:Byte Ptr ) ) = "SetPixbufReader"
 	Function ShowEntity_( ent:Byte Ptr ) = "ShowEntity"
 	Function SpriteViewMode_( sprite:Byte Ptr,Mode:Int ) = "SpriteViewMode"
 	Function TextureBlend_( tex:Byte Ptr,blend:Int ) = "TextureBlend"

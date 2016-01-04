@@ -143,7 +143,7 @@ Light* Light::CreateLight(int l_type,Entity* parent_ent){
 	light->class_name="Light";
 	
 	// no of lights increased, enable additional gl light
-	no_lights=no_lights+1;
+	no_lights++;
 	glEnable(gl_light[no_lights-1]);
 		
 	float white_light[]={1.0,1.0,1.0,1.0};

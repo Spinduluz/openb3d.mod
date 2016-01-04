@@ -236,6 +236,14 @@ Type TTexture
 		
 	End Method
 	
+	Method NameTexture( name:String )
+		
+		Local n:Byte Ptr = name.ToCString()
+		NameTexture_( GetInstance( Self ), n )
+		MemFree n
+		
+	End Method
+	
 	Method TextureName:String()
 	
 		Return String.FromCString( TextureName_( GetInstance(Self) ) )

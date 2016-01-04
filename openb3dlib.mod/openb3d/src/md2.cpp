@@ -173,12 +173,7 @@ const float md2_anorms[][3]={
 { -0.688191f, -0.587785f, -0.425325f }
 };
 
-
-Mesh* LoadMD2(string filename,Entity* parent_ent){
-	File* Stream;
-	Stream = File::ReadFile(filename);
-	if (Stream == 0) return 0;
-
+Mesh* LoadMD2(File* Stream,Entity* parent_ent){
 	if (Stream->ReadInt()!=844121161) return 0;
 	if (Stream->ReadInt()!=8) return 0;
 
@@ -295,6 +290,11 @@ Mesh* LoadMD2(string filename,Entity* parent_ent){
 
 }
 
-
+Mesh* LoadMD2(string filename,Entity* parent_ent){
+	File* Stream;
+	Stream = File::ReadFile(filename);
+	if (Stream == 0) return 0;
+	return LoadMD2(Stream,parent_ent);
+}
 
 }

@@ -3,25 +3,6 @@
 
 #include "glew.h"
 
-/*
-#ifdef linux
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include <GL/glu.h>
-#endif
-
-#ifdef WIN32
-#include <gl\GLee.h>
-#include <GL\glu.h>
-#endif
-
-#ifdef __APPLE__
-#include "GLee.h"
-#include <OpenGL/glu.h>
-#endif
-*/
-
 #include "surface.h"
 #include "camera.h"
 #include "shadermat.h"
@@ -37,20 +18,20 @@ int Shader::ShaderIDCount;
 static int default_program=0;
 
 enum{
-USE_FLOAT_1,
-USE_FLOAT_2,
-USE_FLOAT_3,
-USE_FLOAT_4,
-USE_INTEGER_1,
-USE_INTEGER_2,
-USE_INTEGER_3,
-USE_INTEGER_4,
-USE_ENTITY_COORDS,
-USE_SURFACE,
-USE_MODEL_MATRIX,
-USE_VIEW_MATRIX,
-USE_PROJ_MATRIX,
-USE_MODELVIEW_MATRIX
+	USE_FLOAT_1,
+	USE_FLOAT_2,
+	USE_FLOAT_3,
+	USE_FLOAT_4,
+	USE_INTEGER_1,
+	USE_INTEGER_2,
+	USE_INTEGER_3,
+	USE_INTEGER_4,
+	USE_ENTITY_COORDS,
+	USE_SURFACE,
+	USE_MODEL_MATRIX,
+	USE_VIEW_MATRIX,
+	USE_PROJ_MATRIX,
+	USE_MODELVIEW_MATRIX
 };
 
 
@@ -61,10 +42,13 @@ ShaderObject* ShaderObject::CreateVertShader(string shaderFileName){
 	if(file==0) {
 		return 0;
 	}
-
+#if 0
 	fseek(file->pFile, 0L, SEEK_END);
 	unsigned long FileLength = ftell(file->pFile);
 	fseek(file->pFile, 0L, SEEK_SET);
+#else
+	unsigned long FileLength = file->FileSize();
+#endif
 	// wrong size "void main(){}"
 	if (FileLength<13){
 		file->CloseFile();
@@ -137,10 +121,13 @@ ShaderObject* ShaderObject::CreateFragShader(string shaderFileName){
 	if(file==0) {
 		return 0;
 	}
-
+#if 0
 	fseek(file->pFile, 0L, SEEK_END);
 	unsigned long FileLength = ftell(file->pFile);
 	fseek(file->pFile, 0L, SEEK_SET);
+#else
+	unsigned long FileLength = file->FileSize();
+#endif
 	// wrong size "void main(){}"
 	if (FileLength<13){
 		file->CloseFile();
@@ -1737,7 +1724,7 @@ Material* Material::LoadMaterial(string filename,int flags, int frame_width,int 
 	}*/
 
 	Material* tex=new Material();
-	tex->file=filename;
+	tex->file_name=filename;
 
 	// set tex.flags before TexInList
 	tex->flags=flags;
@@ -1756,8 +1743,8 @@ Material* Material::LoadMaterial(string filename,int flags, int frame_width,int 
 
 
 	unsigned char* buffer;
-
-	buffer=stbi_load(filename.c_str(),&tex->width,&tex->height,0,4);
+	//buffer=stbi_load(filename.c_str(),&tex->width,&tex->height,0,4);
+	buffer=Texture::loadpixbuf(filename.c_str(),&tex->width,&tex->height);
 
 	unsigned int name;
 
@@ -1791,7 +1778,8 @@ Material* Material::LoadMaterial(string filename,int flags, int frame_width,int 
 	tex->width=frame_width;
 	tex->height=frame_height;
 	delete dstbuffer;
-	stbi_image_free(buffer);
+	//stbi_image_free(buffer);
+	Texture::freepixbuf(buffer);
 
 
 	return tex;

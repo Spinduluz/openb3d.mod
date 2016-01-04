@@ -266,19 +266,21 @@ void New3ds(){
   texture       = 0;
 }
 
-Mesh* Load3ds(string URL, Entity* parent_ent){
+Mesh* Load3ds(File* Stream, Entity* parent_ent){
   int Size;
   //Local OldDir:String
   unsigned char Red, Green, Blue;
   //unsigned char Percent;
   //Local Pixmap:TPixmap
-  Stream = File::ReadResourceFile(URL);
-  if (Stream == 0) return 0;
 
   //Size = Stream.Size()
+#if 0
   fseek(Stream->pFile, 0, SEEK_END); // seek to end of file
   Size = ftell(Stream->pFile); // get current file pointer
   fseek(Stream->pFile, 0, SEEK_SET);
+#else
+  Size = Stream->FileSize();
+#endif
 
   // Read Main-Chunk
   ReadChunk();
@@ -412,6 +414,12 @@ Mesh* Load3ds(string URL, Entity* parent_ent){
     mesh->UpdateMat(true);
   }
   return mesh;
+}
+
+Mesh* Load3ds(string URL,Entity* parent_ent){
+	File* Stream = File::ReadResourceFile(URL);
+	if (Stream == 0) return 0;
+	return Load3ds(Stream,parent_ent);
 }
 
 } // namespace

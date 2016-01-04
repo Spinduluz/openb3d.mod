@@ -16,6 +16,7 @@
 #include "brush.h"
 #include "texture.h"
 #include "tree.h"
+#include "file.h"
 
 #include <iostream>
 #include <vector>
@@ -73,8 +74,17 @@ public:
 	static Mesh* CreateMesh(Entity* parent_ent=NULL);
 	Surface* CreateSurface(Brush* Bru=NULL);
 	Bone* CreateBone(Entity* parent_ent=NULL);
+
 	static Mesh* LoadMesh(string filename,Entity* parent_ent=NULL);
-	static Mesh* LoadAnimMesh(string filename,Entity* parent_ent=NULL);
+	static Mesh* LoadMeshX(File* file,Entity* parent_ent=NULL);
+	static Mesh* LoadMesh3DS(File* file,Entity* parent_ent=NULL);
+	static Mesh* LoadMeshB3D(File* file,Entity* parent_ent=NULL);
+
+	static Mesh* LoadAnimMesh(string filename,Entity* parent_ent=NULL);	
+	static Mesh* LoadAnimMesh3DS(File* file,Entity* parent_ent=NULL);
+	static Mesh* LoadAnimMeshMD2(File* file,Entity* parent_ent=NULL);
+	static Mesh* LoadAnimMeshB3D(File* file,Entity* parent_ent=NULL);
+
 	static Mesh* CreateQuad(Entity* parent_ent=NULL);
 	static Mesh* CreatePlane(int divs=1, Entity* parent_ent=NULL);
 	static Mesh* CreateCube(Entity* parent_ent=NULL);

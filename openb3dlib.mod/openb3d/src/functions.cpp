@@ -15,6 +15,7 @@
 #include "particle.h"
 #include "physics.h"
 #include "actions.h"
+#include "file.h"
 
 extern "C" {
 
@@ -25,6 +26,10 @@ void TextureGLTexEnv(Texture* tex, int target, int pname, int param){//
 	tex->glTexEnv[2][tex->glTexEnv_count] = param;
 	tex->TextureBlend(6);
 	if(tex->glTexEnv_count<12) tex->glTexEnv_count++;
+}
+
+void NameTexture(Texture *tex, const char *name){
+	tex->SetTextureName(name);
 }
 
 void BrushGLColor(Brush* brush, float r, float g, float b, float a){//
@@ -2119,5 +2124,56 @@ Function SetAnimKey(ent:TEntity,frame,pos_key=True,rot_key=True,scale_key=True)
 End Function
 */
 
+// Some additions...
+// ===============================================================================================================================
+
+enum {
+	LOAD_ANIM_MESH_B3D,
+	LOAD_ANIM_MESH_3DS,
+	LOAD_ANIM_MESH_MD2
+};
+
+Mesh* _LoadAnimMesh(File *file,int type,Entity *parent){
+	switch(type){
+	case LOAD_ANIM_MESH_B3D:
+		return Mesh::LoadAnimMeshB3D(file,parent);
+	case LOAD_ANIM_MESH_3DS:
+		return Mesh::LoadAnimMesh3DS(file,parent);
+	case LOAD_ANIM_MESH_MD2:
+		return Mesh::LoadAnimMeshMD2(file,parent);
+	}
+	return NULL;
+}
+
+#if defined(BLITZMAX_BUILD)
+Mesh *LoadAnimMeshFromStream(bbStreamIO *stream,int type,Entity *parent){
+	Mesh *mesh;
+	File *file=File::ReadStreamBB(stream);
+
+	if(!file) return NULL;
+	mesh=_LoadAnimMesh(file,type,parent);
+	file->CloseFile();
+	return mesh;
+}
+#endif
+
+Mesh *LoadAnimMeshFromBuffer(const void *buffer,int len,int type,Entity *parent){
+	Mesh *mesh;
+	File *file=File::ReadBuffer(buffer, len);
+
+	if(!file) return NULL;
+	mesh=_LoadAnimMesh(file,type,parent);
+	file->CloseFile();
+	return mesh;
+}
+
+static void FreePixbuf(unsigned char *buf){
+}
+
+void SetPixbufReader(Texture::LoadPixbuf load,Texture::FreePixbuf free){
+	Texture::loadpixbuf=load;
+	Texture::freepixbuf=free?free:FreePixbuf;
+}
+	
 } /* extern "C" */
 

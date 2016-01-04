@@ -22,9 +22,7 @@ public:
 	float grid[4][4];
 
 	Matrix(){
-
 		LoadIdentity();
-
 	}
 
 	void LoadIdentity(){

@@ -13,9 +13,8 @@
 #include "matrix.h"
 
 class Quaternion{
- 
 public:
-float x,y,z,w;
+	float x,y,z,w;
 };
 
 

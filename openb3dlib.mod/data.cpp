@@ -1439,7 +1439,7 @@ float* TextureFloat( Texture* obj,int varid ){
 
 const char* TextureString( Texture* obj,int varid ){
 	switch (varid){
-		case TEXTURE_file : return obj->file.c_str();
+		case TEXTURE_file : return obj->file_name.c_str();
 		case TEXTURE_file_abs : return obj->file_abs.c_str();
 	}
 	return NULL;

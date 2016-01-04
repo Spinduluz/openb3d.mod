@@ -1,4 +1,6 @@
-;
+#ifndef SHADEROBJECT_H
+#define SHADEROBJECT_H
+
 #include <map>
 #include <vector>
 
@@ -133,3 +135,4 @@ class ProgramObject{
 
 };
 
+#endif // SHADEROBJECT_H

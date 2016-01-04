@@ -24,38 +24,37 @@
 #include <list>
 #include <stdlib.h>
 
+#if defined(BLITZMAX_DEBUG)
+#include "bmaxdebug.h"
+#endif
+
 using namespace std;
 
-float Global::ambient_red=0.5,Global::ambient_green=0.5,Global::ambient_blue=0.5;
+float Global::ambient_red=0.5;
+float Global::ambient_green=0.5;
+float Global::ambient_blue=0.5;
 
 Shader* Global::ambient_shader=0;
 
-int Global::vbo_enabled=true,Global::vbo_min_tris=0;
+int Global::vbo_enabled=true;
+int Global::vbo_min_tris=false;
+
+int Global::gl_sgis_generate_mipmap=false;
+int Global::gl_ext_framebuffer_object=false;
 
 float Global::anim_speed=1.0;
-
 int Global::fog_enabled=false;
-
 int Global::width=640,Global::height=480;
-
 int Global::Shadows_enabled=false;
-
 int Global::alpha_enable=-1;
-
 int Global::blend_mode=-1;
-
 int Global::fx1=-1;
-
 int Global::fx2=-1;
 
-
-
 Pivot* Global::root_ent=new Pivot();
-
 Camera* Global::camera_in_use;
 
 void Global::Graphics(){
-
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -74,11 +73,9 @@ void Global::Graphics(){
 
 	glEnable(GL_NORMALIZE);
 
-
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-
 
 	float amb[]={0.5,0.5,0.5,1.0};
 
@@ -89,10 +86,17 @@ void Global::Graphics(){
 
 	Texture::AddTextureFilter("",9);
 
-	if (atof((char*)glGetString(GL_VERSION))<1.5){
-		Global::vbo_enabled=false;
-	}
+	const char *glverstr=(const char*)glGetString(GL_VERSION);
+	double glver=atof(glverstr);
 
+	/*if (atof((char*)glGetString(GL_VERSION))<1.5){
+		Global::vbo_enabled=false;
+	}*/
+	if(glver<1.5) Global::vbo_enabled=false;
+	if(GLEW_SGIS_generate_mipmap) Global::gl_sgis_generate_mipmap=true;
+	if(GL_EXT_framebuffer_object) Global::gl_ext_framebuffer_object=true;
+#if defined(BLITZMAX_DEBUG)
+#endif
 }
 
 void Global::AmbientLight(float r,float g,float b){
@@ -296,11 +300,100 @@ void Global::UpdateEntityAnim(Mesh& mesh){
 }
 
 bool CompareEntityOrder(Entity* ent1,Entity* ent2){
-
 	if(ent1->order>ent2->order){
 		return true;
 	}else{
 		return false;
 	}
-
 }
+
+// ==========================================================================================================
+
+enum{
+	RENDERSTATE_UNKNOWN,
+	RENDERSTATE_ENABLED,
+	RENDERSTATE_DISABLED,
+};
+
+struct GLState{
+	GLenum type;
+	int state;
+};
+
+static GLState gl_state[]={
+	{GL_ALPHA_TEST,RENDERSTATE_UNKNOWN},
+	{GL_BLEND,RENDERSTATE_UNKNOWN},
+	{GL_COLOR_MATERIAL,RENDERSTATE_UNKNOWN},
+	{GL_CULL_FACE,RENDERSTATE_UNKNOWN},
+	{GL_DEPTH_TEST,RENDERSTATE_UNKNOWN},
+	{GL_FOG,RENDERSTATE_UNKNOWN},
+	{GL_LIGHTING,RENDERSTATE_UNKNOWN},
+	{GL_NORMALIZE,RENDERSTATE_UNKNOWN},
+	{GL_POINT_SMOOTH,RENDERSTATE_UNKNOWN},
+	{GL_POINT_SPRITE,RENDERSTATE_UNKNOWN},
+	{GL_POLYGON_OFFSET_FILL,RENDERSTATE_UNKNOWN},
+	{GL_SCISSOR_TEST,RENDERSTATE_UNKNOWN},
+	{GL_STENCIL_TEST,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_2D,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_3D,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_CUBE_MAP,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_GEN_Q,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_GEN_R,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_GEN_S,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_GEN_T,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT0,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT1,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT2,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT3,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT4,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT5,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT6,RENDERSTATE_UNKNOWN},
+	{GL_LIGHT7,RENDERSTATE_UNKNOWN}
+/*GL_COLOR_ARRAY
+GL_NORMAL_ARRAY
+GL_TEXTURE_COORD_ARRAY
+GL_VERTEX_ARRAY*/
+};
+
+#define STATE_COUNT sizeof(gl_state)/sizeof(GLState)
+
+void GL_Enable(GLenum type){
+	for(int i=0; i<STATE_COUNT; i++){
+		if(gl_state[i].type==type){
+			// Already enabled. Skip.
+			if(gl_state[i].state==RENDERSTATE_ENABLED){
+				return;
+			}
+			// Set state and skip iteration
+			glEnable(type);
+			gl_state[i].state=RENDERSTATE_ENABLED;
+			return;
+		}
+	}
+	// Not found. Set anyway but log occurance
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Global::Enable: Unhandled render state");
+#endif
+	glEnable(type);
+}
+
+void GL_Disable(GLenum type){
+	for(int i=0; i<STATE_COUNT; i++){
+		if(gl_state[i].type==type){
+			// Already enabled. Skip.
+			if(gl_state[i].state==RENDERSTATE_DISABLED){
+				return;
+			}
+			// Set state and skip iteration
+			glDisable(type);
+			gl_state[i].state=RENDERSTATE_DISABLED;
+			return;
+		}
+	}
+	// Not found. Set anyway but log occurance
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Global::Disable: Unhandled render state");
+#endif
+	glDisable(type);
+}
+

@@ -17,9 +17,7 @@
 using namespace std;
  
 class Light : public Entity{
- 
 public:
- 
 	static int light_no;
 	static int no_lights;
 	static int max_lights;
@@ -36,7 +34,6 @@ public:
 	float inner_ang,outer_ang;
 	
 	Light(){
-
 		cast_shadow=1;
 		light_type=0;
 		range=1.0/1000.0;
@@ -45,7 +42,6 @@ public:
 		blue=1.0;
 		inner_ang=0.0;
 		outer_ang=45.0;
-	
 	}
 	
 	Light* CopyEntity(Entity* parent_ent=NULL);

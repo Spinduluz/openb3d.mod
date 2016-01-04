@@ -26,20 +26,18 @@ public:
 	static int vbo_enabled;
 	static int vbo_min_tris;
 
+	static int gl_sgis_generate_mipmap;
+	static int gl_ext_framebuffer_object;
+
 	static int Shadows_enabled;
-
 	static float anim_speed;
-
 	static int fog_enabled; // used to keep track of whether fog is enabled between camera update and mesh render
-
 	static Pivot* root_ent;
-
 	static Camera* camera_in_use;
-	
+
 	static void Graphics();
-	
+
 	static void AmbientLight(float r,float g,float b);
-	
 	static void ClearCollisions();
 	static void Collisions(int src_no,int dest_no,int method_no,int response_no=0);
 	static void ClearWorld(int entities=true,int brushes=true,int textures=true);
@@ -51,9 +49,6 @@ public:
 	static int blend_mode;
 	static int fx1;
 	static int fx2;
-
-
-	
 };
 
 bool CompareEntityOrder(Entity* ent1,Entity* ent2);

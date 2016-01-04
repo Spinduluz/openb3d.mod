@@ -48,10 +48,6 @@ void Animation::AnimateMesh(Mesh* ent1,float framef,int start_frame,int end_fram
 				src_surf_it++;
 				dst_surf_it++;
 			}
-			
-
-
-			
 			return;
 		}
 
@@ -88,22 +84,13 @@ void Animation::AnimateMesh(Mesh* ent1,float framef,int start_frame,int end_fram
 			t0*=anim_surf.no_verts*3;
 			t1*=anim_surf.no_verts*3;
 
-
 			for(int i=0;i<=anim_surf.no_verts*3;i++){
 				anim_surf.vert_coords[i]=surf.vert_coords[i+t0]*m0+surf.vert_coords[i+t1]*m1;
 
 			}
-
-
-
-
 			surf_it++;
-
 		}
-		
 		return;
-
-
 	}
 
 	ent1->anim_render=true;
@@ -133,7 +120,7 @@ void Animation::AnimateMesh(Mesh* ent1,float framef,int start_frame,int end_fram
 		float y2=0.0;
 		float z2=0.0;
 
-  	int flag=0;
+  		int flag=0;
 		// position
 
 	  // backwards
@@ -410,7 +397,6 @@ void Animation::AnimateMesh2(Mesh* ent1,float framef,int start_frame,int end_fra
 			
 		}
 		return;
-
 	}
 
 		ent1->anim_render=true;

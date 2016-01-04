@@ -32,7 +32,7 @@ ModuleInfo "Copyright: 2014 Mark Mcvittie, Bruce A Henderson"
 
 ModuleInfo "History: 1.00 Initial Release"
 
-
+'Import Koriolis.ZipStream
 Import Openb3d.Openb3d
 
 Rem

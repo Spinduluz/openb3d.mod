@@ -1,4 +1,7 @@
 ' functions.bmx
+Const LOAD_ANIM_MESH_B3D:Int=0
+Const LOAD_ANIM_MESH_3DS:Int=1
+Const LOAD_ANIM_MESH_MD2:Int=2
 
 Rem
 bbdoc: undocumented
@@ -6,6 +9,13 @@ End Rem
 Function TextureGLTexEnv( tex:TTexture,target:Int=0,pname:Int=0,param:Int=0 )
 	TextureGLTexEnv_( TTexture.GetInstance(tex),target,pname,param )
 End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function NameTexture( tex:TTexture, name:String )
+	tex.NameTexture( name )
+End Function 
 
 Rem
 bbdoc: undocumented
@@ -853,6 +863,20 @@ Function LoadAnimMesh:TMesh( file:String,parent:TEntity=Null )
 End Function
 
 Rem
+bbdoc:
+End Rem
+Function LoadAnimMeshFromStream:TMesh( file:TStream,format:Int,parent:TEntity=Null )
+	Return TMesh.LoadAnimMeshFromStream( file,format,parent )
+End Function
+
+Rem
+bbdoc:
+End Rem
+Function LoadAnimMeshFromBuffer:TMesh( buf:Byte[],num:Int,format:Int,parent:TEntity=Null )
+	Return TMesh.LoadAnimMeshFromBuffer( buf,num,format,parent )
+End Function
+
+Rem
 bbdoc: <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadAnimTexture">Online doc</a>
 End Rem
 Function LoadAnimTexture:TTexture( file:String,flags:Int,frame_width:Int,frame_height:Int,first_frame:Int,frame_count:Int )
@@ -1151,6 +1175,13 @@ bbdoc: <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=SetCubeMode">
 End Rem
 Function SetCubeMode( tex:TTexture,Mode:Int )
 	SetCubeMode_( TTexture.GetInstance(tex),Mode )
+End Function
+
+Rem
+bbdoc:
+End Rem
+Function SetPixbufReader( loader:Byte Ptr( filename:Byte Ptr,width:Int Var,height:Int Var ), free( buf:Byte Ptr ) )
+	SetPixbufReader_ loader,free
 End Function
 
 Rem
