@@ -31,21 +31,19 @@ string Mid(const string& s,int offset,int characters){
 		return s.substr(offset-1,characters);
 }
 
-string Replace(const string& s,const string& find_s,const string& replace_s){
+string Replace( string s,const string& find_s,const string& replace_s){
 	size_t i;
-	string str=s;
-
 	for(;;){
-		i=str.find(find_s);
+		i=s.find(find_s);
 
 		if(i!=string::npos){
-			str.replace(i,find_s.length(),replace_s);
+			s.replace(i,find_s.length(),replace_s);
 		}else{
-			return str;
+			return s;
 		}
 	
 	}
-	return str;
+	return s;
 }
 
 int Instr(const string& s1,const string& s2,int offset){
@@ -68,17 +66,16 @@ string Lower(const string& s){
 	return s;
 }
 
-string Trim(const string& s){
-	string str=s;
-    size_t startpos=str.find_first_not_of(" \t");
-    size_t endpos=str.find_last_not_of(" \t");
+string Trim(string s){
+    size_t startpos=s.find_first_not_of(" \t");
+    size_t endpos=s.find_last_not_of(" \t");
   
     if(string::npos==startpos||string::npos==endpos){
-        str="";  
+        s="";  
     }else{
-        str=str.substr(startpos,endpos-startpos+1);
+        s=s.substr(startpos,endpos-startpos+1);
 	}	
-	return str;
+	return s;
 }
 
 string Chr(int asc){	
@@ -97,21 +94,19 @@ int Len(const string& s){
 }
 
 // not in Blitz - returns the part of the string that lies in between the nth (specified by count) pair of splitters (specified by splitter). if the string has no splitter at front or end of string, they're added internally before splitting
-string Split(const string& s,const string& splitter,int count){
-	string str=s;
-
+string Split(string s,const string& splitter,int count){
 	if(count<1) return "";
 
-	if(Left(str,Len(splitter))!=splitter) str=splitter+str; // add splitter to start of string if not already there to make splitting easier
-	if(Right(str,Len(splitter))!=splitter) str=str+splitter; // add splitter to end of string if not already there to make splitting easier
-	int pos=Instr(str,splitter,0); // get position of first splitter
+	if(Left(s,Len(splitter))!=splitter) s=splitter+s; // add splitter to start of string if not already there to make splitting easier
+	if(Right(s,Len(splitter))!=splitter) s=s+splitter; // add splitter to end of string if not already there to make splitting easier
+	int pos=Instr(s,splitter,0); // get position of first splitter
 
 	for(int i=1;i<=count;i++){
 	
-		int new_pos=Instr(str,splitter,pos);
+		int new_pos=Instr(s,splitter,pos);
 		if(new_pos!=0){
 			pos=pos+Len(splitter);
-			string split_string=Mid(str,pos,new_pos-pos);
+			string split_string=Mid(s,pos,new_pos-pos);
 			pos=new_pos;
 			if(i==count){
 				return split_string;

@@ -143,6 +143,8 @@ Function UpdateCubemap(tex:TTexture,camera:TCamera,entity:TEntity)
 	SetCubeFace tex,0
 	RotateEntity camera,0,90,0
 	RenderWorld
+	'Flip
+	'WaitKey
 	BackBufferToTex tex
 	
 	' do forward view

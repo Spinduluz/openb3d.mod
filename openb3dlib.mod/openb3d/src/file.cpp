@@ -58,34 +58,15 @@ static string filepath_in_use;
 
 }*/
 
-#if defined(OLD_FILE_SYS)
-inline int filelen(FILE *pFile){
-	int len,p=ftell(pFile);
-	fseek(pFile,0,SEEK_END);
-	len=ftell(pFile);
-	fseek(pFile,p,SEEK_SET);
-	return len;
-}
-
-inline void readfile(File *file,FILE *pFile){
-	int len=filelen(pFile);
-	file->buf=new unsigned char[len];
-	file->pos=file->buf;
-	file->end=file->buf+len;
-	fread(file->buf,1,len,pFile);
-	fclose(pFile);
-}
-
 string File::ResourceFilePath(string filename){
-
 	std::replace(filename.begin(), filename.end(), '\\', '/');
 
-	File* stream;
+	FILE* stream;
 
-	stream=File::ReadFile(filename);
+	stream=fopen(filename.c_str(),"rb");
 
-	if (stream!=0) {
-		stream->CloseFile();
+	if (stream) {
+		fclose(stream);
 		return filename;
 	}
 
@@ -98,19 +79,17 @@ string File::ResourceFilePath(string filename){
 		filename=filepath_in_use+"/"+filename;
 	}
 
-	stream=File::ReadFile(filename);
+	stream=fopen(filename.c_str(),"rb");
 
-	if (stream!=0) {
-		stream->CloseFile();
+	if (stream) {
+		fclose(stream);
 		return filename;
 	}
 
 	return "";
-
 }
 
 File* File::ReadResourceFile(string filename){
-
 	std::replace(filename.begin(), filename.end(), '\\', '/');
 
 	string::size_type idx=filename.rfind("/");
@@ -121,400 +100,6 @@ File* File::ReadResourceFile(string filename){
 
 	//string filename2=ResourceFilePath(filename);
 	if(filename==""){
-		cout << "Error: No Filename: " << filename << endl;
-	}
-
-	const char* c_filename=filename.c_str(); // WHY?
-
-	FILE* pFile=fopen(c_filename,"rb");
-
-	if(pFile==NULL){
-		cout << "Error: Cannot Find Resource File: " << filename << endl;
-		return NULL;
-	}
-
-	File* file=new File();
-#if 0
-	file->pFile=pFile;
-#else
-	readfile(file,pFile);
-#endif
-
-	return file;
-}
-
-File* File::ReadFile(string filename){
-	//string filename2=filename; // WHY?
-
-	FILE* pFile=fopen(filename.c_str(),"rb");
-
-	if(pFile==NULL){
-		cout << "Error: Can't Find Document File '"+filename+"'" << endl;
-		return NULL;
-	}
-
-	File* file=new File();
-#if 0
-	file->pFile=pFile;
-#else
-	readfile(file,pFile);
-#endif
-
-	return file;
-}
-
-File* File::WriteFile(string filename){
-
-/*	if(filename==""){
-		RuntimeError("Error: No Filename");
-	}*/
-
-	string filename2=filename;
-
-	FILE* pFile=fopen(filename2.c_str(), "wb" );
-
-	if(pFile==NULL){
-		cout << "Error: Can't Write File '"+filename+"'" << endl;
-		return NULL;
-	}
-
-	File* file=new File();
-	file->pFile=pFile;
-
-	return file;
-
-}
-
-File* File::ReadBuffer(const void *buffer,int len){
-	if(!buffer || !len)
-		return NULL;
-
-	File *file = new File;
-	file->buf = (unsigned char*)buffer;
-	file->pos = file->buf;
-	file->end = file->buf+len;
-
-	return file;
-}
-#if defined(BLITZMAX_BUILD)
-File* File::ReadStreamBB(bbStreamIO *stream){
-	if(!stream)
-		return NULL;
-
-	File *file = new File;
-	file->bbStream = stream;
-
-	return file;
-}
-#endif
-
-void File::CloseFile(){
-
-	if(pFile) fclose(pFile);
-	if(buf) delete[] buf;
-
-	delete this;
-
-}
-
-char File::ReadByte(){
-	char c;
-	Read(&c,1,1);
-	return c;
-}
-
-short File::ReadShort(){
-	short s;
-	Read(&s,1,2);
-	return s;
-}
-
-int File::ReadInt(){
-	int i;
-	Read(&i,1,4);
-	return i;
-}
-
-long File::ReadLong(){
-	long l;
-	Read(&l,1,8);
-	return l;
-}
-
-float File::ReadFloat(){
-	float f;
-	Read(&f,1,4);
-	return f;
-}
-
-string File::ReadString(){
-	int length=ReadInt();
-#if 0 // Old crap
-	char* c=new char[length+1];
-	fgets(c,length+1,pFile);
-
-	string s=c;
-
-	return s;
-#else
-	string s;
-	s.reserve(length+1); // I assume we're expecting a zero terminated string? I have no idea to be honest
-	Read(&s[0],1,length+1);
-
-	return s;
-#endif
-}
-
-string File::ReadLine(){
-
-	string s="";
-	char c=ReadByte();
-
-	// get string up to first new line character of end of file
-	while(c!=13 && c!=10 && Eof()!=true){
-		if(c!=0){
-			s+=c;
-		}
-		c=ReadByte();
-	}
-
-	int pos=-1;
-
-	// pass possible remaining new line character
-	if(Eof()!=true){
-		pos=FilePos();
-		c=ReadByte();
-		if(c!=13 && c!=10) SeekFile(pos);
-	}
-
-	return s;
-}
-
-void File::WriteByte(char c){
-	fwrite(&c,1,1,pFile);
-}
-
-void File::WriteShort(short s){
-	fwrite(&s,1,2,pFile);
-}
-
-void File::WriteInt(int i){
-	fwrite(&i,1,4,pFile);
-}
-
-void File::WriteLong(long l){
-	fwrite(&l,1,8,pFile);
-}
-
-void File::WriteFloat(float f){
-	fwrite(&f,1,4,pFile);
-}
-
-void File::WriteString(string s){
-#if 0 // Old crap
-	const char* cs=s.c_str();
-	fputs(cs,pFile);
-#else
-	fputs(s.c_str(),pFile);
-#endif
-}
-
-void File::WriteLine(string s){
-#if 0 // Old crap
-	for(unsigned int i=0;i<s.length();i++){
-
-		string sc=&s[i];
-		const char* c=sc.c_str();
-
-		WriteByte(*c);
-	}
-
-	char c13=13;
-	char c10=10;
-
-	WriteByte(c13);
-	WriteByte(c10);
-#else
-#ifdef _WIN32
-	char lf[3]="\r\n";
-#else
-	char lf[2]="\n";
-#endif
-	fwrite(s.c_str(),1,s.length(),pFile);
-	fwrite(lf,1,sizeof(lf)-1,pFile);
-#endif
-}
-
-void File::SeekFile(int pos){
-	if(pFile) fseek(pFile,pos,SEEK_SET);
-	if(buf) Seek(pos,SEEK_SET);
-#if defined(BLITZMAX_BUILD)
-	if(bbStream) bbStream->Seek(pos);
-#endif
-}
-
-int File::FilePos(){
-	if(pFile) return ftell(pFile);
-	if(buf) return (int)(pos-buf);
-#if defined(BLITZMAX_BUILD)
-	if(bbStream) return bbStream->Pos();
-#endif
-	return 0;
-}
-
-int File::FileSize(){
-	if(pFile) return filelen(pFile);
-	if(buf) return (int)(end-buf);
-#if defined(BLITZMAX_BUILD)
-	if(bbStream) return bbStream->Size();
-#endif
-}
-
-int File::Eof(){
-#if 0 // Old crap
-	int endof=0;
-	int pos=ftell(pFile);
-	char c;
-	fread(&c,1,1,pFile);
-	endof=feof(pFile);
-	fseek(pFile,pos,SEEK_SET);
-	return endof;
-#else
-	if(pFile) return feof(pFile);
-	if(buf) return (pos>=end);
-#if defined(BLITZMAX_BUILD)
-	if (bbStream) return bbStream->Eof();
-#endif
-	return 1;
-#endif
-}
-
-size_t File::Read(void *buffer,size_t size,size_t count){
-	if(pFile) return fread(buffer,size,count,pFile);
-#if defined(BLITZMAX_BUILD)
-	if(bbStream) return bbStream->Read(buffer,size*count);
-#endif
-
-	size_t r=end-pos;
-	size_t s=size*count;
-
-	/*BBString *str=bbStringFromCString( "From OpenB3D" );
-	bbOnDebugLog( str );*/
-
-	if(r>s) r=s;
-	memcpy(buffer,pos,r);
-	pos+=r;
-	return r;
-}
-
-char *File::Gets(char *str,int num){
-	if(pFile) return fgets(str,num,pFile);
-	if(buf) Read(str,1,num);
-#if defined(BLITZMAX_BUILD)
-	if(bbStream) bbStream->Read(str,num);
-#endif
-	return str;
-}
-
-int File::Seek(long int offset,int origin){
-	unsigned char *p;
-
-	switch(origin){
-	case SEEK_SET:
-		p=buf+offset;
-		break;
-	case SEEK_CUR:
-		p=pos+offset;
-		break;
-	case SEEK_END:
-		p=end+offset;
-		break;
-	}
-
-	if (p<buf) p=buf;
-	if (p>end) p=end;
-
-	pos=p;
-
-	return 0;
-}
-#else
-string File::ResourceFilePath(const string& filename){
-#if 0
-	std::replace(filename.begin(), filename.end(), '\\', '/');
-
-	File* stream;
-
-	stream=File::ReadFile(filename);
-
-	if (stream!=0) {
-		stream->CloseFile();
-		return filename;
-	}
-
-	string::size_type idx=filename.rfind("/");
-
-	if(idx!=string::npos){
-		filename=filename.substr(idx+1);
-	}
-	if (filepath_in_use.length() != 0) {
-		filename=filepath_in_use+"/"+filename;
-	}
-
-	stream=File::ReadFile(filename);
-
-	if (stream!=0) {
-		stream->CloseFile();
-		return filename;
-	}
-
-	return "";
-#else
-	string name=filename;
-	std::replace(name.begin(), name.end(), '\\', '/');
-
-	FILE* stream;
-
-	stream=fopen(name.c_str(),"rb");
-
-	if (stream) {
-		fclose(stream);
-		return name;
-	}
-
-	string::size_type idx=name.rfind("/");
-
-	if(idx!=string::npos){
-		name=name.substr(idx+1);
-	}
-	if (filepath_in_use.length() != 0) {
-		name=filepath_in_use+"/"+name;
-	}
-
-	stream=fopen(name.c_str(),"rb");
-
-	if (stream) {
-		fclose(stream);
-		return name;
-	}
-
-	return "";
-#endif
-}
-
-File* File::ReadResourceFile(const string& filename){
-	string name=filename;
-
-	std::replace(name.begin(), name.end(), '\\', '/');
-
-	string::size_type idx=name.rfind("/");
-
-	if(idx!=string::npos){
-		filepath_in_use=name.substr(0,idx);
-	}
-
-	//string filename2=ResourceFilePath(filename);
-	if(name==""){
 #if defined(BLITZMAX_DEBUG)
 		DebugLog("Error: No Filename");
 		//cout << "Error: No Filename: " << filename << endl;
@@ -522,7 +107,7 @@ File* File::ReadResourceFile(const string& filename){
 		return NULL;
 	}
 
-	FILE* f=fopen(name.c_str(),"rb");
+	FILE* f=fopen(filename.c_str(),"rb");
 
 	if(!f){
 #if defined(BLITZMAX_DEBUG)
@@ -927,5 +512,3 @@ size_t FileBB::Read(void *buffer,size_t size,size_t count){
 #endif // BLITZMAX_BUILD
 
 // ==========================================================================================================
-
-#endif

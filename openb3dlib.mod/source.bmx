@@ -80,6 +80,7 @@ Import "openb3d/src/bmaxdebug.cpp"
 ?
 Import "openb3d/src/unzip/unzip.c"
 Import "openb3d/src/unzip/ioapi.c"
+Import "openb3d/src/dds.cpp"
 
 Import "methods.cpp" ' must be imported in this file on Mac
 Import "data.cpp"

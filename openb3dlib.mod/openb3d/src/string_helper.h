@@ -19,15 +19,15 @@ using namespace std;
 string Left(const string& s,int length);
 string Right(const string& s,unsigned int length);
 string Mid(const string& s,int offset,int characters=0);
-string Replace(const string& s,const string& find,const string& replace);
+string Replace(string s,const string& find,const string& replace);
 int Instr(const string& s1,const string& s2,int offset=0);
 string Upper(const string& s);
 string Lower(const string& s);
-string Trim(const string& s);
+string Trim(string s);
 string Chr(int asc);
 int Asc(const string& s);
 int Len(const string& s);
-string Split(const string& s,const string& splitter,int count);
+string Split(string s,const string& splitter,int count);
 // Simple string "hasher"
 size_t StringHash(const string& s);
 

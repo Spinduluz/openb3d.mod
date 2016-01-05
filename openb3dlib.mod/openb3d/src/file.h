@@ -23,72 +23,6 @@
 
 using namespace std;
 
-#if defined(OLD_FILE_SYS)
-class File{
- // This class should really be "abstracted".
-// But I can't really be arsed tbh
-public:
-	File()
-	:pFile(NULL)
-#if defined(BLITZMAX_BUILD)
-	,bbStream(NULL)
-#endif
-	,buf(NULL)
-	,pos(NULL)
-	,end(NULL){};
-	
-	virtual ~File(){
-		//if(pFile) delete pFile;
-	}
-	
-	FILE * pFile;
-
-#if defined(BLITZMAX_BUILD)
-	bbStreamIO *bbStream;
-#endif
-
-	unsigned char *buf;
-	unsigned char *pos;
-	unsigned char *end;
-
-//	static string DocsDir();
-	static string ResourceFilePath(string filename);
-	static File* ReadResourceFile(string filename);
-	static File* ReadFile(string filename);
-	static File* WriteFile(string filename);
-
-	static File* ReadBuffer(const void *buffer,int len);
-#if defined(BLITZMAX_BUILD)
-	static File* ReadStreamBB(bbStreamIO *stream);
-#endif
-	void CloseFile();
-	char ReadByte();
-	short ReadShort();
-	int ReadInt();
-	long ReadLong();
-	float ReadFloat();
-	string ReadString();
-	string ReadLine();
-	void WriteByte(char c);
-	void WriteShort(short s);
-	void WriteInt(int i);
-	void WriteLong(long l);
-	void WriteFloat(float f);
-	void WriteString(string s);
-	void WriteLine(string s);
-	
-	virtual void SeekFile(int pos);
-	virtual int FilePos();
-	virtual int FileSize();
-	
-	virtual int Eof();
-
-	virtual size_t Write(const void *buffer,size_t size,size_t count);
-	virtual size_t Read(void *buffer,size_t size,size_t count);
-	virtual char *Gets(char *str,int num);
-	int Seek(long int offset,int origin);
-};
-#else
 class File{
 public:
 	File(){
@@ -98,8 +32,8 @@ public:
 	}
 
 //	static string DocsDir();
-	static string ResourceFilePath(const string& filename);
-	static File* ReadResourceFile(const string& filename);
+	static string ResourceFilePath(string filename);
+	static File* ReadResourceFile(string filename);
 	static File* ReadFile(const string& filename);
 	static File* WriteFile(const string& filename);
 
@@ -218,7 +152,5 @@ public:
 #endif // BLITZMAX_BUILD
 
 // ==========================================================================================================
-
-#endif // OLD_FILE_SYS
  
 #endif
