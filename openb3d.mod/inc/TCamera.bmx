@@ -147,7 +147,7 @@ Type TCamera Extends TEntity
 	Method CameraViewport( x:Int,y:Int,width:Int,height:Int )
 	
 		CameraViewport_( GetInstance(Self),x,y,width,height) ' update values before inverted y
-		CameraViewport_( GetInstance(Self),x,vheight[0]-y-height,width,height )
+		'CameraViewport_( GetInstance(Self),x,vheight[0]-y-height,width,height )
 				
 	End Method
 	

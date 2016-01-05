@@ -17,8 +17,10 @@
 #include "file.h"
 #include "global.h"
 #include "shadow.h"
+#include "dds.h"
 
 #include <string.h>
+#include <algorithm>
 
 #if defined(BLITZMAX_DEBUG)
 #include "bmaxdebug.h"
@@ -63,6 +65,13 @@ inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buff
 }
 
 // ==========================================================================================================
+
+bool is_dds(const string& filename){
+	string ext=filename.substr(filename.length()-4);
+	transform(ext.begin(),ext.end(),ext.begin(),::tolower);
+	if(ext==".dds") return true;
+	return false;
+}
 
 int _io_file_eof(void *ptr){
 	File *file=(File*)ptr;
@@ -141,6 +150,37 @@ Texture::Texture()
 };
 
 Texture* Texture::LoadTexture(string filename,int flags){
+	if(is_dds(filename)){
+		Texture* tex=new Texture();
+		tex->file_name=filename;
+		tex->file_hash=StringHash(filename);
+
+		// set tex.flags before TexInList
+		tex->flags=flags;
+		tex->FilterFlags();
+
+		// check to see if texture with same properties exists already, if so return existing texture
+		Texture* old_tex=tex->TexInList();
+		if(old_tex){
+			delete tex; // No memory leak.
+			return old_tex;
+		}else{
+			tex_list.push_back(tex);
+		}
+
+		DirectDrawSurface *dds=DirectDrawSurface::LoadSurface(filename,false);
+		if(!dds){
+			tex->FreeTexture();
+			return NULL;
+		}
+
+		glGenTextures(1,&tex->texture);
+		glBindTexture(dds->target,tex->texture);
+		dds->UploadTexture(tex);
+		dds->FreeDirectDrawSurface();
+		return tex;
+	}
+
 	if (flags&128) {
 		filename=File::ResourceFilePath(filename);
 

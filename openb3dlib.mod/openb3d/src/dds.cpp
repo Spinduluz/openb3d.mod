@@ -2,6 +2,9 @@
 #include "dds.h"
 #include "glew.h"
 
+#if defined(BLITZMAX_DEBUG)
+#include "bmaxdebug.h"
+#endif
 
 struct DXTColorBlock{
 	unsigned short col0;
@@ -237,17 +240,19 @@ struct DDSHeader {
 
 #pragma pack(pop,packed)
 
-inline int DDS_Clamp(int a) { return a<0?1:a; }
+inline int DDS_Clamp(int a) { return a<=0?1:a; }
 
-inline bool DDS_GetInfo(DDSHeader *header,unsigned int& format,int& components,unsigned int& type){
-	type=GL_TEXTURE_2D;
+inline bool DDS_GetInfo(DDSHeader *header,unsigned int& format,int& components,unsigned int& target){
+	target=GL_TEXTURE_2D;
 	if(header->caps2 & DDSCAPS2_CUBEMAP){
-		type=GL_TEXTURE_CUBE_MAP;
+		target=GL_TEXTURE_CUBE_MAP;
 	}
-	// Bitmap3D not implemented?
+	// texture3D not implemented?
 	if(header->caps2 & DDSCAPS2_VOLUME){
 		return false;
 	}
+
+	DDSPixelFormat& pf=header->pixelformat;
 
 	if(header->pixelformat.flags & DDPF_FOURCC){
 		switch(header->pixelformat.fourcc)
@@ -268,16 +273,27 @@ inline bool DDS_GetInfo(DDSHeader *header,unsigned int& format,int& components,u
 			break;
 		}
 	}else if(header->pixelformat.flags & DDPF_RGBA && header->pixelformat.rgbbitcount==32){
-		format=GL_RGBA;
+		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff && pf.abitmask==0xff000000)
+			format=GL_BGRA;
+		else
+			format=GL_RGBA;
 	}else if(header->pixelformat.flags & DDPF_RGB && header->pixelformat.rgbbitcount==32){
-		format=GL_RGBA;
+		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff)
+			format=GL_BGRA;
+		else
+			format=GL_RGBA;
 	}else if(header->pixelformat.flags & DDPF_RGB && header->pixelformat.rgbbitcount==24){
-		format=GL_RGB;
+		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff)
+			format=GL_BGR;
+		else
+			format=GL_RGB;
 	}else if(header->pixelformat.rgbbitcount==8){ // Luminance?
 		return false;
 	}else{
 		return false;
 	}
+
+	return true;
 }
 
 inline int DDS_GetSizeBytes(int width,int height,int format){
@@ -297,7 +313,7 @@ inline int DDS_GetPitch(int width,unsigned int format){
 #define strncasecmp _strnicmp
 #endif
 
-DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename){
+DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool flip){
 	unsigned char *buffer,*buf;
 	DDSHeader *dds;
 	File *file;
@@ -317,42 +333,44 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename){
 	dds=(DDSHeader*)buf;
 	buf+=sizeof(DDSHeader);
 
-	unsigned int format,type;
+	unsigned int format,target;
 	int components;
 
-	if(!DDS_GetInfo(dds,format,components,type)){
+	if(!DDS_GetInfo(dds,format,components,target)){
 		return NULL;
 	}
 
 	DirectDrawSurface *surf=new DirectDrawSurface;
-
 	int mipmaps;
 
-	surf->format = format;
-	surf->target = type;
-	surf->width=dds->width;
-	surf->height=dds->height;
-	surf->depth=DDS_Clamp(dds->depth);
-	mipmaps=surf->mipmapcount=dds->mipmapcount;
+	surf->buffer=buffer;
+	mipmaps=dds->mipmapcount;
 
 	if(mipmaps!=0) mipmaps--;
 
-	for(int i=0; i< (type==GL_TEXTURE_CUBE_MAP?6:1); i++){
+	for(int i=0; i<(target==GL_TEXTURE_CUBE_MAP?6:1); i++){
 		DirectDrawSurface *s;
 
-		surf->mipmaps.push_back(DirectDrawSurface());
-		s=&surf->mipmaps.back();
+		if(target==GL_TEXTURE_CUBE_MAP){
+			surf->mipmaps.push_back(DirectDrawSurface());
+			s=&surf->mipmaps.back();
+		}else
+			s=surf;
 
 		s->format=format;
-		s->target=type;
+		s->target=target;
 		s->dxt=buf;
-		s->width=surf->width;
-		s->height=surf->height;
-		s->depth=surf->depth;
+		s->width=dds->width;
+		s->height=dds->height;
+		s->depth=DDS_Clamp(dds->depth);
 		s->pitch=DDS_GetPitch(s->width,format);
 		s->size=DDS_GetSizeBytes(s->width,s->height,format) * s->depth;
+		s->components=components;
+		s->mipmapcount=mipmaps;
 
 		buf+=s->size;
+
+		if(flip) s->Flip();
 
 		int w,h,d;
 
@@ -366,22 +384,171 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename){
 			mip=&s->mipmaps.back();
 
 			mip->format=format;
-			mip->target=type;
+			mip->target=target;
 			mip->dxt=buf;
 			mip->width=w;
 			mip->height=h;
 			mip->depth=d;
 			mip->pitch=DDS_GetPitch(w,format);
 			mip->size=DDS_GetSizeBytes(w,h,format) * d;
+			mip->components=components;
 
 			buf+=mip->size;
 
-			w=DDS_Clamp(s->width>>1);
-			h=DDS_Clamp(s->height>>1);
-			d=DDS_Clamp(s->depth>>1);
+			if(flip) mip->Flip();
+
+			w=DDS_Clamp(w>>1);
+			h=DDS_Clamp(h>>1);
+			d=DDS_Clamp(d>>1);
 		}
+	}
+
+	if(target==GL_TEXTURE_CUBE_MAP && flip){
+		DirectDrawSurface tmp=surf->mipmaps[3];
+		surf->mipmaps[3]=surf->mipmaps[2];
+		surf->mipmaps[2]=tmp;
 	}
 
 	return surf;
 }
+
+DirectDrawSurface::DirectDrawSurface()
+:buffer(NULL)
+,mipmaps()
+,width(0)
+,height(0)
+,depth(0)
+,mipmapcount(0)
+,pitch(0)
+,size(0)
+,dxt(NULL)
+,format(0)
+,components(0)
+,target(0){
+}
+
+void DirectDrawSurface::FreeDirectDrawSurface(){
+	if(buffer) delete[] buffer;
+	delete this;
+}
+
+bool DirectDrawSurface::IsCompressed(){
+	if(format==GL_COMPRESSED_RGB_S3TC_DXT1_EXT || format==GL_COMPRESSED_RGBA_S3TC_DXT3_EXT || format==GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+		return true;
+	return false;
+}
+
+void DirectDrawSurface::Flip(){
+	int linesize;
+	int offset;
+
+	if(!IsCompressed()){
+		unsigned int imagesize=size/depth;
+		linesize=imagesize/height;
+
+		for(int n=0; n<depth; n++){
+			offset=imagesize*n;
+			
+			unsigned char *t=dxt+offset;
+			unsigned char *b=t+(imagesize+linesize);
+
+			for(int i=0; i<(height)>>1; i++){
+				DXT_SwapPointer(t,b,linesize);
+
+				t+=linesize;
+				b-=linesize;
+			}
+		}
+	}else{
+		FlipDXT flipblocks;
+
+		unsigned int xblocks=width/4;
+		unsigned int yblocks=height/4;
+		unsigned int blocksize;
+
+		switch(format){
+		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+			blocksize=8;
+			flipblocks=DXT_FlipBlocksDXTC1;
+			break;
+		case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+			blocksize=16;
+			flipblocks=DXT_FlipBlocksDXTC3;
+			break;
+		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+			blocksize=16;
+			flipblocks=DXT_FlipBlocksDXTC5;
+			break;
+		default:
+			return;
+		}
+
+		linesize=xblocks*blocksize;
+
+		DXTColorBlock *t;
+		DXTColorBlock *b;
+
+		for(int j=0; j<(yblocks)>>1; j++){
+			b=(DXTColorBlock*)dxt+(j*linesize);
+			t=(DXTColorBlock*)dxt+(((yblocks-j)-1)*linesize);
+
+			flipblocks(t,xblocks);
+			flipblocks(b,xblocks);
+
+			DXT_SwapPointer(t,b,linesize);
+		}
+	}
+}
+
+void DirectDrawSurface::UploadTexture(Texture *tex){
+	tex->format=format;
+	tex->width=width;
+	tex->height=height;
+	if(target==GL_TEXTURE_CUBE_MAP){
+		UploadTextureCubeMap();
+		tex->flags|=128;
+	} else 
+		UploadTexture2D();
+}
+
+void DirectDrawSurface::UploadTexture2D(){
+	if(IsCompressed()){
+		glCompressedTexImage2D(GL_TEXTURE_2D,0,format,width,height,0,size,dxt);
+		for(int i=0; i<mipmapcount; i++){
+			DirectDrawSurface& mip=mipmaps[i];
+			glCompressedTexImage2D(GL_TEXTURE_2D,i+1,format,mip.width,mip.height,0,mip.size,mip.dxt);
+		}
+	} else {
+		glTexImage2D(GL_TEXTURE_2D,0,components,width,height,0,format,GL_UNSIGNED_BYTE,dxt);
+		for(int i=0; i<mipmapcount; i++){
+			DirectDrawSurface& mip=mipmaps[i];
+			glTexImage2D(GL_TEXTURE_2D,i+1,components,mip.width,mip.height,0,format,GL_UNSIGNED_BYTE,mip.dxt);
+		}
+	}
+}
+
+void DirectDrawSurface::UploadTextureCubeMap(){
+	DirectDrawSurface *s;
+	unsigned int t=0;
+
+	for(int i=0; i<6; i++){
+		t=GL_TEXTURE_CUBE_MAP_POSITIVE_X+i;
+		s=&mipmaps[i];
+
+		if(IsCompressed()){
+			glCompressedTexImage2D(t,0,format,s->width,s->height,0,s->size,s->dxt);
+			for(int i=0; i<s->mipmapcount; i++){
+				DirectDrawSurface& mip=s->mipmaps[i];
+				glCompressedTexImage2D(t,i+1,format,mip.width,mip.height,0,mip.size,mip.dxt);
+			}
+		} else {
+			glTexImage2D(t,0,components,s->width,s->height,0,format,GL_UNSIGNED_BYTE,s->dxt);
+			for(int i=0; i<s->mipmapcount; i++){
+				DirectDrawSurface& mip=s->mipmaps[i];
+				glTexImage2D(t,i+1,components,mip.width,mip.height,0,format,GL_UNSIGNED_BYTE,mip.dxt);
+			}
+		}
+	}
+}
+
 

@@ -4,12 +4,13 @@
 #include <memory.h>
 #include <vector>
 #include <iostream>
+#include "texture.h"
 
 using namespace std;
 
 class DirectDrawSurface{
 public:
-	unsigned char *buf;
+	unsigned char *buffer;
 	vector<DirectDrawSurface> mipmaps;
 
 	int width;
@@ -21,9 +22,20 @@ public:
 
 	unsigned char *dxt;
 	unsigned int format;
+	unsigned int components;
 	unsigned int target;
 
-	static DirectDrawSurface *LoadSurface(const string& filename);
+	static DirectDrawSurface *LoadSurface(const string& filename,bool flip=true);
+
+	DirectDrawSurface();
+	void FreeDirectDrawSurface();
+
+	bool IsCompressed();
+	void Flip();
+
+	void UploadTexture(Texture *tex);
+	void UploadTexture2D();
+	void UploadTextureCubeMap();
 };
 
 #endif // DDS_H
