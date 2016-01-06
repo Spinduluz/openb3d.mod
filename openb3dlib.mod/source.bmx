@@ -44,6 +44,7 @@ Import "openb3d/src/geosphere.cpp" ' 0.8
 Import "openb3d/src/global.cpp"
 Import "openb3d/src/isosurface.cpp" ' was metaball 0.9
 Import "openb3d/src/light.cpp"
+Import "openb3d/src/shaderobject.cpp"
 Import "openb3d/src/material.cpp"
 Import "openb3d/src/maths_helper.cpp"
 Import "openb3d/src/matrix.cpp"
@@ -78,9 +79,11 @@ Import "openb3d/src/stb_image.c"
 ?debug
 Import "openb3d/src/bmaxdebug.cpp"
 ?
-Import "openb3d/src/unzip/unzip.c"
-Import "openb3d/src/unzip/ioapi.c"
+Import "openb3d/src/unzip.c"
+Import "openb3d/src/ioapi.c"
+Import "openb3d/src/fileresource.cpp"
 Import "openb3d/src/dds.cpp"
+Import "openb3d/src/programobject.cpp"
 
 Import "methods.cpp" ' must be imported in this file on Mac
 Import "data.cpp"

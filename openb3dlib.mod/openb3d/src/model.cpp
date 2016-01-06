@@ -29,14 +29,16 @@ const int BONE=8;
 const int KEYS=9;
 
 Mesh* LoadAnimB3D(string f_name,Entity* parent_ent_ext){
-	File* file;
+	FilePtr file;
 
 	file=File::ReadResourceFile(f_name);
 	if(!file) return NULL;
-	return LoadAnimB3D(file,parent_ent_ext);
+
+	Mesh *r=LoadAnimB3D(file,parent_ent_ext);
+	return r;
 }
 
-Mesh* LoadAnimB3D(File* file,Entity* parent_ent_ext){
+Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 
 	// Start file reading
 
@@ -909,8 +911,6 @@ Mesh* LoadAnimB3D(File* file,Entity* parent_ent_ext){
 
 	}while(!file->Eof());
 
-	file->CloseFile();
-
 	//ChangeDir(cd); // ***todo***
 
 	//cout << endl << "Finished loading b3d" << endl;
@@ -958,7 +958,7 @@ void TrimVerts(Surface* surf){
 }
 
 
-string b3dReadString(File* file){
+string b3dReadString(FilePtr file){
 	string t="";
 	for(;;){
 		char ch=file->ReadByte();
@@ -967,7 +967,7 @@ string b3dReadString(File* file){
 	}
 }
 
-string ReadTag(File* file){
+string ReadTag(FilePtr file){
 
 	int pos=file->FilePos();
 

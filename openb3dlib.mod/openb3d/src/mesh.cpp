@@ -400,15 +400,15 @@ Mesh* Mesh::LoadMesh(string filename,Entity* parent_ent){
 	return mesh;
 }
 
-Mesh* Mesh::LoadMeshX(File* file,Entity* parent_ent){
+Mesh* Mesh::LoadMeshX(FilePtr file,Entity* parent_ent){
 	return loadX::LoadX(file,parent_ent);
 }
 
-Mesh* Mesh::LoadMesh3DS(File* file,Entity* parent_ent){
+Mesh* Mesh::LoadMesh3DS(FilePtr file,Entity* parent_ent){
 	return load3ds::Load3ds(file,parent_ent);
 }
 
-Mesh* Mesh::LoadMeshB3D(File* file,Entity* parent_ent){
+Mesh* Mesh::LoadMeshB3D(FilePtr file,Entity* parent_ent){
 	Entity* ent=LoadAnimMeshB3D(file);
 	ent->HideEntity();
 	Mesh* mesh=dynamic_cast<Mesh*>(ent)->CollapseAnimMesh();
@@ -438,15 +438,15 @@ Mesh* Mesh::LoadAnimMesh(string filename,Entity* parent_ent){
 	return LoadAnimB3D(filename,parent_ent);
 }
 
-Mesh* Mesh::LoadAnimMesh3DS(File* file,Entity* parent_ent){
+Mesh* Mesh::LoadAnimMesh3DS(FilePtr file,Entity* parent_ent){
 	return load3ds::Load3ds(file,parent_ent);
 }
 
-Mesh* Mesh::LoadAnimMeshMD2(File* file,Entity* parent_ent){
+Mesh* Mesh::LoadAnimMeshMD2(FilePtr file,Entity* parent_ent){
 	return loadMD2::LoadMD2(file,parent_ent);
 }
 
-Mesh* Mesh::LoadAnimMeshB3D(File* file,Entity* parent_ent){
+Mesh* Mesh::LoadAnimMeshB3D(FilePtr file,Entity* parent_ent){
 	return LoadAnimB3D(file,parent_ent);
 }
 
@@ -2647,10 +2647,8 @@ void Mesh::Render(){
 							glTexEnvi(GL_TEXTURE_ENV,GL_RGB_SCALE,2.0);
 							break;
 						case 6:// custom
-						for(int itexenv=0;itexenv<surf.brush->tex[ix]->glTexEnv_count;itexenv++){
-							glTexEnvi(	surf.brush->tex[ix]->glTexEnv[0][itexenv],
-										surf.brush->tex[ix]->glTexEnv[1][itexenv],
-										surf.brush->tex[ix]->glTexEnv[2][itexenv]);
+						for(int itexenv=0;itexenv<surf.brush->tex[ix]->texenv_count;itexenv++){
+							glTexEnvi(surf.brush->tex[ix]->texenv[0][itexenv],surf.brush->tex[ix]->texenv[1][itexenv],surf.brush->tex[ix]->texenv[2][itexenv]);
 						}
 							break;
 						default: glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);

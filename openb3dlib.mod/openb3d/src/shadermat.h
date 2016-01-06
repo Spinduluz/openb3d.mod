@@ -1,23 +1,38 @@
 #ifndef SHADER_MAT_H
 #define SHADER_MAT_H
 
+//
+// There be monsters here, aka memory leaks
+//
+// This will probably have to be rewritten. I'm not sure it can be salvaged.
+
 
 //#include "global.h"
 #include "matrix.h"
 //#include "surface.h"
 #include "texture.h"
 #include "shaderobject.h"
+#include "programobject.h"
+
+#include "refobject.h"
 
 #include <string>
 #include <sstream>
+#include <array>
+
+#if defined(BLITZMAX_DEBUG)
+#include "bmaxdebug.h"
+#endif
 
 class Surface;
 class Entity;
 
-class ShaderData{
-	public:
+// ==========================================================================================================
+
+struct ShaderData{
 	string name;
 	int type;
+
 	union{
 		//float valuef[3];
 		//int valuei[3];
@@ -32,6 +47,8 @@ class ShaderData{
 	};
 };
 
+// ==========================================================================================================
+
 class Material : public Texture{
 public:
 	static Material* LoadMaterial(string filename,int flags=0, int frame_width=0,int frame_height=0,int first_frame=0,int frame_count=1);
@@ -39,46 +56,90 @@ public:
 	void MaterialToBuffer(unsigned char* buffer);
 };
 
+// ==========================================================================================================
 
-class Sampler{
-public:
-	string Name;
+struct Sampler{
+#if defined(BLITZMAX_DEBUG)
+	static int debug_count;
+#endif
+	bool is_used; // FIXME:
+
+	string name;
+	int slot;
 	Texture* texture;
-	int Slot;
-	int is3D;
-	
-	static Sampler* Create(string Name, int Slot, Texture* Tex);
+	bool is_texture3d; // -> BOOL=false/true <-
 
+	Sampler(string name="",int slot=0,Texture *tex=NULL):is_used(false),name(name),slot(slot),texture(tex),is_texture3d(false) {
+	}
+
+	~Sampler(){
+	}
+	
+	static Sampler* Create(string name, int slot, Texture* tex);
 };
 
+// ==========================================================================================================
+struct ShaderTextureArray2{
+	int count;
+	Sampler items[255];
 
+	ShaderTextureArray2():count(0),items(){
+	}
 
-class Shader {//: public MaterialPlugin{
+	Sampler& operator[](int i){
+		return items[i];
+	}
+};
+
+class ShaderTextureArray : public array<Sampler*,255>{
+public:
+	int count;
+
+	ShaderTextureArray():array<Sampler*,255>(),count(0){
+	}
+};
+
+// ==========================================================================================================
+
+class Shader : public ReferencedObject {
+public: 
+// Move this to make all members public.
+// Does not matter much since all other classes have their members public
 	static int ShaderIDCount;
 
-	int texCount;
-	Sampler* Shader_Tex[255];
-	ProgramObject* arb_program;
-	int ID;
+	ShaderTextureArray shader_texture;
+	ProgramObject* arb_program; // Why a pointer?
+
+	int id;
+
 	string name;
-	char UpdateSampler;
+	size_t hash;
 
-	vector<ShaderData> Parameters;
+	bool updatesampler; // Change from char to bool and lowercased the string
 
+	vector<ShaderData> parameters;
 
 	//-------------------------------------------------------------------------------	
 	
 	//void UpdateData(Surface* surf);
 	
 	// internal 
-public:
-	static Shader* CreateShaderMaterial(string Name = "");
+#if defined(BLITZMAX_DEBUG)
+	static int debug_count;
+#endif
+
+	static Shader* CreateShaderMaterial(string name="");
+
+	Shader();
+	~Shader();
+
+	// FIXME: Bind and Unbind instead
 	void TurnOn(Matrix& mat, Surface* surf, vector<float>* vertices=0);
 	void TurnOff();
-	void AddShader(string _vert, string _frag);
-	void AddShaderFromString(string _vert, string _frag);
-	void AddSampler2D(string Name, int Slot, Texture* Tex);
-	void AddSampler3D(string Name, int Slot, Texture* Tex);
+	void AddShader(string vsfilename, string fsfilename);
+	void AddShaderFromString(string vsfilename, string fsfilename);
+	void AddSampler2D(string name, int slot, Texture* tex);
+	void AddSampler3D(string name, int slot, Texture* tex);
 	void ProgramAttriBegin();
 	void ProgramAttriEnd();
 
@@ -131,5 +192,19 @@ public:
 	void SetParameter4D(string name, double v1, double v2, double v3, double v4);*/
 
 };
+
+#if defined(BLITZMAX_DEBUG)
+class _AllocatedStuff{
+public:
+	_AllocatedStuff(){
+	}
+	~_AllocatedStuff(){
+		DebugLog("Shaders        [%i]",Shader::debug_count);
+		DebugLog("Samplers       [%i]",Sampler::debug_count);
+		DebugLog("ProgramObjects [%i]",ProgramObject::debug_count);
+		DebugLog("ShaderObjects  [%i]",ShaderObject::debug_count);
+	}
+};
+#endif
 
 #endif

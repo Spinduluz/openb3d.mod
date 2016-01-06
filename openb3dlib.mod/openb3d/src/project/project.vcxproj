@@ -34,6 +34,7 @@
     <ClCompile Include="..\dds.cpp" />
     <ClCompile Include="..\entity.cpp" />
     <ClCompile Include="..\file.cpp" />
+    <ClCompile Include="..\fileresource.cpp" />
     <ClCompile Include="..\functions.cpp" />
     <ClCompile Include="..\geom.cpp" />
     <ClCompile Include="..\geosphere.cpp" />
@@ -51,8 +52,10 @@
     <ClCompile Include="..\physics.cpp" />
     <ClCompile Include="..\pick.cpp" />
     <ClCompile Include="..\pivot.cpp" />
+    <ClCompile Include="..\programobject.cpp" />
     <ClCompile Include="..\project.cpp" />
     <ClCompile Include="..\quaternion.cpp" />
+    <ClCompile Include="..\shaderobject.cpp" />
     <ClCompile Include="..\shadow.cpp" />
     <ClCompile Include="..\sprite.cpp" />
     <ClCompile Include="..\sprite_batch.cpp" />
@@ -87,6 +90,7 @@
     <ClInclude Include="..\dds.h" />
     <ClInclude Include="..\entity.h" />
     <ClInclude Include="..\file.h" />
+    <ClInclude Include="..\fileresource.h" />
     <ClInclude Include="..\functions.h" />
     <ClInclude Include="..\geom.h" />
     <ClInclude Include="..\geosphere.h" />
@@ -104,8 +108,10 @@
     <ClInclude Include="..\physics.h" />
     <ClInclude Include="..\pick.h" />
     <ClInclude Include="..\pivot.h" />
+    <ClInclude Include="..\programobject.h" />
     <ClInclude Include="..\project.h" />
     <ClInclude Include="..\quaternion.h" />
+    <ClInclude Include="..\refobject.h" />
     <ClInclude Include="..\shadermat.h" />
     <ClInclude Include="..\shaderobject.h" />
     <ClInclude Include="..\shadow.h" />

@@ -63,12 +63,6 @@ public:
 		size=0;
 		ShaderMat=0;
 	};
-
-
-
-	
-
-
 };
 
 #endif

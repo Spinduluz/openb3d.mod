@@ -748,10 +748,11 @@ Terrain* StaticIterListTerrain( int classid,int varid ){
 	return obj;
 }
 
+// What in the bloody hell is this?
 Texture* StaticIterListTexture( int classid,int varid ){
 	static int id=0;
-	static list<Texture*> objlist;
-	static list<Texture*>::iterator it;
+	static list<TexturePtr> objlist;
+	static list<TexturePtr>::iterator it;
 	static Texture* obj;
 	
 	switch (classid){
@@ -762,7 +763,7 @@ Texture* StaticIterListTexture( int classid,int varid ){
 	}
 	if (objlist.size() == 0) return NULL;
 	if (id == 0) it=objlist.begin();
-	obj=*it;
+	obj=(*it).get();
 	it++;
 	id++;
 	if (id == objlist.size()) id=0;

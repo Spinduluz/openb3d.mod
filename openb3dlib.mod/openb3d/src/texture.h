@@ -15,20 +15,26 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <memory>
+#include <vector>
 
 using namespace std;
 
 class Camera;
+class Texture;
+// We cant use unique_ptr at the moment because it.. well unique and
+// that StaticIter... thingie in data.cpp wants to make a copy of the list and that's a no go
+//typedef unique_ptr<Texture,void(*)(Texture*)> TexturePtr; 
+typedef shared_ptr<Texture> TexturePtr; 
 
 class Texture{
 public:
-
 	typedef unsigned char *(*LoadPixbuf)(const char *filename,int *width,int *height);
 	typedef void (*FreePixbuf)(unsigned char *buf);
 
 	static LoadPixbuf loadpixbuf;
 	static FreePixbuf freepixbuf;
-	static list<Texture*> tex_list;
+	static list<TexturePtr> tex_list;
 
 	unsigned int texture;
 
@@ -60,8 +66,8 @@ public:
 	int cube_face;
 	int cube_mode;
 	
-	int glTexEnv_count;//
-	int glTexEnv[3][12];//
+	int texenv_count;
+	int texenv[3][12];
 
 	Texture();
 
@@ -85,6 +91,7 @@ public:
 	void SetTextureName(string name);
 	static void ClearTextureFilters();
 	static void AddTextureFilter(string text_match,int flags);
+
 	Texture* TexInList();
 	void FilterFlags();
 	//static string Strip(string filename);

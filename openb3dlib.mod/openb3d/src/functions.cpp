@@ -20,12 +20,12 @@
 extern "C" {
 
 void TextureGLTexEnv(Texture* tex, int target, int pname, int param){//
-	if(target==0) tex->glTexEnv_count=0;
-	tex->glTexEnv[0][tex->glTexEnv_count] = target;
-	tex->glTexEnv[1][tex->glTexEnv_count] = pname;
-	tex->glTexEnv[2][tex->glTexEnv_count] = param;
+	if(target==0) tex->texenv_count=0;
+	tex->texenv[0][tex->texenv_count] = target;
+	tex->texenv[1][tex->texenv_count] = pname;
+	tex->texenv[2][tex->texenv_count] = param;
 	tex->TextureBlend(6);
-	if(tex->glTexEnv_count<12) tex->glTexEnv_count++;
+	if(tex->texenv_count<12) tex->texenv_count++;
 }
 
 void NameTexture(Texture *tex, const char *name){
@@ -1769,7 +1769,6 @@ void Wireframe(int enable){
 	  glPolygonMode(GL_FRONT,GL_LINE);
 	else
 	  glPolygonMode(GL_FRONT,GL_FILL);
-
 }
 
 //' Blitz2D
@@ -1800,16 +1799,22 @@ float EntityScaleZ(Entity* ent,bool glob){
 	return ent->EntityScaleZ(glob);
 }
 
+// const char* ->
 Shader* LoadShader(char* ShaderName, char* VshaderFileName, char* FshaderFileName){
-	Shader* s=Shader::CreateShaderMaterial(ShaderName);
-	s->AddShader(VshaderFileName, FshaderFileName);
-	return s;
+	Shader* shader=Shader::CreateShaderMaterial(ShaderName);
+	shader->AddShader(VshaderFileName, FshaderFileName);
+	return shader;
 }
 
+// const char* ->
 Shader* CreateShader(char* ShaderName, char* VshaderString, char* FshaderString){
-	Shader* s=Shader::CreateShaderMaterial(ShaderName);
-	s->AddShaderFromString(VshaderString, FshaderString);
-	return s;
+	Shader* shader=Shader::CreateShaderMaterial(ShaderName);
+	shader->AddShaderFromString(VshaderString, FshaderString);
+	return shader;
+}
+
+void FreeShader(Shader *shader){
+	shader->DestroyRef();
 }
 
 void ShadeSurface(Surface* surf, Shader* material){
@@ -2133,7 +2138,7 @@ enum {
 	LOAD_ANIM_MESH_MD2
 };
 
-Mesh* _LoadAnimMesh(File *file,int type,Entity *parent){
+Mesh* _LoadAnimMesh(FilePtr file,int type,Entity *parent){
 	switch(type){
 	case LOAD_ANIM_MESH_B3D:
 		return Mesh::LoadAnimMeshB3D(file,parent);
@@ -2145,25 +2150,23 @@ Mesh* _LoadAnimMesh(File *file,int type,Entity *parent){
 	return NULL;
 }
 
-#if defined(BLITZMAX_BUILD)
+#if defined(BLITZMAX_BUILD) && defined(BLITZMAX_TSTREAM)
 Mesh *LoadAnimMeshFromStream(bbStreamIO *stream,int type,Entity *parent){
 	Mesh *mesh;
-	File *file=File::ReadStreamBB(stream);
+	FilePtr file=File::ReadStreamBB(stream);
 
 	if(!file) return NULL;
 	mesh=_LoadAnimMesh(file,type,parent);
-	file->CloseFile();
 	return mesh;
 }
 #endif
 
 Mesh *LoadAnimMeshFromBuffer(const void *buffer,int len,int type,Entity *parent){
 	Mesh *mesh;
-	File *file=File::ReadBuffer(buffer, len);
+	FilePtr file=File::ReadBuffer(buffer, len);
 
 	if(!file) return NULL;
 	mesh=_LoadAnimMesh(file,type,parent);
-	file->CloseFile();
 	return mesh;
 }
 
@@ -2173,6 +2176,10 @@ static void FreePixbuf(unsigned char *buf){
 void SetPixbufReader(Texture::LoadPixbuf load,Texture::FreePixbuf free){
 	Texture::loadpixbuf=load;
 	Texture::freepixbuf=free?free:FreePixbuf;
+}
+
+bool AddFileResource(const char *filename,int reserved){
+	return File::AddFileResource(filename,reserved);
 }
 	
 } /* extern "C" */

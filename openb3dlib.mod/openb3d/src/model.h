@@ -20,10 +20,10 @@
 using namespace std;
 
 Mesh* LoadAnimB3D(string f_name,Entity* parent_ent_ext=NULL);
-Mesh* LoadAnimB3D(File* file,Entity* parent_ent_ext=NULL);
+Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext=NULL);
 
-string b3dReadString(File* file);
-string ReadTag(File* file);
+string b3dReadString(FilePtr file);
+string ReadTag(FilePtr file);
 int NewTag(string tag);
 int TagID(string tag);
 void TrimVerts(Surface* surf);

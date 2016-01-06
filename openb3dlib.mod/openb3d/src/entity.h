@@ -20,18 +20,18 @@
 #include <list>
 #include <cmath>
 #include <string>
+#include <memory>
+
 using namespace std;
 
 class CollisionImpact;
 
-class Entity{
-	
+class Entity{	
 public:
+	typedef unique_ptr<CollisionImpact> CollisionImpactPtr;
 		
 	// static entity list
 	static list<Entity*> entity_list;
-
-
 	
 	// relations
 	list<Entity*> child_list;
@@ -40,6 +40,7 @@ public:
 	// transform
 	Matrix mat;
 	Matrix rotmat;
+
 	float px,py,pz;
 	float sx,sy,sz;
 	float rx,ry,rz;
@@ -51,6 +52,7 @@ public:
 	// visibility
 	int order;
 	float alpha_order;
+
 	int hide;
 	float cull_radius;
 
@@ -104,8 +106,7 @@ public:
 	static float tformed_y;
 	static float tformed_z;
 
-	Entity(){
-	
+	Entity(){	
 		// relations
 		parent=NULL;
 		
@@ -163,17 +164,19 @@ public:
 		
 		// picking
 		pick_mode=0;
-		obscurer=false;
-											
+		obscurer=false;									
 	}
 	
-	//virtual ~Entity(){};		//Actually not needed, since no class derived from Entity has a destructor
+	virtual ~Entity(){};		//Actually not needed, since no class derived from Entity has a destructor
+								// IT IS NEEDED
 
 	virtual Entity* CopyEntity(Entity* ent)=0;
 	virtual void FreeEntity(void);
+
 	// relations
 	void EntityParent(Entity* parent_ent,int glob=true);
 	Entity* GetParent();
+
 	int CountChildren();
 	Entity* GetChild(int child_no);
 	Entity* FindChild(string child_name);
@@ -194,7 +197,7 @@ public:
 	float EntityYaw(int global=false);
 	float EntityPitch(int global=false);
 	float EntityRoll(int global=false);
-	float EntityScaleX(int glob=false);
+	float EntityScaleX(int glob=false); // Is glob lazy speek for global?
 	float EntityScaleY(int glob=false);
 	float EntityScaleZ(int glob=false);
 	// material

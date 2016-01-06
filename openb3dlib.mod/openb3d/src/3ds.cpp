@@ -266,7 +266,7 @@ void New3ds(){
   texture       = 0;
 }
 
-Mesh* Load3ds(File* Stream, Entity* parent_ent){
+Mesh* Load3ds(FilePtr Stream, Entity* parent_ent){
   int Size;
   //Local OldDir:String
   unsigned char Red, Green, Blue;
@@ -285,7 +285,6 @@ Mesh* Load3ds(File* Stream, Entity* parent_ent){
   // Read Main-Chunk
   ReadChunk();
   if (ChunkID != M3D_3DS_MAIN || ChunkSize != Size) {
-    Stream->CloseFile();
     //Print "No 3DS File"
     return 0;
   }
@@ -376,7 +375,6 @@ Mesh* Load3ds(File* Stream, Entity* parent_ent){
       }
     }
   }
-  Stream->CloseFile();
 
   if (surface!=0){
     MovedTris.sort();
@@ -417,9 +415,11 @@ Mesh* Load3ds(File* Stream, Entity* parent_ent){
 }
 
 Mesh* Load3ds(string URL,Entity* parent_ent){
-	File* Stream = File::ReadResourceFile(URL);
-	if (Stream == 0) return 0;
-	return Load3ds(Stream,parent_ent);
+	FilePtr Stream = File::ReadResourceFile(URL);
+	if (!Stream) return NULL;
+	
+	Mesh *r=Load3ds(Stream,parent_ent);
+	return r;
 }
 
 } // namespace

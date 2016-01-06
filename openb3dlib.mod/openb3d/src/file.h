@@ -13,33 +13,47 @@
 //#import <UIKit/UIKit.h>
 
 #include <string>
+#include <memory>
 #include <stdio.h>
 #include <memory.h>
-#include "unzip/unzip.h"
+#include <vector>
+#include "unzip.h"
 
 #if defined(BLITZMAX_BUILD)
 #include <pub.mod/mapstream.mod/bbstream.h>
 #endif
 
+#if defined(BLITZMAX_DEBUG)
+#include "bmaxdebug.h"
+#endif
+
 using namespace std;
+
+class FileResource;
+class File;
+typedef shared_ptr<File> FilePtr;
+
+void FreeFilePtr(File *file);
 
 class File{
 public:
-	File(){
-	};
-	
-	virtual ~File(){
-	}
+	File();
+	virtual ~File();
 
 //	static string DocsDir();
-	static string ResourceFilePath(string filename);
-	static File* ReadResourceFile(string filename);
-	static File* ReadFile(const string& filename);
-	static File* WriteFile(const string& filename);
+	static vector<FileResource*> resources;
 
-	static File* ReadBuffer(const void *buffer,int len);
-#if defined(BLITZMAX_BUILD)
-	static File* ReadStreamBB(bbStreamIO *stream);
+	static bool AddFileResource(const string& filename,int reserved=0);
+	static void CloseFileResource(const char *name);
+
+	static string ResourceFilePath(string filename);
+	static FilePtr ReadResourceFile(string filename);
+	static FilePtr ReadFile(const string& filename);
+	static FilePtr WriteFile(const string& filename);
+
+	static FilePtr ReadBuffer(const void *buffer,int len);
+#if defined(BLITZMAX_BUILD) && defined(BLITZMAX_TSTREAM)
+	static FilePtr ReadStreamBB(bbStreamIO *stream);
 #endif
 	static bool Exists(const string& filename);
 
@@ -58,6 +72,9 @@ public:
 	void WriteFloat(float f);
 	void WriteString(string s);
 	void WriteLine(string s);
+
+	int ReadBuffer(vector<unsigned char>& buf);
+	int ReadBuffer(unsigned char **buffer);
 	
 	virtual void SeekFile(int pos);
 	virtual int FilePos();
@@ -115,13 +132,16 @@ public:
 
 // ==========================================================================================================
 
+typedef void UnzipHandle;
+typedef shared_ptr<UnzipHandle> UnzipHandlePtr;
+
 class FileUnz : public File{
 public:
+	UnzipHandlePtr file;
 	unz_file_info info;
-	unzFile *file;
-	int bytes_read;
+	size_t bytes_read;
 
-	FileUnz(unzFile *file=NULL);
+	FileUnz(UnzipHandlePtr file=UnzipHandlePtr());
 	~FileUnz();
 
 	void SeekFile(int pos);
@@ -134,7 +154,7 @@ public:
 
 // ==========================================================================================================
 
-#if defined(BLITZMAX_BUILD)
+#if defined(BLITZMAX_BUILD) && defined(BLITZMAX_TSTREAM)
 class FileBB : public File {
 public:
 	bbStreamIO *stream;

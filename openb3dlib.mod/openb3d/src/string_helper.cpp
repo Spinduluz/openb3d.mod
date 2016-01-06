@@ -118,6 +118,7 @@ string Split(string s,const string& splitter,int count){
 	return "";
 }
 
+#if 0
 size_t StringHash(const string& s){
 	size_t hash=0;
 	for(string::const_iterator i=s.begin(); i!=s.end(); i++){
@@ -125,4 +126,6 @@ size_t StringHash(const string& s){
 	}
 	return hash;
 }
+#endif
+
 

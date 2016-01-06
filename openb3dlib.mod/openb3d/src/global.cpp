@@ -158,14 +158,16 @@ void Global::ClearWorld(int entities,int brushes,int textures){
 	}
 
 	if(textures){
-		list<Texture*>::iterator it;
+		/*list<Texture*>::iterator it;
 		for(it=Texture::tex_list.begin();it!=Texture::tex_list.end();it++){
 			Texture* tex=*it;
 			tex->FreeTexture();
 			it=Texture::tex_list.begin();
 			it--;
-		}
-		Texture::tex_list.clear();
+		}*/
+		// Not necessary to free texture by texture when using shared/unique pointers.
+		// They will delete themselves when they go out of scope. i.e. deleted
+		Texture::tex_list.clear(); // Should be enough to release shared/unique pointers
 	}
 }
 
@@ -239,8 +241,7 @@ void Global::UpdateEntityAnim(Mesh& mesh){
 			mesh.anim_time=mesh.anim_time+r;
 
 			Animation::AnimateMesh2(&mesh,mesh.anim_time,first,last);
-
-			if(anim_start==true) mesh.anim_time=first;
+			if(anim_start) mesh.anim_time=first;
 
 		}else{
 			if(mesh.anim_mode==4){	//Manual mode
@@ -251,19 +252,15 @@ void Global::UpdateEntityAnim(Mesh& mesh){
 			Animation::AnimateMesh(&mesh,mesh.anim_time,first,last);
 
 			if(mesh.anim_mode==0) mesh.anim_update=false; // after updating animation so that animation is in final 'stop' pose - don't update again
-
 			if(mesh.anim_mode==1){
-
 				mesh.anim_time=mesh.anim_time+(mesh.anim_speed*anim_speed);
 				if(mesh.anim_time>last){
 					mesh.anim_time=first+(mesh.anim_time-last);
 				}
 				return;
-
 			}
 
 			if(mesh.anim_mode==2){
-
 				if(mesh.anim_dir==1){
 					mesh.anim_time=mesh.anim_time+(mesh.anim_speed*anim_speed);
 					if(mesh.anim_time>last){
@@ -280,23 +277,17 @@ void Global::UpdateEntityAnim(Mesh& mesh){
 					}
 				}
 				return;
-
 			}
 
 			if(mesh.anim_mode==3){
-
 				mesh.anim_time=mesh.anim_time+(mesh.anim_speed*anim_speed);
 				if(mesh.anim_time>last){
 					mesh.anim_time=last;
 					mesh.anim_mode=0;
 				}
-
 			}
-
 		}
-
 	}
-
 }
 
 bool CompareEntityOrder(Entity* ent1,Entity* ent2){
@@ -358,7 +349,7 @@ GL_VERTEX_ARRAY*/
 #define STATE_COUNT sizeof(gl_state)/sizeof(GLState)
 
 void GL_Enable(GLenum type){
-	for(int i=0; i<STATE_COUNT; i++){
+	for(unsigned int i=0; i<STATE_COUNT; i++){
 		if(gl_state[i].type==type){
 			// Already enabled. Skip.
 			if(gl_state[i].state==RENDERSTATE_ENABLED){
@@ -378,7 +369,7 @@ void GL_Enable(GLenum type){
 }
 
 void GL_Disable(GLenum type){
-	for(int i=0; i<STATE_COUNT; i++){
+	for(unsigned int i=0; i<STATE_COUNT; i++){
 		if(gl_state[i].type==type){
 			// Already enabled. Skip.
 			if(gl_state[i].state==RENDERSTATE_DISABLED){

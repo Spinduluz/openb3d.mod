@@ -33,7 +33,7 @@ ModuleInfo "Copyright: Wrapper - 2014 Mark Mcvittie, Bruce A Henderson"
 ModuleInfo "Copyright: Openb3d - Angelo Rosina"
 
 ModuleInfo "History: 1.00 Initial Release"
-
+ModuleInfo "CC_OPTS: -std=c++11"
 ?Win32
 ModuleInfo "CC_OPTS: -DGLEW_STATIC"
 ?

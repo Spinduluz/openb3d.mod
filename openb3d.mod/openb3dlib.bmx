@@ -29,7 +29,7 @@ Import BRL.PNGLoader		' imports BRL.Pixmap, PUB.LibPNG
 Import BRL.JPGLoader		' imports BRL.Pixmap, PUB.LibJPEG
 Import BRL.Retro			' imports BRL.Basic
 Import BRL.Map
-Import PUB.MapStream
+'Import PUB.MapStream
 
 ' functions.cpp
 Extern
@@ -160,7 +160,7 @@ Extern
 	Function LightRange_( light:Byte Ptr,Range:Float ) = "LightRange"
 	Function LinePick_:Byte Ptr( x:Float,y:Float,z:Float,dx:Float,dy:Float,dz:Float,radius:Float ) = "LinePick"
 	Function LoadAnimMesh_:Byte Ptr( file:Byte Ptr,parent:Byte Ptr ) = "LoadAnimMesh"
-	Function LoadAnimMeshFromStream_:Byte Ptr( stream:Byte Ptr,format:Int,parent:Byte Ptr ) = "LoadAnimMeshFromStream"
+'	Function LoadAnimMeshFromStream_:Byte Ptr( stream:Byte Ptr,format:Int,parent:Byte Ptr ) = "LoadAnimMeshFromStream"
 	Function LoadAnimMeshFromBuffer_:Byte Ptr( buf:Byte Ptr,num:Int,format:Int,parent:Byte Ptr ) = "LoadAnimMeshFromBuffer"
 	Function LoadAnimTexture_:Byte Ptr( file:Byte Ptr,flags:Int,frame_width:Int,frame_height:Int,first_frame:Int,frame_count:Int ) = "LoadAnimTexture"
 	Function LoadBrush_:Byte Ptr( file:Byte Ptr,flags:Int,u_scale:Float,v_scale:Float ) = "LoadBrush"
@@ -325,6 +325,7 @@ Extern
 	' *** Shader
 	Function LoadShader_:Byte Ptr( ShaderName:Byte Ptr,VshaderFileName:Byte Ptr,FshaderFileName:Byte Ptr ) = "LoadShader"
 	Function CreateShader_:Byte Ptr( ShaderName:Byte Ptr,VshaderString:Byte Ptr,FshaderString:Byte Ptr ) = "CreateShader"
+	Function FreeShader_( Shader:Byte Ptr ) = "FreeShader"
 	Function ShadeSurface_( surf:Byte Ptr,material:Byte Ptr ) = "ShadeSurface"
 	Function ShadeMesh_( mesh:Byte Ptr,material:Byte Ptr ) = "ShadeMesh"
 	Function ShadeEntity_( ent:Byte Ptr,material:Byte Ptr ) = "ShadeEntity"
@@ -367,6 +368,9 @@ Extern
 	' *** VoxelSprite
 	Function CreateVoxelSprite_:Byte Ptr( slices:Int,parent:Byte Ptr ) = "CreateVoxelSprite"
 	Function VoxelSpriteMaterial_( voxelspr:Byte Ptr,mat:Byte Ptr ) = "VoxelSpriteMaterial"
+	
+	' *** FileSystem
+	Function AddFileResource_:Byte( filename:Byte Ptr,reserved:Int=0 ) = "AddFileResource"
 	
 End Extern
 

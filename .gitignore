@@ -7,8 +7,8 @@
 *.x86.i
 *.x86.a
 .bmx/*
-.exe
-.dll
+*.exe
+*.dll
 backup/
 
 #################

@@ -12,8 +12,6 @@
 namespace loadX{
 
 File*  Stream;
-
-
 	class XLoader_TreeNode{
 	public:
 		list<XLoader_TreeNode*> children;
@@ -32,7 +30,7 @@ File*  Stream;
 
 list<int>      MovedTris;
 
-string xReadString(File* file, int lenght){
+string xReadString(FilePtr file, int lenght){
 	string t="";
 	for(int i=1;i<=lenght;i++){
 		char ch=file->ReadByte();
@@ -41,7 +39,7 @@ string xReadString(File* file, int lenght){
 	return t;
 }
 
-string xReadAll(File* file){
+string xReadAll(FilePtr file){
 	string t="";
 	while (!file->Eof()){
 		char ch=file->ReadByte();
@@ -50,7 +48,7 @@ string xReadAll(File* file){
 	return t;
 }
 
-void string_find_and_replace( string &source, string find, string replace ) {
+void string_find_and_replace(string &source,string find,string replace) {
      
 	size_t j;
 	for ( ; (j = source.find( find )) != string::npos ; ) {
@@ -295,7 +293,7 @@ list<XLoader_TreeNode*> XLoader_FindTreeElements(XLoader_TreeNode* tree, string 
 	
 }
 
-Mesh* LoadX(File* Stream,Entity* parent_ent){
+Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 	if(!Stream) return NULL;
 
 	string header = xReadString(Stream, 4);
@@ -600,8 +598,6 @@ Mesh* LoadX(File* Stream,Entity* parent_ent){
 					}
 				}
 					
-				Stream->CloseFile();
-					
 				return submesh;
 			}else{
 				//cout<<"X Mesh Loader: Unsupported format '"<<format<<"'!";
@@ -618,9 +614,10 @@ Mesh* LoadX(File* Stream,Entity* parent_ent){
 }
 
 Mesh* LoadX(string URL,Entity* parent_ent){
-	Stream = File::ReadResourceFile(URL);
-	if(Stream == 0) return 0;
-	return LoadX(Stream,parent_ent);
+	FilePtr file = File::ReadResourceFile(URL);
+	if(!file) return NULL;
+
+	return LoadX(file,parent_ent);
 }
 
-}
+} // namespace loadX

@@ -224,7 +224,7 @@ Type TMesh Extends TEntity
 		Return mesh
 		
 	End Function
-	
+Rem
 	Function LoadAnimMeshFromStream:TMesh( file:TStream,format:Int,parent:TEntity=Null )
 		Local map:Byte Ptr=MapStream(file)
 		Local inst:Byte Ptr=LoadAnimMeshFromStream_( map,format,GetInstance(parent) )
@@ -232,7 +232,7 @@ Type TMesh Extends TEntity
 		UnmapStream(map)
 		Return mesh
 	End Function
-	
+End Rem	
 	Function LoadAnimMeshFromBuffer:TMesh( buf:Byte[],num:Int,format:Int,parent:TEntity=Null )
 		Local inst:Byte Ptr=LoadAnimMeshFromBuffer_( buf,num,format,GetInstance(parent) )
 		Local mesh:TMesh=CreateObject(inst)

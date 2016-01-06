@@ -7,11 +7,9 @@
  *
  */
 
-// Note from Thomas
-// not much that make sense in this file.
-
 #include "file.h"
 #include "string_helper.h"
+#include "fileresource.h"
 //#include "misc.h"
 
 #include <string>
@@ -57,9 +55,37 @@ static string filepath_in_use;
 	return docs_dir;
 
 }*/
+void FreeFilePtr(File *file){
+	if(file) file->CloseFile();
+}
 
+vector<FileResource*> File::resources;
+
+bool File::AddFileResource(const string& filename,int reserved){
+	FileResource *r=FileZipResource::Create(filename);
+	if(r) resources.push_back(r);
+	return (r!=NULL);
+}
+
+void File::CloseFileResource(const char *name){
+	vector<FileResource*>::iterator i,b,e;
+
+	b=resources.begin();
+	e=resources.end();
+
+	for(i=b; i!=e; i++){
+		if(!strcmp(name,(*i)->GetName())){
+			(*i)->FreeResource();
+			resources.erase(i,i);
+		}
+	}
+}
+
+// I should take some time and look more closely at this
+// method some day. Is this really useful?
 string File::ResourceFilePath(string filename){
 	std::replace(filename.begin(), filename.end(), '\\', '/');
+	string rname=filename; // Save name for archive
 
 	FILE* stream;
 
@@ -86,10 +112,14 @@ string File::ResourceFilePath(string filename){
 		return filename;
 	}
 
+	for(FileResource *r : resources){
+		if(r->FileExist(rname)) return rname; 
+	}
+
 	return "";
 }
 
-File* File::ReadResourceFile(string filename){
+FilePtr File::ReadResourceFile(string filename){
 	std::replace(filename.begin(), filename.end(), '\\', '/');
 
 	string::size_type idx=filename.rfind("/");
@@ -110,6 +140,11 @@ File* File::ReadResourceFile(string filename){
 	FILE* f=fopen(filename.c_str(),"rb");
 
 	if(!f){
+		// Not found on file system... check resources
+		for(FileResource *r : resources){
+			if(r->FileExist(filename)) return r->ReadFile(filename);
+		}
+
 #if defined(BLITZMAX_DEBUG)
 		DebugLog("Error: Cannot Find Resource File: %s",filename.c_str());
 		//cout << "Error: Cannot Find Resource File: " << filename << endl;
@@ -121,16 +156,20 @@ File* File::ReadResourceFile(string filename){
 	file->ReadFile(f);
 	fclose(f);
 
-	return file;
+	return FilePtr(file,FreeFilePtr);
 }
 
-File* File::ReadFile(const string& filename){
+FilePtr File::ReadFile(const string& filename){
 	FILE* f=fopen(filename.c_str(),"rb");
 
 	if(!f){
+		// Not found on file system... check resources
+		for(FileResource *r : resources){
+			if(r->FileExist(filename)) return r->ReadFile(filename);
+		}
+
 #if defined(BLITZMAX_DEBUG)
 		DebugLog("Error: Can't Find Document File '%s'",filename.c_str());
-		//cout << "Error: Can't Find Document File '"+filename+"'" << endl;
 #endif
 		return NULL;
 	}
@@ -139,43 +178,48 @@ File* File::ReadFile(const string& filename){
 	file->ReadFile(f);
 	fclose(f);
 
-	return file;
+	return FilePtr(file,FreeFilePtr);
 }
 
-File* File::WriteFile(const string& filename){
+FilePtr File::WriteFile(const string& filename){
 	FILE* f=fopen(filename.c_str(), "wb" );
 
 	if(!f){
 #if defined(BLITZMAX_DEBUG)
 		DebugLog("Error: Can't Write File '%s'",filename.c_str());
-		//cout << "Error: Can't Write File '"+filename+"'" << endl;
 #endif
 		return NULL;
 	}
 
 	FileStdc* file=new FileStdc(f);
-	return file;
+	return FilePtr(file,FreeFilePtr);
 
 }
 
-File* File::ReadBuffer(const void *buffer,int len){
+FilePtr File::ReadBuffer(const void *buffer,int len){
 	if(!buffer || !len)
 		return NULL;
 
 	File *file = new FileMem((unsigned char*)buffer,len);
-	return file;
+	return FilePtr(file,FreeFilePtr);
 }
 
-#if defined(BLITZMAX_BUILD)
-File* File::ReadStreamBB(bbStreamIO *stream){
+#if defined(BLITZMAX_BUILD) && defined(BLITZMAX_TSTREAM)
+FilePtr File::ReadStreamBB(bbStreamIO *stream){
 	if(!stream)
 		return NULL;
 
 	FileBB *file = new FileBB(stream);
 
-	return file;
+	return FilePtr(file,FreeFilePtr);
 }
 #endif
+
+File::File(){
+};
+	
+File::~File(){
+}
 
 bool File::Exists(const string& filename){
 	FILE *f=fopen(filename.c_str(),"rb");
@@ -277,15 +321,35 @@ void File::WriteFloat(float f){
 void File::WriteString(string s){
 	Write(&s[0],1,s.length());
 }
-
+// FIXME: Pass by reference
 void File::WriteLine(string s){
 #ifdef _WIN32
-	char lf[3]="\r\n";
+	char linefeed[]="\r\n";
 #else
-	char lf[2]="\n";
+	char linefeed[]="\n";
 #endif
 	Write(s.c_str(),1,s.length());
-	Write(lf,1,sizeof(lf)-1);
+	Write(linefeed,1,sizeof(linefeed)-1);
+}
+
+int File::ReadBuffer(vector<unsigned char>& buf){
+	int len=FileSize();
+	if(!len) return -1;
+
+	buf.reserve(len);
+	return Read(&buf[0],1,len);
+}
+
+int File::ReadBuffer(unsigned char **buffer){
+	int len=FileSize();
+	if(!len) return -1;
+
+	unsigned char *buf=new unsigned char[len];
+	if(!buf) return -1;
+
+	Read(buf,1,len);
+	*buffer=buf;
+	return len;
 }
 
 void File::SeekFile(int pos){
@@ -408,7 +472,7 @@ size_t FileMem::Read(void *buffer,size_t size,size_t count){
 }
 
 bool FileMem::ReadFile(FILE *f){
-	int size,p;
+	int size;
 
 	fseek(f,0,SEEK_END);
 	size=ftell(f);
@@ -417,6 +481,7 @@ bool FileMem::ReadFile(FILE *f){
 	buf=new unsigned char[size+1];
 	pos=buf;
 	end=buf+size;
+
 	return (fread(buf,1,size,f)==size);
 }
 
@@ -433,15 +498,15 @@ bool FileMem::ReadFile(const string& filename){
 
 #define UNZ_SEEK_BUFFER 16384
 
-FileUnz::FileUnz(unzFile *file):info(),file(NULL),bytes_read(0){
+FileUnz::FileUnz(UnzipHandlePtr file):file(file),info(),bytes_read(0){
 	if(file){
-		unzGetCurrentFileInfo(file,&info,NULL,0,NULL,0,NULL,0);
-		unzOpenCurrentFile(file);
+		unzOpenCurrentFile(file.get());
+		unzGetCurrentFileInfo(file.get(),&info,NULL,0,NULL,0,NULL,0);
 	}
 }
 
 FileUnz::~FileUnz(){
-	if(file) unzCloseCurrentFile(file);
+	if(file) unzCloseCurrentFile(file.get());
 }
 
 void FileUnz::SeekFile(int pos){
@@ -450,13 +515,13 @@ void FileUnz::SeekFile(int pos){
 
 	if(pos>FileSize()) pos=FileSize();
 	// Close and reopen the file
-	unzCloseCurrentFile(file);
-	unzOpenCurrentFile(file);
+	unzCloseCurrentFile(file.get());
+	unzOpenCurrentFile(file.get());
 
 	while(p<pos){
 		int s=pos-p;
 		if(s>UNZ_SEEK_BUFFER) s=UNZ_SEEK_BUFFER;
-		p+=unzReadCurrentFile(file,b,s);
+		p+=unzReadCurrentFile(file.get(),b,s);
 	}
 	bytes_read=pos;
 }
@@ -474,7 +539,7 @@ int FileUnz::Eof() {
 }
 
 size_t FileUnz::Read(void *buffer,size_t size,size_t count){
-	int r=unzReadCurrentFile(file,buffer,size*count);
+	int r=unzReadCurrentFile(file.get(),buffer,size*count);
 	bytes_read+=r;
 	return r;
 }
@@ -483,7 +548,7 @@ size_t FileUnz::Read(void *buffer,size_t size,size_t count){
 
 // ==========================================================================================================
 
-#if defined(BLITZMAX_BUILD)
+#if defined(BLITZMAX_BUILD) && defined(BLITZMAX_TSTREAM)
 FileBB::FileBB(bbStreamIO *stream):stream(stream){
 }
 

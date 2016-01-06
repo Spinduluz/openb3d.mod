@@ -56,4 +56,8 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 
 Wend
+
+FreeShader Shader
+FreeShader Shader2
+
 End

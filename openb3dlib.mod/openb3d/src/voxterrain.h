@@ -2,7 +2,7 @@
 #define VOXTERRAIN_H
 
 #include "terrain.h"
-#include "metaball.h"
+//#include "metaball.h"
 
 class VoxelTerrain : public Terrain{
 

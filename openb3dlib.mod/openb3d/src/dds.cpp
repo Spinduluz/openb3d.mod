@@ -1,6 +1,9 @@
 #include "file.h"
 #include "dds.h"
 #include "glew.h"
+#include "string_helper.h"
+
+#include <algorithm>
 
 #if defined(BLITZMAX_DEBUG)
 #include "bmaxdebug.h"
@@ -273,20 +276,29 @@ inline bool DDS_GetInfo(DDSHeader *header,unsigned int& format,int& components,u
 			break;
 		}
 	}else if(header->pixelformat.flags & DDPF_RGBA && header->pixelformat.rgbbitcount==32){
-		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff && pf.abitmask==0xff000000)
+		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff && pf.abitmask==0xff000000){
 			format=GL_BGRA;
-		else
+			components=4;
+		}else{
 			format=GL_RGBA;
+			components=4;
+		}
 	}else if(header->pixelformat.flags & DDPF_RGB && header->pixelformat.rgbbitcount==32){
-		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff)
+		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff){
 			format=GL_BGRA;
-		else
+			components=4;
+		}else{
 			format=GL_RGBA;
+			components=4;
+		}
 	}else if(header->pixelformat.flags & DDPF_RGB && header->pixelformat.rgbbitcount==24){
-		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff)
+		if(pf.rbitmask==0x00ff0000 && pf.gbitmask==0x0000ff00 && pf.bbitmask==0x000000ff){
 			format=GL_BGR;
-		else
+			components=3;
+		}else{
 			format=GL_RGB;
+			components=3;
+		}
 	}else if(header->pixelformat.rgbbitcount==8){ // Luminance?
 		return false;
 	}else{
@@ -296,27 +308,24 @@ inline bool DDS_GetInfo(DDSHeader *header,unsigned int& format,int& components,u
 	return true;
 }
 
-inline int DDS_GetSizeBytes(int width,int height,int format){
+inline int DDS_GetSizeBytes(int width,int height,int format,int components){
 	if(format==GL_COMPRESSED_RGB_S3TC_DXT1_EXT || format==GL_COMPRESSED_RGBA_S3TC_DXT3_EXT || format==GL_COMPRESSED_RGBA_S3TC_DXT5_EXT){
 		return ((width+3)/4) * ((height+3)/4) * (format==GL_COMPRESSED_RGB_S3TC_DXT1_EXT?8:16);
 	}
-	return width * height * (format==GL_RGB?3:4);
+	return width * height * components;
 }
 
-inline int DDS_GetPitch(int width,unsigned int format){
+inline int DDS_GetPitch(int width,unsigned int format,int components){
 	if(format==GL_COMPRESSED_RGB_S3TC_DXT1_EXT || format==GL_COMPRESSED_RGBA_S3TC_DXT3_EXT || format==GL_COMPRESSED_RGBA_S3TC_DXT5_EXT){
 		return ((width+3)/4) * ((format==GL_COMPRESSED_RGB_S3TC_DXT1_EXT?8:16));
 	}
+	return width * components;
 }
-
-#if defined(_MSC_VER)
-#define strncasecmp _strnicmp
-#endif
 
 DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool flip){
 	unsigned char *buffer,*buf;
 	DDSHeader *dds;
-	File *file;
+	FilePtr file;
 	int len;
 
 	file=File::ReadFile(filename);
@@ -326,9 +335,8 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 	file->Read(buffer,1,len);
 
 	buf=buffer;
-	if(strncasecmp((char*)buf,"DDS ",4)){
-		return NULL;
-	}
+	if(strncasecmp((char*)buf,"DDS ",4)) return NULL;
+
 	buf+=4;
 	dds=(DDSHeader*)buf;
 	buf+=sizeof(DDSHeader);
@@ -336,52 +344,57 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 	unsigned int format,target;
 	int components;
 
+	// Just to silence the compiler
+	format=0;
+	target=0;
+	components=0;
+
 	if(!DDS_GetInfo(dds,format,components,target)){
 		return NULL;
 	}
 
-	DirectDrawSurface *surf=new DirectDrawSurface;
+	DirectDrawSurface *surface=new DirectDrawSurface;
 	int mipmaps;
 
-	surf->buffer=buffer;
+	surface->buffer=buffer;
 	mipmaps=dds->mipmapcount;
 
 	if(mipmaps!=0) mipmaps--;
 
 	for(int i=0; i<(target==GL_TEXTURE_CUBE_MAP?6:1); i++){
-		DirectDrawSurface *s;
+		DirectDrawSurface *base;
 
 		if(target==GL_TEXTURE_CUBE_MAP){
-			surf->mipmaps.push_back(DirectDrawSurface());
-			s=&surf->mipmaps.back();
+			surface->mipmaps.push_back(DirectDrawSurface());
+			base=&surface->mipmaps.back();
 		}else
-			s=surf;
+			base=surface;
 
-		s->format=format;
-		s->target=target;
-		s->dxt=buf;
-		s->width=dds->width;
-		s->height=dds->height;
-		s->depth=DDS_Clamp(dds->depth);
-		s->pitch=DDS_GetPitch(s->width,format);
-		s->size=DDS_GetSizeBytes(s->width,s->height,format) * s->depth;
-		s->components=components;
-		s->mipmapcount=mipmaps;
+		base->format=format;
+		base->target=target;
+		base->dxt=buf;
+		base->width=dds->width;
+		base->height=dds->height;
+		base->depth=DDS_Clamp(dds->depth);
+		base->pitch=DDS_GetPitch(base->width,format,components);
+		base->size=DDS_GetSizeBytes(base->width,base->height,format,components) * base->depth;
+		base->components=components;
+		base->mipmapcount=mipmaps;
 
-		buf+=s->size;
+		buf+=base->size;
 
-		if(flip) s->Flip();
+		if(flip) base->Flip();
 
 		int w,h,d;
 
-		w=DDS_Clamp(s->width>>1);
-		h=DDS_Clamp(s->height>>1);
-		d=DDS_Clamp(s->depth>>1);
+		w=DDS_Clamp(base->width>>1);
+		h=DDS_Clamp(base->height>>1);
+		d=DDS_Clamp(base->depth>>1);
 
 		for(int j=0; j<mipmaps && ( w || h ); j++){
 			DirectDrawSurface *mip;
-			s->mipmaps.push_back(DirectDrawSurface());
-			mip=&s->mipmaps.back();
+			base->mipmaps.push_back(DirectDrawSurface());
+			mip=&base->mipmaps.back();
 
 			mip->format=format;
 			mip->target=target;
@@ -389,8 +402,8 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 			mip->width=w;
 			mip->height=h;
 			mip->depth=d;
-			mip->pitch=DDS_GetPitch(w,format);
-			mip->size=DDS_GetSizeBytes(w,h,format) * d;
+			mip->pitch=DDS_GetPitch(w,format,components);
+			mip->size=DDS_GetSizeBytes(w,h,format,components) * d;
 			mip->components=components;
 
 			buf+=mip->size;
@@ -404,12 +417,12 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 	}
 
 	if(target==GL_TEXTURE_CUBE_MAP && flip){
-		DirectDrawSurface tmp=surf->mipmaps[3];
-		surf->mipmaps[3]=surf->mipmaps[2];
-		surf->mipmaps[2]=tmp;
+		DirectDrawSurface tmp=surface->mipmaps[3];
+		surface->mipmaps[3]=surface->mipmaps[2];
+		surface->mipmaps[2]=tmp;
 	}
 
-	return surf;
+	return surface;
 }
 
 DirectDrawSurface::DirectDrawSurface()
@@ -488,7 +501,7 @@ void DirectDrawSurface::Flip(){
 		DXTColorBlock *t;
 		DXTColorBlock *b;
 
-		for(int j=0; j<(yblocks)>>1; j++){
+		for(unsigned int j=0; j<(yblocks)>>1; j++){
 			b=(DXTColorBlock*)dxt+(j*linesize);
 			t=(DXTColorBlock*)dxt+(((yblocks-j)-1)*linesize);
 

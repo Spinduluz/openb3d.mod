@@ -865,9 +865,9 @@ End Function
 Rem
 bbdoc:
 End Rem
-Function LoadAnimMeshFromStream:TMesh( file:TStream,format:Int,parent:TEntity=Null )
-	Return TMesh.LoadAnimMeshFromStream( file,format,parent )
-End Function
+'Function LoadAnimMeshFromStream:TMesh( file:TStream,format:Int,parent:TEntity=Null )
+'	Return TMesh.LoadAnimMeshFromStream( file,format,parent )
+'End Function
 
 Rem
 bbdoc:
@@ -1943,6 +1943,13 @@ Function CreateShader:TShader( ShaderName:String,VshaderString:String,FshaderStr
 End Function
 
 Rem
+bbdoc: Free shader
+End Rem
+Function FreeShader( Shader:TShader )
+	TShader.FreeShader( Shader )
+End Function
+
+Rem
 bbdoc: Apply shader to a surface.
 End Rem
 Function ShadeSurface( surf:TSurface,material:TShader )
@@ -2213,4 +2220,14 @@ bbdoc: undocumented
 End Rem
 Function VoxelSpriteMaterial( voxelspr:TVoxelSprite,mat:TMaterial )
 	voxelspr.VoxelSpriteMaterial( mat )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function AddFileResource:Byte(filename:String,reserved:Int=0 )
+	Local name:Byte Ptr=filename.ToCString()
+	Local ret:Byte=AddFileResource_( name,reserved )
+	MemFree name
+	Return ret
 End Function

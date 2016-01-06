@@ -2,7 +2,7 @@
 #define LOAD_X
 
 namespace loadX{
-	Mesh* LoadX(File* Stream,Entity* parent_ent);
+	Mesh* LoadX(FilePtr Stream,Entity* parent_ent);
 	Mesh* LoadX(string URL,Entity* parent_ent);
 }
 

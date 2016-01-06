@@ -26,10 +26,8 @@
 #include "bmaxdebug.h"
 #endif
 
-list<Texture*> Texture::tex_list;
-
 void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeight, unsigned int srcX, unsigned int srcY, unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel);
-#if 1
+
 static int gl_cube_faces[]={
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
@@ -38,16 +36,6 @@ static int gl_cube_faces[]={
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 };
-#else
-static int gl_cube_faces[]={
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-};
-#endif
 
 // FIXME: Cleanup.... I get a headache from my own code
 inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buffer){
@@ -64,12 +52,24 @@ inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buff
 	}
 }
 
+inline void GL_CopyTexImage2D(GLenum target,int x,int y,int width,int height){
+	if(Global::gl_sgis_generate_mipmap && !Global::gl_ext_framebuffer_object){
+		glTexParameteri(target,GL_GENERATE_MIPMAP,GL_TRUE);
+	}	
+	glCopyTexImage2D(target,0,GL_RGBA,x,y,width,height,0);
+	if(Global::gl_ext_framebuffer_object){
+		glGenerateMipmap(target);
+	}
+}
+
+void FreeTexturePtr(Texture *tex){
+	if(tex) tex->FreeTexture();
+}
+
 // ==========================================================================================================
 
 bool is_dds(const string& filename){
-	string ext=filename.substr(filename.length()-4);
-	transform(ext.begin(),ext.end(),ext.begin(),::tolower);
-	if(ext==".dds") return true;
+	if(!strcasecmp(filename.c_str()+filename.length()-4,".dds")) return true;
 	return false;
 }
 
@@ -91,13 +91,16 @@ void _io_file_skip(void *ptr,unsigned int n){
 
 unsigned char *stbi_load_pixbuf(const char *filename,int *width,int *height){
 	stbi_io_callbacks io;
+	unsigned char *pixbuf;
 
 	io.eof=_io_file_eof;
 	io.read=_io_file_read;
 	io.skip=_io_file_skip;
 
-	File *file=File::ReadFile(filename);
-	return stbi_load_from_callbacks(&io,file,width,height,0,4);
+	FilePtr file=File::ReadFile(filename);
+	pixbuf=stbi_load_from_callbacks(&io,file.get(),width,height,0,4);
+
+	return pixbuf;
 	//return stbi_load(filename,width,height,0,4);
 }
 
@@ -106,6 +109,8 @@ void stbi_free_pixbuf(unsigned char *buf){
 }
 
 // ==========================================================================================================
+
+list<TexturePtr> Texture::tex_list;//( 128 );
 
 Texture::LoadPixbuf Texture::loadpixbuf = stbi_load_pixbuf;
 Texture::FreePixbuf Texture::freepixbuf = stbi_free_pixbuf;
@@ -132,8 +137,8 @@ Texture::Texture()
 ,framebuffer(NULL)
 ,cube_face(0)
 ,cube_mode(1)
-,glTexEnv_count(0)
-,glTexEnv() {
+,texenv_count(0)
+,texenv() {
 #if 0
 	//texture=NULL;
 	file_name="";
@@ -145,11 +150,12 @@ Texture::Texture()
 	framebuffer=0;
 	cube_face=0,cube_mode=1;
 		
-	glTexEnv_count=0;//
+	texenv_count=0;//
 #endif
 };
 
 Texture* Texture::LoadTexture(string filename,int flags){
+	// Try to load DDS file first
 	if(is_dds(filename)){
 		Texture* tex=new Texture();
 		tex->file_name=filename;
@@ -165,7 +171,7 @@ Texture* Texture::LoadTexture(string filename,int flags){
 			delete tex; // No memory leak.
 			return old_tex;
 		}else{
-			tex_list.push_back(tex);
+			tex_list.push_back(TexturePtr(tex,FreeTexturePtr));
 		}
 
 		DirectDrawSurface *dds=DirectDrawSurface::LoadSurface(filename,false);
@@ -180,7 +186,7 @@ Texture* Texture::LoadTexture(string filename,int flags){
 		dds->FreeDirectDrawSurface();
 		return tex;
 	}
-
+	// Other images.
 	if (flags&128) {
 		filename=File::ResourceFilePath(filename);
 
@@ -199,7 +205,7 @@ Texture* Texture::LoadTexture(string filename,int flags){
 			delete tex; // No memory leak...
 			return old_tex;
 		}else{
-			tex_list.push_back(tex);
+			tex_list.push_back(TexturePtr(tex,FreeTexturePtr));
 		}
 
 		string filename_left=Left(filename,Len(filename)-4);
@@ -252,7 +258,7 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 		delete tex; // No memory leak.
 		return old_tex;
 	}else{
-		tex_list.push_back(tex);
+		tex_list.push_back(TexturePtr(tex,FreeTexturePtr));
 	}
 #if 0
 	string filename_left=Left(filename,Len(filename)-4);
@@ -313,13 +319,8 @@ Texture* Texture::CreateTexture(int width,int height,int flags, int frames,strin
 	tex->file_hash=StringHash(fname);
 	tex->format=GL_RGBA;
 
-	int target=GL_TEXTURE_2D;
-	if(flags&128) target=GL_TEXTURE_CUBE_MAP;
-
 	unsigned int id;
 	glGenTextures(1,&id);
-	/*glBindTexture(target,id);
-	GL_TexImage2D(target,width,height,NULL);*/
 	tex->texture=id;
 
 	return tex;
@@ -327,7 +328,7 @@ Texture* Texture::CreateTexture(int width,int height,int flags, int frames,strin
 }
 
 void Texture::FreeTexture(){
-	tex_list.remove(this);
+	tex_list.remove(TexturePtr(this));
 	delete this;
 }
 
@@ -379,9 +380,7 @@ void Texture::AddTextureFilter(string text_match,int flags){
 
 Texture* Texture::TexInList(){
 	// check if tex already exists in list and if so return it
-	list<Texture*>::iterator it;
-	for(it=tex_list.begin();it!=tex_list.end();it++){
-		Texture* tex=*it;
+	for(TexturePtr& tex : tex_list){
 #if 0
 		if(!tex->file_hash || !file_hash){ // Assume we dont have a hash.
 			if(file_name==tex->file_name && flags==tex->flags){// && blend==tex->blend){
@@ -396,7 +395,7 @@ Texture* Texture::TexInList(){
 		}
 #else
 		if(file_hash==tex->file_hash && flags==tex->flags){
-			return tex;
+			return tex.get();
 		}
 #endif
 	}
@@ -424,26 +423,15 @@ void Texture::BufferToTex(unsigned char* buffer, int frame){
 
 }
 
-inline void GL_CopyTexImage2D(GLenum target,int x,int y,int width,int height){
-	if(Global::gl_sgis_generate_mipmap && !Global::gl_ext_framebuffer_object){
-		glTexParameteri(target,GL_GENERATE_MIPMAP,GL_TRUE);
-	}	
-	glCopyTexImage2D(target,0,GL_RGBA,x,y,width,height,0);
-	if(Global::gl_ext_framebuffer_object){
-		glGenerateMipmap(target);
-	}
-}
-
 void Texture::BackBufferToTex(int frame){
 	if(flags&128){
 		glBindTexture(GL_TEXTURE_CUBE_MAP,texture);
 		GL_CopyTexImage2D(gl_cube_faces[cube_face],0,0,width,height);
-		//glCopyTexImage2D(gl_cube_faces[cube_face],0,GL_RGBA,0,/*Global::height-height*/0,width,height,0);
-		//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}else{
 		glBindTexture(GL_TEXTURE_2D,texture);
-		glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,0,/*Global::height-height*/0,width,height,0);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		GL_CopyTexImage2D(GL_TEXTURE_2D,0,0,width,height);
+		//glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,0,/*Global::height-height*/0,width,height,0);
+		//glGenerateMipmap(GL_TEXTURE_2D);
 	}
 }
 

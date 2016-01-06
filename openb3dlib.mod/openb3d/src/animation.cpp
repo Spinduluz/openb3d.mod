@@ -72,6 +72,7 @@ void Animation::AnimateMesh(Mesh* ent1,float framef,int start_frame,int end_fram
 
 			int t0, t1;
 			t0=0;
+			t1=0; // Silence the compiler.
 			for(unsigned int i=0;i<=anim_surf.vert_weight4.size();i++){
 				if (anim_surf.vert_weight4[i]>=framef){
 					t1=i; t0=i-1;

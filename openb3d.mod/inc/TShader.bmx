@@ -104,6 +104,10 @@ Type TShader
 		
 	End Function
 	
+	Function FreeShader( Shader:TShader )
+		FreeShader_( GetInstance(Shader) )
+	End Function
+	
 	Method ShadeSurface( surf:TSurface )
 	
 		ShadeSurface_( TSurface.GetInstance(surf),GetInstance(Self) )

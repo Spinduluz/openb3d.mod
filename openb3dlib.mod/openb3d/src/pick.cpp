@@ -11,6 +11,8 @@
 
 list<Entity*> Pick::ent_list;
 
+const float Pick::EPSILON=0.0001f;
+
 float Pick::picked_x;
 float Pick::picked_y;
 float Pick::picked_z;

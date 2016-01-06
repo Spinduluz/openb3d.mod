@@ -134,7 +134,6 @@ RenderWorld
 TLight.GetLightValues()
 TLight.specular[1,0]=200/255.0 ; TLight.specular[1,1]=100/255.0 ; TLight.specular[1,2]=100/255.0
 
-
 While Not KeyDown(KEY_ESCAPE)
 
 	' move camera
@@ -227,6 +226,9 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 	
 Wend
+FreeShader Shader
+FreeShader Shader2
+FreeShader Shader3
 End
 
 
@@ -245,6 +247,7 @@ End Function
 
 ' camera mouselook (from firepaint3d.bb)
 Function MouseLook( pivot:TPivot,camera:TCamera,time%,elapsed% )
+	If Not MouseDown(2) Return
 
 	Repeat
 		elapsed=MilliSecs()-time
