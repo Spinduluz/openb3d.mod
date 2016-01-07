@@ -7,7 +7,7 @@
  *
  */
 
-#include "glew.h"
+#include <GL/glew.h>
 
 #include "texture.h"
 #include "stb_image.h"

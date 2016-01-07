@@ -5,7 +5,9 @@
  *
  */
 
-#include "glew.h"
+// ..\..\..\..\..\pub.mod\glew.mod\
+
+#include <GL/glew.h>
 
 /*
 #ifdef linux
@@ -65,9 +67,6 @@ VoxelTerrain* VoxelTerrain::CreateVoxelTerrain(int xsize, int ysize, int zsize, 
 			}
 
 		}
-
-
-
 	}
 
 

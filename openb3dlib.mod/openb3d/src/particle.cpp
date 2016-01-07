@@ -1,6 +1,6 @@
 #include <stdlib.h> 
 
-#include "glew.h"
+#include <GL/glew.h>
 
 /*
 #ifdef linux

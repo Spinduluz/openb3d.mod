@@ -70,7 +70,12 @@
     <ClCompile Include="..\touch.cpp" />
     <ClCompile Include="..\tree.cpp" />
     <ClCompile Include="..\voxel.cpp" />
-    <ClCompile Include="..\voxterrain.cpp" />
+    <ClCompile Include="..\voxterrain.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\x.cpp" />
     <ClCompile Include="functions2.cpp" />
   </ItemGroup>
@@ -182,7 +187,26 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)lib\$(Configuration)\$(PlatformShortName)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(PlatformShortName)\</IntDir>
+    <TargetName>openb3d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)lib\$(Configuration)\$(PlatformShortName)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(PlatformShortName)\</IntDir>
+    <TargetName>openb3d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)lib\$(Configuration)\$(PlatformShortName)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(PlatformShortName)\</IntDir>
+    <TargetName>openb3d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)lib\$(Configuration)\$(PlatformShortName)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(PlatformShortName)\</IntDir>
+    <TargetName>openb3d</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -190,7 +214,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD;BLITZMAX_DEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\;..\..\make\lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -204,7 +228,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD;BLITZMAX_DEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\;..\..\make\lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -220,7 +244,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\;..\..\make\lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -238,7 +262,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);BLITZMAX_BUILD</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\;..\..\..\..\..\pub.mod\glew.mod\GL\;..\..\..\..\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\..\..\..\..\;..\..\make\lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -21,7 +21,7 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include "glew.h"
+#include <GL/glew.h>
 
 /*
 //#import <OpenGLES/ES1/gl.h>

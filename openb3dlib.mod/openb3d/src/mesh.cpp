@@ -7,7 +7,7 @@
  *
  */
 
-#include "glew.h"
+#include <GL/glew.h>
 
 /*
 #ifdef linux
@@ -1164,7 +1164,7 @@ void Mesh::AddMesh(Mesh* mesh2){
 		Surface* surf1=GetSurface(s1);
 
 		// if surface is empty, don't add it
-		if(surf1->CountVertices()==0 and surf1->CountTriangles()==0) continue;
+		if(surf1->CountVertices()==0 && surf1->CountTriangles()==0) continue;
 
 		int new_surf=true;
 
@@ -2135,7 +2135,7 @@ int Mesh::MeshesIntersect(Mesh* mesh2){
 		Surface* surf1=GetSurface(s1);
 
 		// if surface is empty, don't add it
-		if(surf1->CountVertices()==0 and surf1->CountTriangles()==0) continue;
+		if(surf1->CountVertices()==0 && surf1->CountTriangles()==0) continue;
 
 		for(int t=0;t<=surf1->CountTriangles()-1;t++){
 
@@ -2161,7 +2161,7 @@ int Mesh::MeshesIntersect(Mesh* mesh2){
 			for(int s2=1;s2<=mesh2->CountSurfaces();s2++){
 
 				Surface* surf2=mesh2->GetSurface(s2);
-				if(surf2->CountVertices()==0 and surf2->CountTriangles()==0) continue;
+				if(surf2->CountVertices()==0 && surf2->CountTriangles()==0) continue;
 
 
 				for(int t2=0;t2<=surf2->CountTriangles()-1;t2++){

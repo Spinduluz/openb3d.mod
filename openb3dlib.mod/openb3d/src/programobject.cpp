@@ -1,6 +1,6 @@
 #include "shadermat.h"
 #include "surface.h"
-#include "glew.h"
+#include <GL/glew.h>
 
 #include "string_helper.h"
 

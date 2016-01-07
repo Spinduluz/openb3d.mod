@@ -21,7 +21,8 @@
 '
 SuperStrict
 
-Import "../../pub.mod/glew.mod/GL/*.h"
+Import "../../pub.mod/glew.mod/*.h"
+'Import "../../pub.mod/glew.mod/GL/*.h"
 
 Import "openb3d/src/*.h"
 

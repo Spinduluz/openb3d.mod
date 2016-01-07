@@ -1,7 +1,7 @@
 #include <list>
 #include <string>
 
-#include "glew.h"
+#include <GL/glew.h>
 
 #include "surface.h"
 #include "file.h"

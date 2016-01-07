@@ -1,6 +1,6 @@
 #include "file.h"
 #include "dds.h"
-#include "glew.h"
+#include <GL/glew.h>
 #include "string_helper.h"
 
 #include <algorithm>

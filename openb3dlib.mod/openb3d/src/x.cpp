@@ -324,10 +324,10 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 							
 						// fetch material data
 						list<XLoader_TreeNode*> matlist = XLoader_FindTreeElements(tree, "material");
-						Brush* brushes[matlist.size()];
+						Brush* brushes=new Brush[matlist.size()];
 						vector<string> brushnames;
 
-						loadBrush(matlist, brushes, brushnames);
+						loadBrush(matlist, &brushes, brushnames);
 
 						list<XLoader_TreeNode*> framelist = XLoader_FindTreeElements(tree, "frame");
 						XLoader_TreeNode* frametree;
@@ -523,10 +523,10 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 										texdata = texdata.substr(texdata.find(";;") + 3);
 
 										list<XLoader_TreeNode*> Lmatlist = XLoader_FindTreeElements(meshnode, "material");
-										Brush* Lbrushes[Lmatlist.size()];
+										Brush* Lbrushes=new Brush[Lmatlist.size()];
 										vector<string> Lbrushnames;
 
-										loadBrush(Lmatlist, Lbrushes, Lbrushnames);
+										loadBrush(Lmatlist, &Lbrushes, Lbrushnames);
 										//string texname = texdata.substr(0,texdata.find("}"));
 										string_find_and_replace(texdata, "{", "");
 										vector<string> texname = split(texdata,'}');
@@ -564,10 +564,10 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 											if (Lmatlist.size()==0){
 												for (unsigned int i = 0; i< matlist.size();i++){
 													if (brushnames[i] == texname[m])
-														{New_surface->PaintSurface(brushes[i]);}
+														{New_surface->PaintSurface(&brushes[i]);}
 												}
 											}else{
-												New_surface->PaintSurface(Lbrushes[m]);
+												New_surface->PaintSurface(&Lbrushes[m]);
 											}
 										}
 
