@@ -39,8 +39,13 @@ Shader* Global::ambient_shader=0;
 int Global::vbo_enabled=true;
 int Global::vbo_min_tris=false;
 
-int Global::gl_sgis_generate_mipmap=false;
-int Global::gl_ext_framebuffer_object=false;
+bool Global::gl_sgis_generate_mipmap=false;
+bool Global::gl_ext_framebuffer_object=false;
+
+bool Global::gl_arb_shader_ojects=false;
+bool Global::gl_arb_shading_language_100=false;
+bool Global::gl_arb_vertex_shader=false;
+bool Global::gl_arb_fragment_shader=false;
 
 float Global::anim_speed=1.0;
 int Global::fog_enabled=false;

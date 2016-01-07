@@ -5,6 +5,8 @@
 
 ' TShaderData
 
+' Added CreateShaderProgram
+
 Rem
 bbdoc: Material texture
 End Rem
@@ -104,9 +106,25 @@ Type TShader
 		
 	End Function
 	
-	Function FreeShader( Shader:TShader )
-		FreeShader_( GetInstance(Shader) )
+	Function CreateShaderProgram:TShader( ShaderName:String )
+		Local name:Byte Ptr=ShaderName.ToCString()
+		Local inst:Byte Ptr=CreateShaderProgram_( name )
+		Local material:TShader=CreateObject( inst )
+		MemFree name
+		Return material
 	End Function
+	
+	Method FreeShader()
+	
+		FreeShader_( instance )
+		
+	End Method
+	
+	Method AttachShaderObject( obj:TShaderObject )
+		
+		AttachShaderObject_( instance,obj.instance )
+		
+	End Method
 	
 	Method ShadeSurface( surf:TSurface )
 	

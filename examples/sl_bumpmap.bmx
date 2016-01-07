@@ -78,6 +78,8 @@ Local colortex:TTexture=LoadTexture("media/07_DIFFUSE.jpg")
 Local normaltex:TTexture=LoadTexture("media/07_NORMAL.jpg")
 Local spectex:TTexture=LoadTexture("media/07_DISP.jpg")
 
+'Local reftest:TTexture=LoadTexture("media/07_DIFFUSE.jpg")
+
 ' bumpmap 1 - one light, directional or point
 Local shader:TShader=LoadShader("","shaders/bumpmap.vert.glsl","shaders/bumpmap.frag.glsl")
 ShaderTexture(shader,colortex,"colorMap",0)
@@ -133,6 +135,8 @@ MoveMouse 0,0
 RenderWorld
 TLight.GetLightValues()
 TLight.specular[1,0]=200/255.0 ; TLight.specular[1,1]=100/255.0 ; TLight.specular[1,2]=100/255.0
+
+bumpmode=1
 
 While Not KeyDown(KEY_ESCAPE)
 
@@ -226,6 +230,8 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 	
 Wend
+FreeTexture colortex
+'FreeTexture reftest
 FreeShader Shader
 FreeShader Shader2
 FreeShader Shader3

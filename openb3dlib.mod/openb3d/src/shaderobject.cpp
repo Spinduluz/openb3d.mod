@@ -10,6 +10,8 @@
 
 using namespace std;
 
+string tempname="";
+
 #if defined(BLITZMAX_DEBUG)
 int ShaderObject::debug_count=0;
 int ProgramObject::debug_count=0;
@@ -25,7 +27,7 @@ ShaderObject::~ShaderObject(){
 	glDeleteShader(object);
 }
 
-ShaderObject* ShaderObject::Create(GLenum type, const string& src){
+ShaderObject* ShaderObject::Create(GLenum type, const string& src,const string& name){
 	if(src.empty()) return NULL;
 	// wrong size "void main(){}"
 	if (src.length()<13){
@@ -44,18 +46,23 @@ ShaderObject* ShaderObject::Create(GLenum type, const string& src){
 
 	// Did the shader compile successfuly?
 	int compiled;
-	glGetShaderiv(shader->object,GL_COMPILE_STATUS, &compiled);
+	glGetShaderiv(shader->object,GL_COMPILE_STATUS,&compiled);
 	if (!compiled){
+		// FIXME: Get error etc 
+#if defined(BLITZMAX_DEBUG)
+		DebugLog("Failed to compile shader %s",name.c_str());
+#endif
 		delete shader;
 		return NULL;
 	}
 
-	stringstream s;
-	s << "Unnamed" << ShaderObject::shaderobjects.size();
+	if(name.empty()){
+		stringstream s;
+		s << "Unnamed" << ShaderObject::shaderobjects.size() << (type==GL_VERTEX_SHADER?".vert":".frag");
 
-
-	shader->name=s.str();
-	shader->hash=StringHash(shader->name);
+		shader->name=s.str();
+		shader->hash=StringHash(shader->name);
+	}
 
 	ShaderObject::shaderobjects.push_back(shader);
 	
@@ -81,13 +88,27 @@ ShaderObject* ShaderObject::CreateFromFile(GLenum type,const string& filename){
 	}
 	src+='\0';
 
-	shader=Create(type,src);
+	tempname=filename;
+	shader=Create(type,src,filename);
 
 	shader->name=filename;
 	shader->hash=hash;
 
 	return shader;
 }
+
+// Are you ever used? Ever? No?
+void ShaderObject::Delete(ShaderObject *shader){
+	if (!shader) return;
+
+	for(ProgramObject* o : ProgramObject::programobjects){
+		o->DetachShader(shader);
+	}
+	
+	glDeleteShader(shader->object);
+	ShaderObject::shaderobjects.remove(shader);
+	delete shader;
+}	
 
 ShaderObject* ShaderObject::FindShaderObject(size_t hash){
 	for(ShaderObject *shader : ShaderObject::shaderobjects){
@@ -104,16 +125,4 @@ ShaderObject* ShaderObject::FindShaderObject(const string& name){
 	return FindShaderObject(hash);
 }
 
-// Are you ever used? Ever? No?
-void ShaderObject::Delete(ShaderObject *shader){
-	if (!shader) return;
-
-	for(ProgramObject* o : ProgramObject::programobjects){
-		o->DetachShader(shader);
-	}
-	
-	glDeleteShader(shader->object);
-	ShaderObject::shaderobjects.remove(shader);
-	delete shader;
-}	
 

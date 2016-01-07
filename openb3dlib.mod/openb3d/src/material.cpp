@@ -50,30 +50,21 @@ int Shader::debug_count=0;
 #endif
 int Shader::ShaderIDCount;
 	
-Shader* Shader::CreateShaderMaterial(string name){
+Shader* Shader::CreateShaderMaterial(const string& name){
 	Shader* shader=new Shader;
-	//shader->shader_texture_count=0; Set in constructor
-	if (name.empty()){
-		name="NoName";
-	}
 	if (1){//HardwareInfo->ShaderSupport{
 		stringstream s;
 		shader->id=ShaderIDCount;
-		s << name << shader->id;
-		name+=shader->id;
+		s << (name.empty()?"NoName":name);
+		if(name.empty()) s << shader->id;
 
 		shader->arb_program=ProgramObject::Create(s.str());
 		shader->name = s.str();
-
-		ShaderIDCount++;
 	}else{
-		return 0;
+		return NULL;
 	}
 	ShaderIDCount++;
 
-	/*for (int i=0; i<255; i++){
-		shader->shader_texture[i]=NULL;
-	}*/
 	shader->shader_texture.fill(NULL);
 
 	return shader;
@@ -622,19 +613,19 @@ void Shader::AddShader(string vsfilename, string fsfilename){
 	}
 }
 	
-void Shader::AddShaderFromString(string vsfilename, string fsfilename){
+void Shader::AddShaderFromString(string vssrc,string fssrc,const string& name){
 	if (!arb_program) return;
 
 	ShaderObject* vs;
 	ShaderObject* fs;
 		
-	if (!vsfilename.empty()){
-		vs=ShaderObject::Create(GL_VERTEX_SHADER,vsfilename);
+	if (!vssrc.empty()){
+		vs=ShaderObject::Create(GL_VERTEX_SHADER,vssrc,name+(name.empty()?"":".vert"));
 		if(vs) arb_program->AttachShader(vs);
 	}
 		
-	if (!fsfilename.empty()){
-		fs=ShaderObject::Create(GL_FRAGMENT_SHADER,fsfilename);
+	if (!fssrc.empty()){
+		fs=ShaderObject::Create(GL_FRAGMENT_SHADER,fssrc,name+(name.empty()?"":".frag"));
 		if(fs) arb_program->AttachShader(fs);
 	}
 }

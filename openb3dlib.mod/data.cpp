@@ -748,22 +748,21 @@ Terrain* StaticIterListTerrain( int classid,int varid ){
 	return obj;
 }
 
-// What in the bloody hell is this?
 Texture* StaticIterListTexture( int classid,int varid ){
 	static int id=0;
-	static list<TexturePtr> objlist;
-	static list<TexturePtr>::iterator it;
+	static list<Texture*> objlist;
+	static list<Texture*>::iterator it;
 	static Texture* obj;
 	
 	switch (classid){
 		case TEXTURE_class :
-			switch (varid){
-				case TEXTURE_tex_list : objlist=Texture::tex_list; break;
-			}
+		switch (varid){
+			case TEXTURE_tex_list : objlist=Texture::tex_list; break;
+		}
 	}
 	if (objlist.size() == 0) return NULL;
 	if (id == 0) it=objlist.begin();
-	obj=(*it).get();
+	obj=*it;
 	it++;
 	id++;
 	if (id == objlist.size()) id=0;

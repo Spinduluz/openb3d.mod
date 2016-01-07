@@ -12,6 +12,10 @@
 #include <string>
 using namespace std;
 
+#if defined(BLITZMAX_DEBUG)
+#include "bmaxdebug.h"
+#endif
+
 string Left(const string& s,int length){
 	if (length <= 0) return ""; // SK: fix out of bounds.
 	return s.substr(0,length);
@@ -118,11 +122,12 @@ string Split(string s,const string& splitter,int count){
 	return "";
 }
 
-#if 0
+#if 1
 size_t StringHash(const string& s){
 	size_t hash=0;
-	for(string::const_iterator i=s.begin(); i!=s.end(); i++){
-		hash=hash+(*i)+(hash<<6)+(hash<<16)-hash;
+	for(int c : s){
+		// sdbm algorithm
+		hash=c+(hash<<6)+(hash<<16)-hash;
 	}
 	return hash;
 }

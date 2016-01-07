@@ -476,7 +476,8 @@ void col_tree_sub( Terrain* obj,int l,float v0[],float v1[],float v2[] ){
 // Texture
 
 Texture* TexInList( Texture* obj ){
-	return obj->TexInList();
+	return Texture::TexInList(obj->file_hash,obj->flags);
+	//return obj->TexInList();
 }
 
 void FilterFlags( Texture* obj ){

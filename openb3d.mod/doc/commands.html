@@ -86,6 +86,9 @@ Set shader to be used for all surfaces.
 <tr><td class=docleft width=1%><a href=#AppendAction>AppendAction</a></td><td class=docright>
 undocumented.
 </td></tr>
+<tr><td class=docleft width=1%><a href=#AttachShaderObject>AttachShaderObject</a></td><td class=docright>
+undocumented.
+</td></tr>
 <tr><td class=docleft width=1%><a href=#BackBufferToTex>BackBufferToTex</a></td><td class=docright>
 Copy the contents of the backbuffer to a texture.
 </td></tr>
@@ -280,6 +283,12 @@ undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#CreateShader>CreateShader</a></td><td class=docright>
 Load shader from two strings, vertex and fragment.
+</td></tr>
+<tr><td class=docleft width=1%><a href=#CreateShaderObject>CreateShaderObject</a></td><td class=docright>
+undocumented.
+</td></tr>
+<tr><td class=docleft width=1%><a href=#CreateShaderProgram>CreateShaderProgram</a></td><td class=docright>
+undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#CreateShadow>CreateShadow</a></td><td class=docright>
 Creates stencil shadow, static flag is for static or dynamic shadows.
@@ -509,9 +518,6 @@ undocumented.
 <tr><td class=docleft width=1%><a href=#LoadAnimMeshFromBuffer>LoadAnimMeshFromBuffer</a></td><td class=docright>
 &nbsp;
 </td></tr>
-<tr><td class=docleft width=1%><a href=#LoadAnimMeshFromStream>LoadAnimMeshFromStream</a></td><td class=docright>
-&nbsp;
-</td></tr>
 <tr><td class=docleft width=1%><a href=#LoadAnimSeq>LoadAnimSeq</a></td><td class=docright>
 <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadAnimSeq">Online doc</a>
 </td></tr>
@@ -532,6 +538,9 @@ undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#LoadShader>LoadShader</a></td><td class=docright>
 Load shader from two files, vertex and fragment.
+</td></tr>
+<tr><td class=docleft width=1%><a href=#LoadShaderObject>LoadShaderObject</a></td><td class=docright>
+undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#LoadSprite>LoadSprite</a></td><td class=docright>
 <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadSprite">Online doc</a>
@@ -1009,6 +1018,9 @@ Rigid Body.
 <tr><td class=docleft width=1%><a href=#TShader>TShader</a></td><td class=docright>
 Shader.
 </td></tr>
+<tr><td class=docleft width=1%><a href=#TShaderObject>TShaderObject</a></td><td class=docright>
+ShaderObject.
+</td></tr>
 <tr><td class=docleft width=1%><a href=#TShadowObject>TShadowObject</a></td><td class=docright>
 Shadow object.
 </td></tr>
@@ -1095,7 +1107,7 @@ Voxelsprite mesh entity.
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=AddFileResource>
-<tr><td class=doctop colspan=2>Function AddFileResource:Byte(filename:String,reserved:Int=0 )</td></tr>
+<tr><td class=doctop colspan=2>Function AddFileResource:Byte( filename:String,reserved:Int=0 )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
@@ -1156,6 +1168,11 @@ Voxelsprite mesh entity.
 <br>
 <table class=doc width=100% cellspacing=3 id=AppendAction>
 <tr><td class=doctop colspan=2>Function AppendAction( act1:TAction,act2:TAction )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=AttachShaderObject>
+<tr><td class=doctop colspan=2>Function AttachShaderObject( shader:TShader,shaderobject:TShaderObject )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
@@ -1482,6 +1499,16 @@ Voxelsprite mesh entity.
 <table class=doc width=100% cellspacing=3 id=CreateShader>
 <tr><td class=doctop colspan=2>Function CreateShader:TShader( ShaderName:String,VshaderString:String,FshaderString:String )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>Load shader from two strings, vertex and fragment.</td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=CreateShaderObject>
+<tr><td class=doctop colspan=2>Function CreateShaderObject:TShaderObject( shadertype:Int,source:String,name:String )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=CreateShaderProgram>
+<tr><td class=doctop colspan=2>Function CreateShaderProgram:TShader( name:String="" )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=CreateShadow>
@@ -1863,10 +1890,6 @@ Voxelsprite mesh entity.
 <tr><td class=doctop colspan=2>Function LoadAnimMeshFromBuffer:TMesh( buf:Byte[],num:Int,format:Int,parent:TEntity=Null )</td></tr>
 </table>
 <br>
-<table class=doc width=100% cellspacing=3 id=LoadAnimMeshFromStream>
-<tr><td class=doctop colspan=2>Function LoadAnimMeshFromStream:TMesh( file:TStream,format:Int,parent:TEntity=Null )</td></tr>
-</table>
-<br>
 <table class=doc width=100% cellspacing=3 id=LoadAnimSeq>
 <tr><td class=doctop colspan=2>Function LoadAnimSeq:Int( ent:TEntity,file:String )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright><a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadAnimSeq">Online doc</a></td></tr>
@@ -1900,6 +1923,11 @@ Voxelsprite mesh entity.
 <table class=doc width=100% cellspacing=3 id=LoadShader>
 <tr><td class=doctop colspan=2>Function LoadShader:TShader( ShaderName:String,VshaderFileName:String,FshaderFileName:String )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>Load shader from two files, vertex and fragment.</td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=LoadShaderObject>
+<tr><td class=doctop colspan=2>Function LoadShaderObject:TShaderObject( shadertype:Int,filename:String )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=LoadSprite>
@@ -2694,6 +2722,11 @@ Voxelsprite mesh entity.
 <table class=doc width=100% cellspacing=3 id=TShader>
 <tr><td class=doctop colspan=2>Type TShader</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>Shader.</td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=TShaderObject>
+<tr><td class=doctop colspan=2>Type TShaderObject</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>ShaderObject.</td></tr>
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=TShadowObject>

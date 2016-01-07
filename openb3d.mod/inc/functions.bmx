@@ -1946,7 +1946,7 @@ Rem
 bbdoc: Free shader
 End Rem
 Function FreeShader( Shader:TShader )
-	TShader.FreeShader( Shader )
+	Shader.FreeShader
 End Function
 
 Rem
@@ -2225,9 +2225,37 @@ End Function
 Rem
 bbdoc: undocumented
 End Rem
-Function AddFileResource:Byte(filename:String,reserved:Int=0 )
+Function AddFileResource:Byte( filename:String,reserved:Int=0 )
 	Local name:Byte Ptr=filename.ToCString()
 	Local ret:Byte=AddFileResource_( name,reserved )
 	MemFree name
 	Return ret
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function CreateShaderProgram:TShader( name:String="" )
+	Return TShader.CreateShaderProgram( name )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function AttachShaderObject( shader:TShader,shaderobject:TShaderObject )
+	shader.AttachShaderObject( shaderobject )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function LoadShaderObject:TShaderObject( shadertype:Int,filename:String )
+	Return TShaderObject.LoadShaderObject( shadertype,filename )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function CreateShaderObject:TShaderObject( shadertype:Int,source:String,name:String )
+	Return TShaderObject.CreateShaderObject( shadertype,source,name )
 End Function

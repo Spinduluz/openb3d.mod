@@ -62,10 +62,6 @@ inline void GL_CopyTexImage2D(GLenum target,int x,int y,int width,int height){
 	}
 }
 
-void FreeTexturePtr(Texture *tex){
-	if(tex) tex->FreeTexture();
-}
-
 // ==========================================================================================================
 
 bool is_dds(const string& filename){
@@ -110,7 +106,7 @@ void stbi_free_pixbuf(unsigned char *buf){
 
 // ==========================================================================================================
 
-list<TexturePtr> Texture::tex_list;//( 128 );
+list<Texture*> Texture::tex_list;
 
 Texture::LoadPixbuf Texture::loadpixbuf = stbi_load_pixbuf;
 Texture::FreePixbuf Texture::freepixbuf = stbi_free_pixbuf;
@@ -154,25 +150,28 @@ Texture::Texture()
 #endif
 };
 
+Texture::~Texture(){
+	tex_list.remove(this);
+}
+
 Texture* Texture::LoadTexture(string filename,int flags){
+	filename=File::ResourceFilePath(filename);
+	if(filename.empty()) return NULL;
+
+	// Check this stuff here to avoid unnecessary allocations/deallocations
+	size_t hash=StringHash(filename);
+	FilterFlags(filename,flags);
+
+	Texture *old=TexInList(hash,flags);
+	if(old) return old;
+
 	// Try to load DDS file first
 	if(is_dds(filename)){
 		Texture* tex=new Texture();
 		tex->file_name=filename;
-		tex->file_hash=StringHash(filename);
-
-		// set tex.flags before TexInList
+		tex->file_hash=hash;
 		tex->flags=flags;
-		tex->FilterFlags();
-
-		// check to see if texture with same properties exists already, if so return existing texture
-		Texture* old_tex=tex->TexInList();
-		if(old_tex){
-			delete tex; // No memory leak.
-			return old_tex;
-		}else{
-			tex_list.push_back(TexturePtr(tex,FreeTexturePtr));
-		}
+		tex_list.push_back(tex);
 
 		DirectDrawSurface *dds=DirectDrawSurface::LoadSurface(filename,false);
 		if(!dds){
@@ -188,28 +187,12 @@ Texture* Texture::LoadTexture(string filename,int flags){
 	}
 	// Other images.
 	if (flags&128) {
-		filename=File::ResourceFilePath(filename);
-
 		Texture* tex=new Texture();
 		tex->file_name=filename;
-		tex->file_hash=StringHash(filename);
+		tex->file_hash=hash;
 		tex->format=GL_RGBA;
-
-		// set tex.flags before TexInList
 		tex->flags=flags;
-		tex->FilterFlags();
-
-		// check to see if texture with same properties exists already, if so return existing texture
-		Texture* old_tex=tex->TexInList();
-		if(old_tex){
-			delete tex; // No memory leak...
-			return old_tex;
-		}else{
-			tex_list.push_back(TexturePtr(tex,FreeTexturePtr));
-		}
-
-		string filename_left=Left(filename,Len(filename)-4);
-		string filename_right=Right(filename,3);
+		tex_list.push_back(tex);
 
 		unsigned char* buffer;
 		buffer=loadpixbuf(filename.c_str(),&tex->width,&tex->height);
@@ -242,28 +225,22 @@ Texture* Texture::LoadTexture(string filename,int flags){
 
 Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int frame_height,int first_frame,int frame_count){
 	filename=File::ResourceFilePath(filename);
+	if(filename.empty()) return NULL;
+
+	// Check this stuff here to avoid unnecessary allocations/deallocations
+	// FIXME: We're double checking this stuff if this call comes from LoadTexture
+	size_t hash=StringHash(filename);
+	FilterFlags(filename,flags);
+
+	Texture *old=TexInList(hash,flags);
+	if(old) return old;
 
 	Texture* tex=new Texture();
 	tex->file_name=filename;
-	tex->file_hash=StringHash(filename);
+	tex->file_hash=hash;
 	tex->format=GL_RGBA;
-
-	// set tex.flags before TexInList
 	tex->flags=flags;
-	tex->FilterFlags();
-
-	// check to see if texture with same properties exists already, if so return existing texture
-	Texture* old_tex=tex->TexInList();
-	if(old_tex){
-		delete tex; // No memory leak.
-		return old_tex;
-	}else{
-		tex_list.push_back(TexturePtr(tex,FreeTexturePtr));
-	}
-#if 0
-	string filename_left=Left(filename,Len(filename)-4);
-	string filename_right=Right(filename,3);
-#endif
+	tex_list.push_back(tex);
 
 	unsigned char* buffer=loadpixbuf(filename.c_str(),&tex->width,&tex->height);
 
@@ -308,7 +285,7 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 
 }
 
-Texture* Texture::CreateTexture(int width,int height,int flags, int frames,string fname){
+Texture* Texture::CreateTexture(int width,int height,int flags,int frames,string fname){
 	Texture* tex=new Texture();
 
 	tex->flags=flags;
@@ -328,8 +305,7 @@ Texture* Texture::CreateTexture(int width,int height,int flags, int frames,strin
 }
 
 void Texture::FreeTexture(){
-	tex_list.remove(TexturePtr(this));
-	delete this;
+	DestroyRef();
 }
 
 void Texture::DrawTexture(int x,int y){
@@ -372,34 +348,42 @@ void Texture::ClearTextureFilters(){
 }
 
 void Texture::AddTextureFilter(string text_match,int flags){
-	TextureFilter* filter=new TextureFilter(); // Why even make this a pointer??
+	TextureFilter* filter=new TextureFilter();
 	filter->text_match=text_match;
 	filter->flags=flags;
 	TextureFilter::tex_filter_list.push_back(filter);
 }
 
-Texture* Texture::TexInList(){
-	// check if tex already exists in list and if so return it
-	for(TexturePtr& tex : tex_list){
-#if 0
-		if(!tex->file_hash || !file_hash){ // Assume we dont have a hash.
-			if(file_name==tex->file_name && flags==tex->flags){// && blend==tex->blend){
-			//if(u_scale==tex->u_scale && v_scale==tex->v_scale && u_pos==tex->u_pos && v_pos==tex->v_pos && angle==tex->angle){
-				return tex;
-			//}
-			}
-		} else {
-			if(file_hash==tex->file_hash){
-				return tex;
-			}
+Texture* Texture::TexInList(size_t hash,int flags){
+	// I though about not checking the flags but decided against it since
+	// someone might want to implement a material system (like Quake3).
+
+	// So right now well just load the texture again if flags differ.
+	// It would probably be a good idea to reuse texturename.
+
+	// check if tex already exists in list and if so increase ref count and return it
+	for(Texture* tex : tex_list){
+		if(hash==tex->file_hash && flags==tex->flags){
+			tex->AddRef();
+			return tex;
 		}
-#else
-		if(file_hash==tex->file_hash && flags==tex->flags){
-			return tex.get();
-		}
-#endif
 	}
 	return NULL;
+}
+
+Texture* Texture::TexInList(){
+	for(Texture* tex : tex_list){
+		if(file_hash==tex->file_hash && flags==tex->flags){
+			tex->AddRef();
+			return tex;
+		}
+	}
+	return NULL;
+}
+void Texture::FilterFlags(const string& filename,int& flags){
+	for(TextureFilter* filter : TextureFilter::tex_filter_list){
+		if(Instr(filename,filter->text_match)) flags|=filter->flags;
+	}
 }
 
 void Texture::FilterFlags(){

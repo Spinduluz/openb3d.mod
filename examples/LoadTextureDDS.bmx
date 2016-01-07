@@ -18,8 +18,8 @@ Local dxt5:TMesh=CreateCube()
 Local rgba:TMesh=CreateCube()
 
 PositionEntity dxt1,-5,0,0
-PositionEntity dxt3, 0,0,0
-PositionEntity dxt5, 5,0,0
+PositionEntity dxt3, 5,0,0
+PositionEntity dxt5, 0,0,0
 PositionEntity rgba, 0,5,0
 
 Local dxt1_tex:TTexture=LoadTexture("media/dxt1.dds")

@@ -19,7 +19,7 @@
 #include <vector>
 #include "unzip.h"
 
-#if defined(BLITZMAX_BUILD)
+#if defined(BLITZMAX_BUILD) && defined(BLITZMAX_TSTREAM)
 #include <pub.mod/mapstream.mod/bbstream.h>
 #endif
 

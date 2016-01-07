@@ -105,7 +105,7 @@ inline void DXT_SwapPointer(void *ptr1,void *ptr2,unsigned int size){
 	// FIXME:
 	//	Use shrink to fit?
 	//	Max size to avoid possible overflows?
-	if (tmp.size() < size)
+	if (tmp.size()<size)
 		tmp.reserve(size);
 
 	ptr=&tmp[0];
@@ -179,43 +179,44 @@ inline void DXT_FlipBlocksDXTC5(DXTColorBlock *line,unsigned int num){
 }
 
 // ==========================================================================================================
+enum{
+	DDSD_CAPS					=0x00000001,
+	DDSD_HEIGHT					=0x00000002,
+	DDSD_WIDTH					=0x00000004,
+	DDSD_PITCH					=0x00000008,
+	DDSD_PIXELFORMAT			=0x00001000,
+	DDSD_MIPMAPCOUNT			=0x00020000,
+	DDSD_LINEARSIZE				=0x00080000,
+	DDSD_DEPTH					=0x00800000,
 
-#define DDSD_CAPS					0x00000001
-#define DDSD_HEIGHT					0x00000002
-#define DDSD_WIDTH					0x00000004
-#define DDSD_PITCH					0x00000008
-#define DDSD_PIXELFORMAT			0x00001000
-#define DDSD_MIPMAPCOUNT			0x00020000
-#define DDSD_LINEARSIZE				0x00080000
-#define DDSD_DEPTH					0x00800000
+	DDPF_ALPHAPIXELS			=0x00000001,
+	DDPF_FOURCC					=0x00000004,
+	DDPF_RGB					=0x00000040,
+	DDPF_RGBA					=0x00000041,
 
-#define DDPF_ALPHAPIXELS			0x00000001
-#define DDPF_FOURCC					0x00000004
-#define DDPF_RGB					0x00000040
-#define DDPF_RGBA					0x00000041
+	DDSCAPS_COMPLEX				=0x00000008,
+	DDSCAPS_TEXTURE				=0x00001000,
+	DDSCAPS_MIPMAP				=0x00400000,
 
-#define DDSCAPS_COMPLEX				0x00000008
-#define DDSCAPS_TEXTURE				0x00001000
-#define DDSCAPS_MIPMAP				0x00400000
+	DDSCAPS2_CUBEMAP			=0x00000200,
+	DDSCAPS2_CUBEMAP_POSITIVEX	=0x00000400,
+	DDSCAPS2_CUBEMAP_NEGATIVEX	=0x00000800,
+	DDSCAPS2_CUBEMAP_POSITIVEY	=0x00001000,
+	DDSCAPS2_CUBEMAP_NEGATIVEY	=0x00002000,
+	DDSCAPS2_CUBEMAP_POSITIVEZ	=0x00004000,
+	DDSCAPS2_CUBEMAP_NEGATIVEZ	=0x00008000,
+	DDSCAPS2_CUBEMAP_ALL_FACES	=0x0000FC00,
+	DDSCAPS2_VOLUME				=0x00200000,
 
-#define DDSCAPS2_CUBEMAP			0x00000200
-#define DDSCAPS2_CUBEMAP_POSITIVEX	0x00000400
-#define DDSCAPS2_CUBEMAP_NEGATIVEX	0x00000800
-#define DDSCAPS2_CUBEMAP_POSITIVEY	0x00001000
-#define DDSCAPS2_CUBEMAP_NEGATIVEY	0x00002000
-#define DDSCAPS2_CUBEMAP_POSITIVEZ	0x00004000
-#define DDSCAPS2_CUBEMAP_NEGATIVEZ	0x00008000
-#define DDSCAPS2_CUBEMAP_ALL_FACES	0x0000FC00
-#define DDSCAPS2_VOLUME				0x00200000
-
-#define FOURCC_DXT1					0x31545844
-#define FOURCC_DXT3					0x33545844
-#define FOURCC_DXT5					0x35545844
+	FOURCC_DXT1					=0x31545844,
+	FOURCC_DXT3					=0x33545844,
+	FOURCC_DXT5					=0x35545844
+};
 
 #pragma pack(push,packed)
 #pragma pack(1)
 
-struct DDSPixelFormat {
+struct DDSPixelFormat{
 	unsigned int	size;
 	unsigned int	flags;
 	unsigned int	fourcc;
@@ -226,7 +227,7 @@ struct DDSPixelFormat {
 	unsigned int	abitmask;
 };
 
-struct DDSHeader {
+struct DDSHeader{
 	unsigned int	size;
 	unsigned int	flags;
 	unsigned int	height;
@@ -243,7 +244,7 @@ struct DDSHeader {
 
 #pragma pack(pop,packed)
 
-inline int DDS_Clamp(int a) { return a<=0?1:a; }
+inline int DDS_Clamp(int a) { return a<1?1:a; }
 
 inline bool DDS_GetInfo(DDSHeader *header,unsigned int& format,int& components,unsigned int& target){
 	target=GL_TEXTURE_2D;
@@ -349,9 +350,7 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 	target=0;
 	components=0;
 
-	if(!DDS_GetInfo(dds,format,components,target)){
-		return NULL;
-	}
+	if(!DDS_GetInfo(dds,format,components,target)) return NULL;
 
 	DirectDrawSurface *surface=new DirectDrawSurface;
 	int mipmaps;
@@ -383,7 +382,7 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 
 		buf+=base->size;
 
-		if(flip) base->Flip();
+		//if(flip) base->Flip();
 
 		int w,h,d;
 
@@ -408,7 +407,7 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 
 			buf+=mip->size;
 
-			if(flip) mip->Flip();
+			//if(flip) mip->Flip();
 
 			w=DDS_Clamp(w>>1);
 			h=DDS_Clamp(h>>1);
@@ -526,6 +525,7 @@ void DirectDrawSurface::UploadTexture(Texture *tex){
 
 void DirectDrawSurface::UploadTexture2D(){
 	if(IsCompressed()){
+		//glTexParameteri(target,GL_GENERATE_MIPMAP,GL_TRUE);
 		glCompressedTexImage2D(GL_TEXTURE_2D,0,format,width,height,0,size,dxt);
 		for(int i=0; i<mipmapcount; i++){
 			DirectDrawSurface& mip=mipmaps[i];

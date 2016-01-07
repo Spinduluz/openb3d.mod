@@ -84,11 +84,13 @@ string Chr(int asc);
 int Asc(const string& s);
 int Len(const string& s);
 string Split(string s,const string& splitter,int count);
-
+#if 0
 inline size_t StringHash(const string& s){
 	hash<string> stringhash;
 	return stringhash(s);
 }
-//size_t StringHash(const string& s);
+#else
+size_t StringHash(const string& s);
+#endif
 
 #endif

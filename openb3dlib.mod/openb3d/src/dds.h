@@ -28,6 +28,8 @@ public:
 	static DirectDrawSurface *LoadSurface(const string& filename,bool flip=true);
 
 	DirectDrawSurface();
+	~DirectDrawSurface() {}
+
 	void FreeDirectDrawSurface();
 
 	bool IsCompressed();

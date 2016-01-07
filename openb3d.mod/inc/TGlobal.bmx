@@ -120,7 +120,47 @@ Type TGlobal
 		Graphics3D_( w,h,d,m,r )
 		
 	End Function
+
+	Function Graphics3DEx:TGLGraphics( w:Int,h:Int,d:Int=0,m:Int=0,r:Int=60,flags:Int=-1,usecanvas:Int=False)
 	
+		Select flags ' back=2|alpha=4|depth=8|stencil=16|accum=32
+			Case -1 ' all
+				flags=GRAPHICS_BACKBUFFER|GRAPHICS_ALPHABUFFER|GRAPHICS_DEPTHBUFFER|GRAPHICS_STENCILBUFFER|GRAPHICS_ACCUMBUFFER
+			Case -2 ' all except accum
+				flags=GRAPHICS_BACKBUFFER|GRAPHICS_ALPHABUFFER|GRAPHICS_DEPTHBUFFER|GRAPHICS_STENCILBUFFER
+			Case -3 ' alpha
+				flags=GRAPHICS_BACKBUFFER|GRAPHICS_ALPHABUFFER
+			Case -4 ' depth
+				flags=GRAPHICS_BACKBUFFER|GRAPHICS_DEPTHBUFFER
+			Case -5 ' stencil
+				flags=GRAPHICS_BACKBUFFER|GRAPHICS_STENCILBUFFER
+			Case -6 ' accum
+				flags=GRAPHICS_BACKBUFFER|GRAPHICS_ACCUMBUFFER
+			Default ' none
+				flags=GRAPHICS_BACKBUFFER
+		End Select
+		
+		InitGlobals()
+		
+		width[0]=w;
+		height[0]=h;
+		depth[0]=d;
+		Mode[0]=m;
+		rate[0]=r;
+		
+		Local g:TGLGraphics
+		
+		SetGraphicsDriver( GLMax2DDriver(),flags )
+		
+		If usecanvas=False Then g=TGLGraphics(Graphics( w,h,d,r,flags ))
+		
+		GraphicsInit()
+		
+		Graphics3D_( w,h,d,m,r )
+		Return g
+	
+	End Function
+
 	Function GraphicsInit()
 	
 		TextureFilter("",9)

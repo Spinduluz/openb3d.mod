@@ -31,6 +31,20 @@ Import BRL.Retro			' imports BRL.Basic
 Import BRL.Map
 'Import PUB.MapStream
 
+' WIP
+' CreateShaderProgram_
+' LoadShaderObject_
+' CreateShaderObject_
+' AttachShaderObject_
+
+' 
+' 2016-01-06 Added FreeShader_
+' 2016-01-05 Added AddFileResource_
+' 2016-01-05 LoadAnimMeshFromBuffer_
+' 2016-01-05 SetPixbufReader_
+
+' LoadTexture now support compressed and uncompressed DDS
+
 ' functions.cpp
 Extern
 
@@ -325,7 +339,7 @@ Extern
 	' *** Shader
 	Function LoadShader_:Byte Ptr( ShaderName:Byte Ptr,VshaderFileName:Byte Ptr,FshaderFileName:Byte Ptr ) = "LoadShader"
 	Function CreateShader_:Byte Ptr( ShaderName:Byte Ptr,VshaderString:Byte Ptr,FshaderString:Byte Ptr ) = "CreateShader"
-	Function FreeShader_( Shader:Byte Ptr ) = "FreeShader"
+	Function FreeShader_( Shader:Byte Ptr ) = "FreeShader" 'New addition
 	Function ShadeSurface_( surf:Byte Ptr,material:Byte Ptr ) = "ShadeSurface"
 	Function ShadeMesh_( mesh:Byte Ptr,material:Byte Ptr ) = "ShadeMesh"
 	Function ShadeEntity_( ent:Byte Ptr,material:Byte Ptr ) = "ShadeEntity"
@@ -371,6 +385,12 @@ Extern
 	
 	' *** FileSystem
 	Function AddFileResource_:Byte( filename:Byte Ptr,reserved:Int=0 ) = "AddFileResource"
+	
+	' *** Work in progress 'FIXME: We want to be able to Free shader objects
+	Function CreateShaderProgram_:Byte Ptr( name:Byte Ptr ) = "CreateShaderProgram"
+	Function LoadShaderObject_:Byte Ptr( shadertype:Int,filename:Byte Ptr ) = "LoadShaderObject"
+	Function CreateShaderObject_:Byte Ptr( shadertype:Int,source:Byte Ptr,name:Byte Ptr ) = "CreateShaderObject"
+	Function AttachShaderObject_( shader:Byte Ptr,obj:Byte Ptr ) = "AttachShaderObject"
 	
 End Extern
 
@@ -497,6 +517,7 @@ Include "inc/TUtility.bmx"
 'Include "inc/data.bmx"
 
 ' extra
+Include "inc/TShaderObject.bmx"
 Include "inc/TShader.bmx"
 Include "inc/TTerrain.bmx"
 Include "inc/TShadowObject.bmx"

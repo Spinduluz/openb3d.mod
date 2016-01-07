@@ -30,6 +30,7 @@ class VoxelSprite;
 class Geosphere;
 class Material;
 class OcTree;
+class ShaderObject;
 #else
 typedef struct Texture Texture;
 typedef struct Brush Brush;
@@ -50,6 +51,7 @@ typedef struct VoxelSprite VoxelSprite;
 typedef struct Geosphere Geosphere;
 typedef struct Material Material;
 typedef struct OcTree OcTree;
+typedef struct ShaderObject ShaderObject;
 #endif
 
 #ifdef __cplusplus
@@ -1228,6 +1230,19 @@ void DLL_EXPORT ShaderMaterial(Shader* material, Material* tex, char* name, int 
 OcTree* DLL_EXPORT CreateOcTree(float w, float h, float d, Entity* parent_ent);
 
 void DLL_EXPORT AddToOctree(OcTree* octree, Mesh* mesh, int level, float X, float Y, float Z, float Near, float Far);
+
+// ==========================================================================================================
+// New additions
+#define SHADEROBJECT_VERTEX		0
+#define SHADEROBJECT_FRAGMENT	1
+
+Mesh* DLL_EXPORT LoadAnimMeshFromBuffer(const void *buffer,int len,int type,Entity *parent);
+void DLL_EXPORT SetPixbufReader(unsigned char *(*)(const char*,int*,int*),void(*)(unsigned char*));
+bool DLL_EXPORT AddFileResource(const char *filename,int reserved);
+Shader* DLL_EXPORT CreateShaderProgram(const char *name);
+ShaderObject* DLL_EXPORT LoadShaderObject(int type,const char *filename);
+ShaderObject* DLL_EXPORT CreateShaderObject(int type,const char*source,const char *name);
+void DLL_EXPORT AttachShaderObject(Shader *shader,ShaderObject *object);
 
 #ifdef __cplusplus
 } // extern "C"

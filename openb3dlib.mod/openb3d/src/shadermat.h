@@ -128,7 +128,7 @@ public:
 	static int debug_count;
 #endif
 
-	static Shader* CreateShaderMaterial(string name="");
+	static Shader* CreateShaderMaterial(const string& name="");
 
 	Shader();
 	~Shader();
@@ -136,10 +136,13 @@ public:
 	// FIXME: Bind and Unbind instead
 	void TurnOn(Matrix& mat, Surface* surf, vector<float>* vertices=0);
 	void TurnOff();
+
 	void AddShader(string vsfilename, string fsfilename);
-	void AddShaderFromString(string vsfilename, string fsfilename);
+	void AddShaderFromString(string vssrc, string fssrc,const string& name);
+
 	void AddSampler2D(string name, int slot, Texture* tex);
 	void AddSampler3D(string name, int slot, Texture* tex);
+
 	void ProgramAttriBegin();
 	void ProgramAttriEnd();
 

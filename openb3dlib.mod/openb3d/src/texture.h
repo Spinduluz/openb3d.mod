@@ -18,23 +18,20 @@
 #include <memory>
 #include <vector>
 
+#include "refobject.h"
+
 using namespace std;
 
 class Camera;
-class Texture;
-// We cant use unique_ptr at the moment because it.. well unique and
-// that StaticIter... thingie in data.cpp wants to make a copy of the list and that's a no go
-//typedef unique_ptr<Texture,void(*)(Texture*)> TexturePtr; 
-typedef shared_ptr<Texture> TexturePtr; 
 
-class Texture{
+class Texture : public ReferencedObject{
 public:
 	typedef unsigned char *(*LoadPixbuf)(const char *filename,int *width,int *height);
 	typedef void (*FreePixbuf)(unsigned char *buf);
 
 	static LoadPixbuf loadpixbuf;
 	static FreePixbuf freepixbuf;
-	static list<TexturePtr> tex_list;
+	static list<Texture*> tex_list;
 
 	unsigned int texture;
 
@@ -70,6 +67,7 @@ public:
 	int texenv[3][12];
 
 	Texture();
+	~Texture();
 
 	static Texture* LoadTexture(string filename,int flags=0);
 	static Texture* LoadAnimTexture(string filename,int flags=0, int frame_width=0,int frame_height=0,int first_frame=0,int frame_count=1);
@@ -89,10 +87,13 @@ public:
 	void DepthBufferToTex(Camera* cam);
 	string TextureName();
 	void SetTextureName(string name);
+
 	static void ClearTextureFilters();
 	static void AddTextureFilter(string text_match,int flags);
 
+	static Texture* TexInList(size_t hash,int flags);
 	Texture* TexInList();
+	static void FilterFlags(const string& filename,int& flags);
 	void FilterFlags();
 	//static string Strip(string filename);
 };

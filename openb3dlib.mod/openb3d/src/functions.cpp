@@ -880,7 +880,7 @@ void FreeShadow(ShadowObject* shad){
 bbdoc: <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=FreeTexture">Online Help</a>
 */
 void FreeTexture(Texture* tex){
-	tex->FreeTexture();
+	tex->DestroyRef();
 }
 
 
@@ -1800,16 +1800,16 @@ float EntityScaleZ(Entity* ent,bool glob){
 }
 
 // const char* ->
-Shader* LoadShader(char* ShaderName, char* VshaderFileName, char* FshaderFileName){
+Shader* LoadShader(char* ShaderName,char* VshaderFileName,char* FshaderFileName){
 	Shader* shader=Shader::CreateShaderMaterial(ShaderName);
 	shader->AddShader(VshaderFileName, FshaderFileName);
 	return shader;
 }
 
 // const char* ->
-Shader* CreateShader(char* ShaderName, char* VshaderString, char* FshaderString){
+Shader* CreateShader(char* ShaderName,char* VshaderString,char* FshaderString){
 	Shader* shader=Shader::CreateShaderMaterial(ShaderName);
-	shader->AddShaderFromString(VshaderString, FshaderString);
+	shader->AddShaderFromString(VshaderString,FshaderString,ShaderName);
 	return shader;
 }
 
@@ -2180,6 +2180,48 @@ void SetPixbufReader(Texture::LoadPixbuf load,Texture::FreePixbuf free){
 
 bool AddFileResource(const char *filename,int reserved){
 	return File::AddFileResource(filename,reserved);
+}
+
+Shader* CreateShaderProgram(const char *name){
+	return Shader::CreateShaderMaterial(name);
+}
+
+ShaderObject* LoadShaderObject(int type,const char *filename){
+	GLenum target;
+	switch(type){
+	case 0:
+		target=GL_VERTEX_SHADER;
+		break;
+	case 1:
+		target=GL_FRAGMENT_SHADER;
+		break;
+	case 2: // Geometry shader
+	default:
+		target=GL_VERTEX_SHADER;
+	}
+
+	return ShaderObject::CreateFromFile(target,filename);
+}
+
+ShaderObject* CreateShaderObject(int type,const char*source,const char *name){
+	GLenum target;
+	switch(type){
+	case 0:
+		target=GL_VERTEX_SHADER;
+		break;
+	case 1:
+		target=GL_FRAGMENT_SHADER;
+		break;
+	case 2: // Geometry shader
+	default:
+		target=GL_VERTEX_SHADER;
+	}
+
+	return ShaderObject::Create(target,source,name);
+}
+
+void AttachShaderObject(Shader *shader, ShaderObject *object){
+	shader->arb_program->AttachShader(object);
 }
 	
 } /* extern "C" */

@@ -1,3 +1,19 @@
+v1.1.1-In progress
+Note:
+ Must now be built in C++11 mode (-std=c++11 or -std=0x) since some internal classes (File) is wrapped using std::shared_ptr
+ This is work in progress while I'm trying to get familiar with OpenB3D so functions might come and go on almost a daily basis.
+
+Added:
+-Compressed textures (DDS)
+-AddFileResource: It's now possible to load resources from within a zip file
+-SetPixbufReader: Use this to override OpenB3Ds image loader. DDS reader is not effected by this
+-LoadAnimMeshFromBuffer: 
+-FreeShader: Added to avoid memory leaks.
+-Shader,ProgramObject,ShaderObject and Texture classes are now reference counted.
+
+Fixed:
+-BackbufferToTex when using Cubemaps. Viewport position 0,0 is still at bottom/left though
+
 V1.1
 Added:
 -3d actions: ActMoveBy, ActTurnBy, ActMoveTo, ActTurnTo, and many more
