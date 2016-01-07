@@ -1808,6 +1808,7 @@ Shader* LoadShader(char* ShaderName,char* VshaderFileName,char* FshaderFileName)
 
 // const char* ->
 Shader* CreateShader(char* ShaderName,char* VshaderString,char* FshaderString){
+	if(!VshaderString && !FshaderString) return Shader::CreateShaderMaterial(ShaderName);
 	Shader* shader=Shader::CreateShaderMaterial(ShaderName);
 	shader->AddShaderFromString(VshaderString,FshaderString,ShaderName);
 	return shader;
@@ -2184,6 +2185,14 @@ bool AddFileResource(const char *filename,int reserved){
 
 Shader* CreateShaderProgram(const char *name){
 	return Shader::CreateShaderMaterial(name);
+}
+
+ShaderObject* LoadVertexShader(const char *filename){
+	return ShaderObject::CreateFromFile(GL_VERTEX_SHADER,filename);
+}
+
+ShaderObject* LoadFragmentShader(const char *filename){
+	return ShaderObject::CreateFromFile(GL_FRAGMENT_SHADER,filename);
 }
 
 ShaderObject* LoadShaderObject(int type,const char *filename){

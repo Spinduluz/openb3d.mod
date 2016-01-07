@@ -94,6 +94,14 @@ Type TShader
 	
 	Function CreateShader:TShader( ShaderName:String,VshaderString:String,FshaderString:String )
 	
+		If VshaderString="" And FshaderString="" Then
+			Local name:Byte Ptr=ShaderName.ToCString()
+			Local inst:Byte Ptr=CreateShader_( name,Null,Null )
+			Local material:TShader=CreateObject(inst)
+			MemFree name
+			Return material
+		End If
+		
 		Local cString:Byte Ptr=ShaderName.ToCString()
 		Local vcString:Byte Ptr=VshaderString.ToCString()
 		Local fcString:Byte Ptr=FshaderString.ToCString()

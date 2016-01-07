@@ -6,27 +6,31 @@
 #include "texture.h"
 #include "file.h"
 #include <list>
-#include<cctype>
+#include <cctype>
 #include<algorithm>
+
+// Spi 2016-01-07
+//	Made it buildable on VS2015
 
 namespace loadX{
 
-File*  Stream;
-	class XLoader_TreeNode{
-	public:
-		list<XLoader_TreeNode*> children;
-		string content;
-		string Template;
-		string name;
+File* file;
+
+class XLoader_TreeNode{
+public:
+	list<XLoader_TreeNode*> children;
+	string content;
+	string Template;
+	string name;
 	
-		/*Method New()
-			Self.children = New TList
-		End Method*/
+	/*Method New()
+		Self.children = New TList
+	End Method*/
 	
-		void Add(XLoader_TreeNode* element){
-			children.push_back(element);
-		}
-	};
+	void Add(XLoader_TreeNode* element){
+		children.push_back(element);
+	}
+};
 
 list<int>      MovedTris;
 
@@ -324,10 +328,14 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 							
 						// fetch material data
 						list<XLoader_TreeNode*> matlist = XLoader_FindTreeElements(tree, "material");
-						Brush* brushes=new Brush[matlist.size()];
+#if _MSC_VER
+						Brush** brushes=new Brush*[matlist.size()];
+#else
+						Brush* brushes[matlist.size()];
+#endif
 						vector<string> brushnames;
 
-						loadBrush(matlist, &brushes, brushnames);
+						loadBrush(matlist, brushes, brushnames);
 
 						list<XLoader_TreeNode*> framelist = XLoader_FindTreeElements(tree, "frame");
 						XLoader_TreeNode* frametree;
@@ -523,10 +531,14 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 										texdata = texdata.substr(texdata.find(";;") + 3);
 
 										list<XLoader_TreeNode*> Lmatlist = XLoader_FindTreeElements(meshnode, "material");
-										Brush* Lbrushes=new Brush[Lmatlist.size()];
+#if defined(_MSC_VER)
+										Brush** Lbrushes=new Brush*[Lmatlist.size()];
+#else
+										Brush* Lbrushes[Lmatlist.size()];
+#endif
 										vector<string> Lbrushnames;
 
-										loadBrush(Lmatlist, &Lbrushes, Lbrushnames);
+										loadBrush(Lmatlist, Lbrushes, Lbrushnames);
 										//string texname = texdata.substr(0,texdata.find("}"));
 										string_find_and_replace(texdata, "{", "");
 										vector<string> texname = split(texdata,'}');
@@ -564,10 +576,10 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 											if (Lmatlist.size()==0){
 												for (unsigned int i = 0; i< matlist.size();i++){
 													if (brushnames[i] == texname[m])
-														{New_surface->PaintSurface(&brushes[i]);}
+														{New_surface->PaintSurface(brushes[i]);}
 												}
 											}else{
-												New_surface->PaintSurface(&Lbrushes[m]);
+												New_surface->PaintSurface(Lbrushes[m]);
 											}
 										}
 
@@ -584,11 +596,12 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 											submesh->no_surfs=submesh->no_surfs-1;
 										}
 
-
+										delete[] Lbrushes;
 									}
 								}
 							}
 						}
+						delete[] brushes;
 					}else{
 						if (checkbyte<=32)
 							{Stream->SeekFile(Stream->FilePos() + 1);

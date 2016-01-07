@@ -42,11 +42,11 @@ ShadeEntity(cube2,shader2)
 EntityFX(cube2,32)
 End Rem
 
-Local shader:TShader=CreateShaderProgram()
-Local shader2:TShader=CreateShaderProgram()
+Local shader:TShader=CreateShader()
+Local shader2:TShader=CreateShader()
 
-Local vert:TShaderObject=LoadShaderObject( 0,"shaders/alphamap.vert.glsl" ) ' 0 = VertexShaderObject
-Local frag:TShaderObject=LoadShaderObject( 1,"shaders/alphamap.frag.glsl" ) ' 1 = FragmentShaderObject
+Local vert:TShaderObject=LoadShaderObject( 0,"shaders/alphamap.vert.glsl" )
+Local frag:TShaderObject=LoadShaderObject( 1,"shaders/alphamap.frag.glsl" )
 
 AttachShaderObject( shader,vert )
 AttachShaderObject( shader,frag )

@@ -3,6 +3,9 @@ Const LOAD_ANIM_MESH_B3D:Int=0
 Const LOAD_ANIM_MESH_3DS:Int=1
 Const LOAD_ANIM_MESH_MD2:Int=2
 
+Const SHADEROBJECT_VERTEX:Int=0
+Const SHADEROBJECT_FRAGMENT:Int=1
+
 Rem
 bbdoc: undocumented
 End Rem
@@ -1938,7 +1941,7 @@ End Function
 Rem
 bbdoc: Load shader from two strings, vertex and fragment.
 End Rem
-Function CreateShader:TShader( ShaderName:String,VshaderString:String,FshaderString:String )
+Function CreateShader:TShader( ShaderName:String="",VshaderString:String="",FshaderString:String="" )
 	Return TShader.CreateShader( ShaderName,VshaderString,FshaderString )
 End Function
 
@@ -2256,6 +2259,34 @@ End Function
 Rem
 bbdoc: undocumented
 End Rem
+Function LoadVertexShader:TShaderObject( filename:String )
+	Return LoadShaderObject( SHADEROBJECT_VERTEX,filename )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function LoadFragmentShader:TShaderObject( filename:String )
+	Return LoadShaderObject( SHADEROBJECT_FRAGMENT,filename )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
 Function CreateShaderObject:TShaderObject( shadertype:Int,source:String,name:String )
 	Return TShaderObject.CreateShaderObject( shadertype,source,name )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function CreateVertexShader:TShaderObject( source:String,name:String )
+	Return CreateShaderObject( SHADEROBJECT_VERTEX,source,name )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function CreateFragmentShader:TShaderObject( source:String,name:String )
+	Return CreateShaderObject( SHADEROBJECT_FRAGMENT,source,name )
 End Function

@@ -254,6 +254,9 @@ undocumented.
 <tr><td class=docleft width=1%><a href=#CreateFluid>CreateFluid</a></td><td class=docright>
 undocumented.
 </td></tr>
+<tr><td class=docleft width=1%><a href=#CreateFragmentShader>CreateFragmentShader</a></td><td class=docright>
+undocumented.
+</td></tr>
 <tr><td class=docleft width=1%><a href=#CreateGeosphere>CreateGeosphere</a></td><td class=docright>
 undocumented.
 </td></tr>
@@ -310,6 +313,9 @@ undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#CreateTexture>CreateTexture</a></td><td class=docright>
 <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=CreateTexture">Online doc</a>
+</td></tr>
+<tr><td class=docleft width=1%><a href=#CreateVertexShader>CreateVertexShader</a></td><td class=docright>
+undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#CreateVoxelSprite>CreateVoxelSprite</a></td><td class=docright>
 undocumented.
@@ -527,6 +533,9 @@ undocumented.
 <tr><td class=docleft width=1%><a href=#LoadBrush>LoadBrush</a></td><td class=docright>
 <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadBrush">Online doc</a>
 </td></tr>
+<tr><td class=docleft width=1%><a href=#LoadFragmentShader>LoadFragmentShader</a></td><td class=docright>
+undocumented.
+</td></tr>
 <tr><td class=docleft width=1%><a href=#LoadGeosphere>LoadGeosphere</a></td><td class=docright>
 undocumented.
 </td></tr>
@@ -550,6 +559,9 @@ undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#LoadTexture>LoadTexture</a></td><td class=docright>
 <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadTexture">Online doc</a>
+</td></tr>
+<tr><td class=docleft width=1%><a href=#LoadVertexShader>LoadVertexShader</a></td><td class=docright>
+undocumented.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#MeshCSG>MeshCSG</a></td><td class=docright>
 Method 0 subtracts mesh2 from mesh1, 1 adds meshes, 2 intersects meshes. Returns a new mesh.
@@ -1451,6 +1463,11 @@ Voxelsprite mesh entity.
 <tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
+<table class=doc width=100% cellspacing=3 id=CreateFragmentShader>
+<tr><td class=doctop colspan=2>Function CreateFragmentShader:TShaderObject( source:String,name:String )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
+</table>
+<br>
 <table class=doc width=100% cellspacing=3 id=CreateGeosphere>
 <tr><td class=doctop colspan=2>Function CreateGeosphere:TTerrain( size:Int,parent:TEntity=Null )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
@@ -1497,7 +1514,7 @@ Voxelsprite mesh entity.
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=CreateShader>
-<tr><td class=doctop colspan=2>Function CreateShader:TShader( ShaderName:String,VshaderString:String,FshaderString:String )</td></tr>
+<tr><td class=doctop colspan=2>Function CreateShader:TShader( ShaderName:String="",VshaderString:String="",FshaderString:String="" )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>Load shader from two strings, vertex and fragment.</td></tr>
 </table>
 <br>
@@ -1544,6 +1561,11 @@ Voxelsprite mesh entity.
 <table class=doc width=100% cellspacing=3 id=CreateTexture>
 <tr><td class=doctop colspan=2>Function CreateTexture:TTexture( width:Int,height:Int,flags:Int=9,frames:Int=1 )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright><a href="http://www.blitzbasic.com/b3ddocs/command.php?name=CreateTexture">Online doc</a></td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=CreateVertexShader>
+<tr><td class=doctop colspan=2>Function CreateVertexShader:TShaderObject( source:String,name:String )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=CreateVoxelSprite>
@@ -1905,6 +1927,11 @@ Voxelsprite mesh entity.
 <tr><td class=docleft width=1%>Description</td><td class=docright><a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadBrush">Online doc</a></td></tr>
 </table>
 <br>
+<table class=doc width=100% cellspacing=3 id=LoadFragmentShader>
+<tr><td class=doctop colspan=2>Function LoadFragmentShader:TShaderObject( filename:String )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
+</table>
+<br>
 <table class=doc width=100% cellspacing=3 id=LoadGeosphere>
 <tr><td class=doctop colspan=2>Function LoadGeosphere:TTerrain( file:String,parent:TEntity=Null )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
@@ -1943,6 +1970,11 @@ Voxelsprite mesh entity.
 <table class=doc width=100% cellspacing=3 id=LoadTexture>
 <tr><td class=doctop colspan=2>Function LoadTexture:TTexture( file:String,flags:Int=1 )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright><a href="http://www.blitzbasic.com/b3ddocs/command.php?name=LoadTexture">Online doc</a></td></tr>
+</table>
+<br>
+<table class=doc width=100% cellspacing=3 id=LoadVertexShader>
+<tr><td class=doctop colspan=2>Function LoadVertexShader:TShaderObject( filename:String )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>undocumented.</td></tr>
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=MeshCSG>

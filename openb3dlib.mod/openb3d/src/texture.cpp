@@ -358,8 +358,8 @@ Texture* Texture::TexInList(size_t hash,int flags){
 	// I though about not checking the flags but decided against it since
 	// someone might want to implement a material system (like Quake3).
 
-	// So right now well just load the texture again if flags differ.
-	// It would probably be a good idea to reuse texturename.
+	// So right now we'll just load the texture again if flags differ.
+	// It would probably be a good idea to reuse texturename though.
 
 	// check if tex already exists in list and if so increase ref count and return it
 	for(Texture* tex : tex_list){

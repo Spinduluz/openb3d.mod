@@ -105,8 +105,8 @@ inline void DXT_SwapPointer(void *ptr1,void *ptr2,unsigned int size){
 	// FIXME:
 	//	Use shrink to fit?
 	//	Max size to avoid possible overflows?
-	if (tmp.size()<size)
-		tmp.reserve(size);
+	if (tmp.size()<size+1)
+		tmp.resize(size<10?10:size+1);
 
 	ptr=&tmp[0];
 	memcpy(ptr,ptr1,size);
@@ -129,8 +129,10 @@ inline void DXT_FlipBlocksDXTC1(DXTColorBlock *line,unsigned int num){
 
 	current=line;
 	for(i=0; i<num; i++){
-		DXT_SwapPointer(&current->row[0],&current->row[3],1);
-		DXT_SwapPointer(&current->row[1],&current->row[2],1);
+		//DXT_SwapPointer(&current->row[0],&current->row[3],1);
+		//DXT_SwapPointer(&current->row[1],&current->row[2],1);
+		swap(current->row[0],current->row[3]);
+		swap(current->row[1],current->row[2]);
 
 		current++;
 	}
@@ -144,35 +146,41 @@ inline void DXT_FlipBlocksDXTC3(DXTColorBlock *line,unsigned int num){
 
 	current=line;
 	for(i=0; i<num; i++){
-		block=(DXT3AlphaBlock *)current;
+		block=(DXT3AlphaBlock*)current;
 
-		DXT_SwapPointer(&block->row[0],&block->row[3],2);
-		DXT_SwapPointer(&block->row[1],&block->row[2],2);
+		//DXT_SwapPointer(&block->row[0],&block->row[3],2);
+		//DXT_SwapPointer(&block->row[1],&block->row[2],2);
+		swap(block->row[0],block->row[3]);
+		swap(block->row[1],block->row[2]);
 
 		current++;
 
-		DXT_SwapPointer(&current->row[0],&current->row[3],1);
-		DXT_SwapPointer(&current->row[1],&current->row[2],1);
+		//DXT_SwapPointer(&current->row[0],&current->row[3],1);
+		//DXT_SwapPointer(&current->row[1],&current->row[2],1);
+		swap(current->row[0],current->row[3]);
+		swap(current->row[1],current->row[2]);
 
 		current++;
 	}
 }
 
 inline void DXT_FlipBlocksDXTC5(DXTColorBlock *line,unsigned int num){
-	DXT5AlphaBlock	*Block;
+	DXT5AlphaBlock	*block;
 	DXTColorBlock	*current;
 	unsigned int i;
 
 	current=line;
 	for(i=0; i<num; i++){
-		Block=(DXT5AlphaBlock*)current;
+		block=(DXT5AlphaBlock*)current;
 
-		DXT_FlipAlphaDXT5(Block);
+		DXT_FlipAlphaDXT5(block);
 
 		current++;
 
-		DXT_SwapPointer(&current->row[0],&current->row[3],1);
-		DXT_SwapPointer(&current->row[1],&current->row[2],1);
+		//DXT_SwapPointer(&current->row[0],&current->row[3],1);
+		//DXT_SwapPointer(&current->row[1],&current->row[2],1);
+		swap(current->row[0],current->row[3]);
+		swap(current->row[1],current->row[2]);
 
 		current++;
 	}
@@ -382,7 +390,7 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 
 		buf+=base->size;
 
-		//if(flip) base->Flip();
+		if(flip) base->Flip();
 
 		int w,h,d;
 
@@ -407,7 +415,7 @@ DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool fl
 
 			buf+=mip->size;
 
-			//if(flip) mip->Flip();
+			if(flip) mip->Flip();
 
 			w=DDS_Clamp(w>>1);
 			h=DDS_Clamp(h>>1);
@@ -462,9 +470,9 @@ void DirectDrawSurface::Flip(){
 			offset=imagesize*n;
 			
 			unsigned char *t=dxt+offset;
-			unsigned char *b=t+(imagesize+linesize);
+			unsigned char *b=t+(imagesize-linesize);
 
-			for(int i=0; i<(height)>>1; i++){
+			for(int i=0; i<(height>>1); i++){
 				DXT_SwapPointer(t,b,linesize);
 
 				t+=linesize;
@@ -500,9 +508,9 @@ void DirectDrawSurface::Flip(){
 		DXTColorBlock *t;
 		DXTColorBlock *b;
 
-		for(unsigned int j=0; j<(yblocks)>>1; j++){
-			b=(DXTColorBlock*)dxt+(j*linesize);
-			t=(DXTColorBlock*)dxt+(((yblocks-j)-1)*linesize);
+		for(unsigned int j=0; j<(yblocks>>1); j++){
+			t=(DXTColorBlock*)((unsigned char*)dxt+(j*linesize));
+			b=(DXTColorBlock*)((unsigned char*)dxt+(((yblocks-j)-1)*linesize));
 
 			flipblocks(t,xblocks);
 			flipblocks(b,xblocks);
