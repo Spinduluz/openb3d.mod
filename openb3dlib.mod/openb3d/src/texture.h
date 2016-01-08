@@ -24,6 +24,9 @@ using namespace std;
 
 class Camera;
 
+typedef shared_ptr<unsigned int> GLTextureName;
+typedef shared_ptr<unsigned int> TextureFrames;
+
 class Texture : public ReferencedObject{
 public:
 	typedef unsigned char *(*LoadPixbuf)(const char *filename,int *width,int *height);
@@ -34,18 +37,21 @@ public:
 	static list<Texture*> tex_list;
 
 	unsigned int texture;
+	GLTextureName texture_ref; // This is used to ensure that the opengl texture isn't released/deleted before
+							   // all references are gone
 
 	string file_name;
 	string file_abs;
 	size_t file_hash;
 
 	unsigned int* frames;
-
+	TextureFrames frames_ref;  // This is used to ensure that the texture frames isn't released/deleted before
+							   // all references are gone
 	int flags;
 	int blend;
 	int coords;
 
-	int format; // Added can be GL_RGBA8 or one of the DXT compressed ones
+	int format; // Added can be GL_RGBA or one of the DXT compressed ones
 
 	float u_scale;
 	float v_scale;
@@ -73,6 +79,8 @@ public:
 	static Texture* LoadAnimTexture(string filename,int flags=0, int frame_width=0,int frame_height=0,int first_frame=0,int frame_count=1);
 	static Texture* CreateTexture(int width=256,int height=256,int flags=3, int frames=0,string fname="noname");
 
+	void Bind();
+
 	void FreeTexture();
 	void DrawTexture(int x,int y);
 	void TextureBlend(int blend_no);
@@ -92,6 +100,7 @@ public:
 	static void AddTextureFilter(string text_match,int flags);
 
 	static Texture* TexInList(size_t hash,int flags);
+	static Texture* TexInList(size_t hash,int flags,int blend,int coords,float u_pos,float v_pos,float u_scale,float v_scale,float angle);
 	Texture* TexInList();
 	static void FilterFlags(const string& filename,int& flags);
 	void FilterFlags();

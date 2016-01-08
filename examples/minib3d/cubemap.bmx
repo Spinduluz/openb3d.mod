@@ -116,6 +116,8 @@ While Not KeyDown(KEY_ESCAPE)
 
 Wend
 
+FreeTexture ground_tex
+End
 
 Function UpdateCubemap(tex:TTexture,camera:TCamera,entity:TEntity)
 
@@ -145,37 +147,53 @@ Function UpdateCubemap(tex:TTexture,camera:TCamera,entity:TEntity)
 	RenderWorld
 	'Flip
 	'WaitKey
-	BackBufferToTex tex
+	'BackBufferToTex tex
+	CameraToTex tex,camera
 	
 	' do forward view
 	SetCubeFace tex,1
 	RotateEntity camera,0,0,0
 	RenderWorld
-	BackBufferToTex tex
+	'Flip
+	'WaitKey
+	'BackBufferToTex tex
+	CameraToTex tex,camera
 	
 	' do right view	
 	SetCubeFace tex,2
 	RotateEntity camera,0,-90,0
 	RenderWorld
-	BackBufferToTex tex
+	'Flip
+	'WaitKey
+	'BackBufferToTex tex
+	CameraToTex tex,camera
 	
 	' do backward view
 	SetCubeFace tex,3
 	RotateEntity camera,0,180,0
 	RenderWorld
-	BackBufferToTex tex
+	'Flip
+	'WaitKey
+	'BackBufferToTex tex
+	CameraToTex tex,camera
 	
 	' do up view
 	SetCubeFace tex,4
 	RotateEntity camera,-90,0,0
 	RenderWorld
-	BackBufferToTex tex
+	'Flip
+	'WaitKey
+	'BackBufferToTex tex
+	CameraToTex tex,camera
 	
 	' do down view
 	SetCubeFace tex,5
 	RotateEntity camera,90,0,0
 	RenderWorld
-	BackBufferToTex tex
+	'Flip
+	'WaitKey
+	'BackBufferToTex tex
+	CameraToTex tex,camera
 	
 	' show entity again
 	ShowEntity entity

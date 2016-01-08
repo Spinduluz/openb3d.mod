@@ -1216,7 +1216,6 @@ void Fluid::Render(){
 				float tex_u_scale=1.0,tex_v_scale=1.0,tex_u_pos=0.0,tex_v_pos=0.0,tex_ang=0.0;
 				int tex_cube_mode=0;
 
-
 				texture=brush.cache_frame[ix];
 				tex_flags=brush.tex[ix]->flags;
 				tex_blend=brush.tex[ix]->blend;

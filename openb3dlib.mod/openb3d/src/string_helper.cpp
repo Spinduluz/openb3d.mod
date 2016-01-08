@@ -123,9 +123,10 @@ string Split(string s,const string& splitter,int count){
 }
 
 #if 1
-size_t StringHash(const string& s){
+size_t StringHash(const string& s,bool casesensitive){
 	size_t hash=0;
 	for(int c : s){
+		if(!casesensitive) c=::tolower(c);
 		// sdbm algorithm
 		hash=c+(hash<<6)+(hash<<16)-hash;
 	}

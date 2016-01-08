@@ -449,18 +449,16 @@ void Camera::Update(){
 	glClearColor(cls_r,cls_g,cls_b,1.0);
 	
 	// clear buffers
-	if(cls_color==true && cls_zbuffer==true)
+	if(cls_color && cls_zbuffer)
 	{
 		//glDepthMask(GL_TRUE); // must be set to true before glClear is called. default is true. always true at start of this func
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	}else{
-		if(cls_color==true){
+		if(cls_color){
 			glClear(GL_COLOR_BUFFER_BIT);
-		}else{
-			if(cls_zbuffer==true){
-				//glDepthMask(GL_TRUE); // must be set to true before glClear is called. default is true. alway true at start of this func
-				glClear(GL_DEPTH_BUFFER_BIT);
-			}
+		}else if(cls_zbuffer){
+			//glDepthMask(GL_TRUE); // must be set to true before glClear is called. default is true. alway true at start of this func
+			glClear(GL_DEPTH_BUFFER_BIT);
 		}
 	}
 
@@ -637,7 +635,7 @@ void UpdateEntityRender(Entity* ent,Entity* cam){
 
 	if(mesh){
 
-		if(mesh->Hidden()==true || mesh->brush.alpha==0.0) return;
+		if(mesh->Hidden() || mesh->brush.alpha==0.0) return;
 
 		if(mesh->no_surfs==0) return; // don't render mesh if it doesn't contain surface info
 		

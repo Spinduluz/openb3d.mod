@@ -33,10 +33,10 @@ EntityTexture dxt5,dxt5_tex
 EntityTexture rgba,rgba_tex
 
 While Not KeyHit(KEY_ESCAPE)
-	'TurnEntity dxt1,0,1,0
-	'TurnEntity dxt3,0,1,0
-	'TurnEntity dxt5,0,1,0
-	'TurnEntity rgba,0,1,0
+	TurnEntity dxt1,0,1,0
+	TurnEntity dxt3,0,1,0
+	TurnEntity dxt5,0,1,0
+	TurnEntity rgba,0,1,0
 	
 	UpdateWorld
 	RenderWorld

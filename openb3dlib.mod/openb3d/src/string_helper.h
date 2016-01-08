@@ -90,7 +90,7 @@ inline size_t StringHash(const string& s){
 	return stringhash(s);
 }
 #else
-size_t StringHash(const string& s);
+size_t StringHash(const string& s,bool casesensitive=true);
 #endif
 
 #endif

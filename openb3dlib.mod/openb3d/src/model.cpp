@@ -16,6 +16,8 @@
 #include "animation_keys.h"
 #include "quaternion.h"
 #include "file.h"
+
+#include "string_helper.h"
 //#include "misc.h"
 
 const int TEXS=1;
@@ -340,7 +342,7 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 				// if not then the texture created above (supplied as param below) will be returned
 				new_tex=Texture::LoadTexture(te_file,te_flags);//,tex[tex_no]); ***todo***
 				*/
-
+#if 0
 				Texture* new_tex=Texture::LoadTexture(te_file,te_flags);
 
 				new_tex->blend=te_blend;
@@ -350,8 +352,13 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 				new_tex->u_scale=te_u_scale;
 				new_tex->v_scale=te_v_scale;
 				new_tex->angle=te_angle;
+#else
+				size_t hash=StringHash(te_file);
 
-				tex_no=tex_no+1;
+				Texture* new_tex=Texture::TexInList(hash,te_flags,te_blend,te_coords,te_u_pos,te_v_pos,te_u_scale,te_v_scale,te_angle);
+				if(!new_tex) new_tex=Texture::LoadTexture(te_file,te_flags);
+#endif
+				tex_no++;
 
 				tex.push_back(new_tex);
 
@@ -367,7 +374,7 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 
 			new_tag=ReadTag(file);
 
-			while((NewTag(new_tag)!=true) && (file->Eof()==false)){
+			while((NewTag(new_tag)!=true) && (!file->Eof())){
 
 				b_name=b3dReadString(file);
 
@@ -553,7 +560,7 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 
 			new_tag=ReadTag(file);
 
-			while((NewTag(new_tag)!=true) && (file->Eof())==false){
+			while((NewTag(new_tag)!=true) && (!file->Eof())){
 
 				v_x=file->ReadFloat();
 				v_y=file->ReadFloat();
@@ -700,7 +707,7 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 			bo_bone=new Bone;
 			bo_no_bones=bo_no_bones+1;
 
-			while(NewTag(new_tag)!=true && file->Eof()==false){
+			while(NewTag(new_tag)!=true && !file->Eof()){
 
 				bo_vert_id=file->ReadInt();
 				bo_vert_w=file->ReadFloat();

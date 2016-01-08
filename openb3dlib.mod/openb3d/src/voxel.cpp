@@ -150,7 +150,7 @@ VoxelSprite* VoxelSprite::CreateVoxelSprite(int slices, Entity* parent_ent){
 			}
 
 		}
-		if(surf->vbo_enabled==true){
+		if(surf->vbo_enabled){
 			surf->reset_vbo=1|4|8;
 			surf->UpdateVBO();
 			glBindBuffer(GL_ARRAY_BUFFER,surf->vbo_id[2]);
@@ -219,17 +219,15 @@ void VoxelSprite::Render(){
 
 	int surf_number=0;
 
-	if(fabs(x)>=fabs(y)&&fabs(x)>=fabs(z)) { // viewpoint primarily along x-axis
-        }
-        else if(fabs(y)>=fabs(z)) { // viewpoint primarily along y-axis
+	if(fabs(x)>=fabs(y)&&fabs(x)>=fabs(z)){ // viewpoint primarily along x-axis
+    }else if(fabs(y)>=fabs(z)){ // viewpoint primarily along y-axis
 		surf_number=1;
 		surf_it++;
-        }
-        else { // viewpoint primarily along z-axis
+    }else{ // viewpoint primarily along z-axis
 		surf_number=2;
 		surf_it++;
 		surf_it++;
-        }
+    }
 
 	Surface& surf=**surf_it;
 
@@ -308,11 +306,11 @@ void VoxelSprite::Render(){
 		glColorPointer(4,GL_FLOAT,0,NULL);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,surf.vbo_id[5]);
-		#ifdef __x86_64__
+#if defined(__x86_64__) || defined(_M_X64)
 		glDrawElements(GL_QUADS,surf.no_tris*4/(1<<lod),GL_UNSIGNED_SHORT, (GLvoid *)(long long)(LOD[surf_number*16+lod]*2));
-		#else
+#else
 		glDrawElements(GL_QUADS,surf.no_tris*4/(1<<lod),GL_UNSIGNED_SHORT, (GLvoid *)(LOD[surf_number*16+lod]*2));
-		#endif
+#endif
 
 	}else{
 

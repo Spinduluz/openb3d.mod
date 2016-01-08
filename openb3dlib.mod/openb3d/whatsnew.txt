@@ -1,4 +1,10 @@
 v1.1.1-In progress
+Added:
+-Textures can share a reference to the opengl generated "name".s
+
+Fixed:
+-Textures are actually deleted now. Not just the Texture class.
+
 Note:
  Must now be built in C++11 mode (-std=c++11 or -std=0x) since some internal classes (File) is wrapped using std::shared_ptr
  This is work in progress while I'm trying to get familiar with OpenB3D so functions might come and go on almost a daily basis.

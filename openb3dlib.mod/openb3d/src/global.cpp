@@ -39,13 +39,21 @@ Shader* Global::ambient_shader=0;
 int Global::vbo_enabled=true;
 int Global::vbo_min_tris=false;
 
+bool Global::gl_arb_texture_non_power_of_two=false;
+
 bool Global::gl_sgis_generate_mipmap=false;
 bool Global::gl_ext_framebuffer_object=false;
+bool Global::glu_build_mipmaps=false;
 
 bool Global::gl_arb_shader_ojects=false;
 bool Global::gl_arb_shading_language_100=false;
 bool Global::gl_arb_vertex_shader=false;
 bool Global::gl_arb_fragment_shader=false;
+
+double Global::gl_version=0.0;
+double Global::gl_shader_version=0.0;
+
+vector<Global::GL_Extension> Global::gl_extensions;
 
 float Global::anim_speed=1.0;
 int Global::fog_enabled=false;
@@ -91,17 +99,55 @@ void Global::Graphics(){
 
 	Texture::AddTextureFilter("",9);
 
-	const char *glverstr=(const char*)glGetString(GL_VERSION);
-	double glver=atof(glverstr);
+	const char *version=(const char*)glGetString(GL_VERSION);
+	gl_version=atof(version);
 
-	/*if (atof((char*)glGetString(GL_VERSION))<1.5){
-		Global::vbo_enabled=false;
-	}*/
-	if(glver<1.5) Global::vbo_enabled=false;
-	if(GLEW_SGIS_generate_mipmap) Global::gl_sgis_generate_mipmap=true;
-	if(GL_EXT_framebuffer_object) Global::gl_ext_framebuffer_object=true;
-#if defined(BLITZMAX_DEBUG)
+	version=(const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+	gl_shader_version=atof(version);
+
+	string ext=(const char*)glGetString(GL_EXTENSIONS);
+	size_t e=ext.find_first_of(' ',0);
+	size_t s=0;
+	if(e!=string::npos){
+		gl_extensions.push_back(ext.substr(s,e));
+		s=e+1;
+		while((e=ext.find_first_of(' ',e+1))!=string::npos){
+			gl_extensions.push_back(ext.substr(s,e-s));
+			s=e+1;
+		}
+	}
+
+#if 0
+	FilePtr f=File::WriteFile("GL_EXTENSIONS.TXT");
+	for(GL_Extension& o : gl_extensions){
+		stringstream ss;
+		ss << o.name << " " << o.hash;
+		f->WriteLine(ss.str());
+	}
+	f.reset();
 #endif
+
+	if(gl_version<1.5) Global::vbo_enabled=false;
+	// Check for shader support
+	if(gl_version<2.0){
+		gl_arb_shader_ojects=GLEW_ARB_shader_objects;
+		gl_arb_shading_language_100=GLEW_ARB_shading_language_100;
+		gl_arb_vertex_shader=GLEW_ARB_vertex_shader;
+		gl_arb_fragment_shader=GLEW_ARB_fragment_shader;
+	}
+
+	if(GLEW_SGIS_generate_mipmap){
+		gl_sgis_generate_mipmap=true;
+		glu_build_mipmaps=false;
+	}
+	if(GLEW_EXT_framebuffer_object){
+		gl_ext_framebuffer_object=true;
+		gl_sgis_generate_mipmap=false;
+		glu_build_mipmaps=false;
+	}
+	if(!gl_ext_framebuffer_object && !gl_sgis_generate_mipmap) glu_build_mipmaps=true;
+
+	if(GLEW_ARB_texture_non_power_of_two) gl_arb_texture_non_power_of_two=true;
 }
 
 void Global::AmbientLight(float r,float g,float b){
@@ -210,6 +256,7 @@ void Global::UpdateWorld(float anim_speed){
 
 void Global::RenderWorld(){
 	Camera::cam_list.sort(CompareEntityOrder); // sort cam list based on entity order
+#if 0
 	list<Camera*>::iterator it;
 	for(it=Camera::cam_list.begin();it!=Camera::cam_list.end();it++){
 		//Camera* cam=*it;
@@ -226,6 +273,21 @@ void Global::RenderWorld(){
 			ShadowObject::Update(camera_in_use);
 		}
 	}
+#else
+	for(Camera* cam : Camera::cam_list){
+		camera_in_use=cam;
+		if(camera_in_use->Hidden()) continue;
+		camera_in_use->Render();
+	}
+
+	if(Shadows_enabled){
+		for(Camera* cam : Camera::cam_list){
+			camera_in_use=cam;
+			if(camera_in_use->Hidden()) continue;
+			ShadowObject::Update(camera_in_use);
+		}
+	}
+#endif
 }
 
 void Global::UpdateEntityAnim(Mesh& mesh){
@@ -258,6 +320,7 @@ void Global::UpdateEntityAnim(Mesh& mesh){
 
 			if(mesh.anim_mode==0) mesh.anim_update=false; // after updating animation so that animation is in final 'stop' pose - don't update again
 			if(mesh.anim_mode==1){
+				// +=
 				mesh.anim_time=mesh.anim_time+(mesh.anim_speed*anim_speed);
 				if(mesh.anim_time>last){
 					mesh.anim_time=first+(mesh.anim_time-last);
@@ -293,6 +356,14 @@ void Global::UpdateEntityAnim(Mesh& mesh){
 			}
 		}
 	}
+}
+
+bool Global::CheckExtension(const string& extension){
+	size_t hash=StringHash(extension,false);
+	for(GL_Extension& e : gl_extensions){
+		if(e.hash==hash) return true;
+	}
+	return false;
 }
 
 bool CompareEntityOrder(Entity* ent1,Entity* ent2){
@@ -357,9 +428,7 @@ void GL_Enable(GLenum type){
 	for(unsigned int i=0; i<STATE_COUNT; i++){
 		if(gl_state[i].type==type){
 			// Already enabled. Skip.
-			if(gl_state[i].state==RENDERSTATE_ENABLED){
-				return;
-			}
+			if(gl_state[i].state==RENDERSTATE_ENABLED) return;
 			// Set state and skip iteration
 			glEnable(type);
 			gl_state[i].state=RENDERSTATE_ENABLED;
@@ -377,9 +446,7 @@ void GL_Disable(GLenum type){
 	for(unsigned int i=0; i<STATE_COUNT; i++){
 		if(gl_state[i].type==type){
 			// Already enabled. Skip.
-			if(gl_state[i].state==RENDERSTATE_DISABLED){
-				return;
-			}
+			if(gl_state[i].state==RENDERSTATE_DISABLED) return;
 			// Set state and skip iteration
 			glDisable(type);
 			gl_state[i].state=RENDERSTATE_DISABLED;
@@ -391,5 +458,12 @@ void GL_Disable(GLenum type){
 	DebugLog("Global::Disable: Unhandled render state");
 #endif
 	glDisable(type);
+}
+
+const char *GL_Error(GLenum error){
+	switch(error){
+	default:
+		return "Unknown error";
+	}
 }
 

@@ -26,7 +26,8 @@
 #include "bmaxdebug.h"
 #endif
 
-void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeight, unsigned int srcX, unsigned int srcY, unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel);
+void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeight, unsigned int srcX, unsigned int srcY, 
+	unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel);
 
 static int gl_cube_faces[]={
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -37,23 +38,62 @@ static int gl_cube_faces[]={
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 };
 
+inline void TextureDeleteFrames(unsigned int *frames){
+	// This is a problem. None of the underlying textures are actually deleted
+	if(frames){
+		for(unsigned int *i=frames; *i; i++){
+			glDeleteTextures(1,&*i);
+		}
+		delete[] frames;
+	}
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("TextureDeleteFrames");
+#endif
+}
+
+inline void GL_DeleteTextures(unsigned int* name){
+	if(name){
+		glDeleteTextures(1,name);
+		delete name;
+#if defined(BLITZMAX_DEBUG)
+		DebugLog("GL_DeleteTextures");
+#endif
+	}
+}
+
+inline void GL_GenTextures(Texture *tex){
+	// FIXME: fixed list to avoid allocations
+	unsigned int *name=new unsigned int;
+	// Bail out with exception
+	if(!name) return;
+
+	glGenTextures(1,name);
+	tex->texture_ref=GLTextureName(name,GL_DeleteTextures);
+	tex->texture=*tex->texture_ref;
+}
+
+// ==========================================================================================================
+
 // FIXME: Cleanup.... I get a headache from my own code
 inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buffer){
-	if(Global::gl_sgis_generate_mipmap && (!Global::gl_ext_framebuffer_object || !buffer)){
+	if(!buffer) return;
+
+	if(Global::gl_sgis_generate_mipmap){
 		glTexParameteri(target,GL_GENERATE_MIPMAP,GL_TRUE);
 	}
-	// Create texture
+
 	glTexImage2D(target,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,buffer);
-	// 
-	if(Global::gl_ext_framebuffer_object && buffer){
+
+	if(Global::gl_ext_framebuffer_object){
 		glGenerateMipmap(target);
-	}else if(!Global::gl_sgis_generate_mipmap && buffer){
+	}
+	if(!Global::gl_sgis_generate_mipmap){
 		gluBuild2DMipmaps(target,GL_RGBA,width,height,GL_RGBA,GL_UNSIGNED_BYTE,buffer);
 	}
 }
 
 inline void GL_CopyTexImage2D(GLenum target,int x,int y,int width,int height){
-	if(Global::gl_sgis_generate_mipmap && !Global::gl_ext_framebuffer_object){
+	if(Global::gl_sgis_generate_mipmap){
 		glTexParameteri(target,GL_GENERATE_MIPMAP,GL_TRUE);
 	}	
 	glCopyTexImage2D(target,0,GL_RGBA,x,y,width,height,0);
@@ -115,10 +155,12 @@ Texture::FreePixbuf Texture::freepixbuf = stbi_free_pixbuf;
 
 Texture::Texture()
 :texture(0)
+,texture_ref()
 ,file_name()
 ,file_abs()
 ,file_hash(0)
 ,frames(NULL)
+,frames_ref()
 ,flags(0)
 ,blend(2)
 ,coords(0)
@@ -158,35 +200,42 @@ Texture* Texture::LoadTexture(string filename,int flags){
 	filename=File::ResourceFilePath(filename);
 	if(filename.empty()) return NULL;
 
-	// Check this stuff here to avoid unnecessary allocations/deallocations
-	size_t hash=StringHash(filename);
-	FilterFlags(filename,flags);
-
-	Texture *old=TexInList(hash,flags);
-	if(old) return old;
-
 	// Try to load DDS file first
 	if(is_dds(filename)){
+		// Check this stuff here to avoid unnecessary allocations/deallocations
+		size_t hash=StringHash(filename);
+		FilterFlags(filename,flags);
+
+		Texture *old=TexInList(hash,flags);
+		if(old) return old;
+
+		DirectDrawSurface *dds=DirectDrawSurface::LoadSurface(filename,false);
+		if(!dds) return NULL;
+
 		Texture* tex=new Texture();
 		tex->file_name=filename;
 		tex->file_hash=hash;
 		tex->flags=flags;
 		tex_list.push_back(tex);
 
-		DirectDrawSurface *dds=DirectDrawSurface::LoadSurface(filename,false);
-		if(!dds){
-			tex->FreeTexture();
-			return NULL;
-		}
-
-		glGenTextures(1,&tex->texture);
+		//glGenTextures(1,&tex->texture);
+		GL_GenTextures(tex);
 		glBindTexture(dds->target,tex->texture);
 		dds->UploadTexture(tex);
 		dds->FreeDirectDrawSurface();
+
 		return tex;
 	}
+
 	// Other images.
 	if (flags&128) {
+		// Check this stuff here to avoid unnecessary allocations/deallocations
+		size_t hash=StringHash(filename);
+		FilterFlags(filename,flags);
+
+		Texture *old=TexInList(hash,flags);
+		if(old) return old;
+
 		Texture* tex=new Texture();
 		tex->file_name=filename;
 		tex->file_hash=hash;
@@ -203,12 +252,13 @@ Texture* Texture::LoadTexture(string filename,int flags){
 		tex->frames=new unsigned int[6];
 
 		unsigned char* dstbuffer=new unsigned char[tex->width*tex->height*4];
-		glGenTextures(1,&name);
+		//glGenTextures(1,&name);
+		GL_GenTextures(tex);
 		glBindTexture(GL_TEXTURE_CUBE_MAP,name);
 
 		//tex.gltex=tex.gltex[..tex.no_frames]
 		for (int i=0;i<6;i++){
-			CopyPixels (buffer,tex->width*6,tex->height,tex->width*i,0,dstbuffer,tex->width,tex->height, 4);
+			CopyPixels(buffer,tex->width*6,tex->height,tex->width*i,0,dstbuffer,tex->width,tex->height, 4);
 			GL_TexImage2D(gl_cube_faces[i],tex->width,tex->height,dstbuffer);
 		}
 		delete dstbuffer;
@@ -244,25 +294,32 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 
 	unsigned char* buffer=loadpixbuf(filename.c_str(),&tex->width,&tex->height);
 
-	unsigned int id;
+	//unsigned int id;
 	if (frame_count<=2){
-		glGenTextures(1,&id);
-		glBindTexture(GL_TEXTURE_2D,id);
+		//glGenTextures(1,&id);
+		GL_GenTextures(tex);
+		glBindTexture(GL_TEXTURE_2D,tex->texture);
 		//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,tex->width,tex->height,0,GL_RGBA, GL_UNSIGNED_BYTE,buffer);
 		GL_TexImage2D(GL_TEXTURE_2D,tex->width,tex->height,buffer);
 
-		tex->texture=id;
+		//tex->texture=id;
 	} else {
+		//
+		// FIXME: DO NOT FORGET
+		//	Add reference to opengl textures..
+		//
+		//
+		//
 		tex->no_frames=frame_count;
-		tex->frames=new unsigned int[frame_count];
+		tex->frames=new unsigned int[frame_count+1]; // Allocate an extra unsigned int so we know where the array ends
 
 		unsigned char* dstbuffer=new unsigned char[frame_width*frame_height*4];
 		//tex.gltex=tex.gltex[..tex.no_frames]
 		int frames_in_row=tex->width/frame_width;
 
 		for (int i=0;i<frame_count;i++){
-			CopyPixels(buffer,tex->width,tex->height,frame_width*(i%frames_in_row),frame_height*(i/frames_in_row),
-				dstbuffer,frame_width,frame_height,4);
+			unsigned int id;
+			CopyPixels(buffer,tex->width,tex->height,frame_width*(i%frames_in_row),frame_height*(i/frames_in_row),dstbuffer,frame_width,frame_height,4);
 
 			glGenTextures(1,&id);
 			glBindTexture(GL_TEXTURE_2D,id);
@@ -274,8 +331,14 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 			tex->frames[i]=id;
 		}
 		tex->texture=tex->frames[0];
+		tex->texture_ref=GLTextureName(new unsigned int(tex->texture),GL_DeleteTextures);
+
 		tex->width=frame_width;
 		tex->height=frame_height;
+
+		tex->frames[frame_count]=0;
+		tex->frames_ref=TextureFrames(tex->frames,TextureDeleteFrames);
+
 		delete dstbuffer;
 	}
 	
@@ -362,10 +425,43 @@ Texture* Texture::TexInList(size_t hash,int flags){
 	// It would probably be a good idea to reuse texturename though.
 
 	// check if tex already exists in list and if so increase ref count and return it
+
+	// FIXME: See model.cpp
 	for(Texture* tex : tex_list){
 		if(hash==tex->file_hash && flags==tex->flags){
 			tex->AddRef();
 			return tex;
+		}
+	}
+	return NULL;
+}
+
+Texture* Texture::TexInList(size_t hash,int flags,int blend,int coords,float u_pos,float v_pos,float u_scale,float v_scale,float angle){
+	for(Texture* tex : tex_list){
+		if(hash==tex->file_hash){
+			if(tex->flags==flags && tex->blend==blend && tex->coords==coords && tex->u_pos==u_pos && tex->v_pos==v_pos && tex->u_scale==u_scale && tex->v_scale==v_scale && tex->angle==angle){
+				tex->AddRef();
+				return tex;
+			}
+			Texture *newtex=new Texture;
+			newtex->flags=flags;
+			newtex->blend=blend;
+			newtex->coords=coords;
+			newtex->u_pos=u_pos;
+			newtex->v_pos=v_pos;
+			newtex->u_scale=u_scale;
+			newtex->v_scale=v_scale;
+			newtex->angle=angle;
+
+			newtex->texture_ref=tex->texture_ref;
+			newtex->texture=*newtex->texture_ref;
+
+			newtex->frames=tex->frames;
+			newtex->frames_ref=tex->frames_ref;
+#if defined(BLITZMAX_DEBUG)
+			DebugLog("texture_ref count %i",newtex->texture_ref.use_count());
+#endif
+			return newtex;
 		}
 	}
 	return NULL;
@@ -421,16 +517,16 @@ void Texture::BackBufferToTex(int frame){
 
 void Texture::CameraToTex(Camera* cam, int frame){
 
-	GLenum target;
+	//GLenum target;
 
 	Global::camera_in_use=cam;
 
-	if(flags&128){
+	/*if(flags&128){
 		target=GL_TEXTURE_CUBE_MAP;
 	}else{
 		target=GL_TEXTURE_2D;
-	}
-	
+	}*/
+	GLenum target=(flags&128)?GL_TEXTURE_CUBE_MAP:GL_TEXTURE_2D;
 	glBindTexture(target, texture);
 
 	if (!framebuffer){
@@ -443,7 +539,8 @@ void Texture::CameraToTex(Camera* cam, int frame){
 				glTexImage2D(gl_cube_faces[i],0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 			}
 		}else{
-			GL_TexImage2D(GL_TEXTURE_2D,width,height,NULL);
+			//GL_TexImage2D(GL_TEXTURE_2D,width,height,NULL);
+			glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 		}
 
 	}
@@ -490,13 +587,14 @@ void Texture::DepthBufferToTex(Camera* cam=0 ){
 
 	glBindTexture(GL_TEXTURE_2D,texture);
 	if (cam==0){
-		glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,Global::height-height,width,height,0);
-		glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP_SGIS,GL_TRUE);
+		//glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,Global::height-height,width,height,0);
+		//glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP_SGIS,GL_TRUE);
+		GL_CopyTexImage2D(GL_TEXTURE_2D,0,0,width,height);
 	}else{
 		Global::camera_in_use=cam;
 		
-		if (framebuffer==0){
-			framebuffer=new unsigned int[1];
+		if (!framebuffer){
+			framebuffer=new unsigned int[2];
 			glGenFramebuffers(1, &framebuffer[0]);
 			glGenRenderbuffers(1, &framebuffer[1]);
 			//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
