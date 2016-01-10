@@ -25,6 +25,9 @@ ShaderObject::ShaderObject(){
 ShaderObject::~ShaderObject(){
 	ShaderObject::shaderobjects.remove(this);
 	glDeleteShader(object);
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Deleted ShaderObject %s",name.c_str());
+#endif
 }
 
 ShaderObject* ShaderObject::Create(GLenum type, const string& src,const string& name){
@@ -96,7 +99,7 @@ ShaderObject* ShaderObject::CreateFromFile(GLenum type,const string& filename){
 
 	return shader;
 }
-
+#if 0
 // Are you ever used? Ever? No?
 void ShaderObject::Delete(ShaderObject *shader){
 	if (!shader) return;
@@ -109,7 +112,7 @@ void ShaderObject::Delete(ShaderObject *shader){
 	ShaderObject::shaderobjects.remove(shader);
 	delete shader;
 }	
-
+#endif
 ShaderObject* ShaderObject::FindShaderObject(size_t hash){
 	for(ShaderObject *shader : ShaderObject::shaderobjects){
 		if(shader->hash==hash){

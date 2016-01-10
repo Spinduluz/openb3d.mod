@@ -47,8 +47,15 @@ public:
 
 	};
 
+	~Brush(){ // Objects should always be deleted.
+		for(int i=0;i<8;i++){
+			if(tex[i]) tex[i]->DestroyRef();
+		}
+	}
+
 	Brush* Copy();
 	void FreeBrush();
+
 	static Brush* CreateBrush(float r=255.0,float g=255.0,float b=255.0);
 	static Brush* LoadBrush(string file,int flags=1,float u_scale=1.0,float v_scale=1.0);
 	void BrushColor(float r,float g,float b);

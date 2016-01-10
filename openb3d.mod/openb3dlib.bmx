@@ -391,6 +391,8 @@ Extern
 	Function LoadShaderObject_:Byte Ptr( shadertype:Int,filename:Byte Ptr ) = "LoadShaderObject"
 	Function CreateShaderObject_:Byte Ptr( shadertype:Int,source:Byte Ptr,name:Byte Ptr ) = "CreateShaderObject"
 	Function AttachShaderObject_( shader:Byte Ptr,obj:Byte Ptr ) = "AttachShaderObject"
+	Function DetachShaderObject_( shader:Byte Ptr,obj:Byte Ptr ) = "DetachShaderObject"
+	Function FreeShaderObject_( obj:Byte Ptr ) = "FreeShaderObject"
 	
 End Extern
 

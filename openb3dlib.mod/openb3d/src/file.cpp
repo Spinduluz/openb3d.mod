@@ -151,10 +151,13 @@ FilePtr File::ReadResourceFile(string filename){
 #endif
 		return NULL;
 	}
-
+#if 1
 	FileMem* file=new FileMem();
 	file->ReadFile(f);
 	fclose(f);
+#else
+	FileStdc* file=new FileStdc(f);
+#endif
 
 	return FilePtr(file,FreeFilePtr);
 }
@@ -173,10 +176,13 @@ FilePtr File::ReadFile(const string& filename){
 #endif
 		return NULL;
 	}
-
+#if 1
 	FileMem* file=new FileMem();
 	file->ReadFile(f);
 	fclose(f);
+#else
+	FileStdc* file=new FileStdc(f);
+#endif
 
 	return FilePtr(file,FreeFilePtr);
 }
@@ -385,8 +391,9 @@ char *File::Gets(char *str,int num){
 FileStdc::FileStdc(FILE *file,bool noclose):file(file),noclose(noclose){
 }
 
-FileStdc::FileStdc(const string& filename,const string& mode):file(NULL){
+FileStdc::FileStdc(const string& filename,const string& mode):file(NULL),noclose(false){
 	file=fopen(filename.c_str(),mode.c_str());
+	FileSize();
 }
 
 FileStdc::~FileStdc() {
@@ -411,7 +418,8 @@ int FileStdc::FileSize(){
 }
 
 int FileStdc::Eof(){
-	return feof(file);
+	//return (feof(file));
+	return (FileSize()==FilePos());
 }
 
 size_t FileStdc::Write(const void *buffer,size_t size,size_t count){
@@ -478,7 +486,7 @@ bool FileMem::ReadFile(FILE *f){
 	size=ftell(f);
 	fseek(f,0,SEEK_SET);
 
-	buf=new unsigned char[size+1];
+	buf=new unsigned char[size];
 	pos=buf;
 	end=buf+size;
 

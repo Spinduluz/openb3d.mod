@@ -102,6 +102,8 @@
     <ClInclude Include="..\file.h" />
     <ClInclude Include="..\fileresource.h" />
     <ClInclude Include="..\functions.h" />
+    <ClInclude Include="..\functions_c.h" />
+    <ClInclude Include="..\functions_cpp.h" />
     <ClInclude Include="..\geom.h" />
     <ClInclude Include="..\geosphere.h" />
     <ClInclude Include="..\global.h" />

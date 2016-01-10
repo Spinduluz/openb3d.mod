@@ -10,6 +10,8 @@
 #include "string_helper.h"
 
 #include <string>
+#include <algorithm>
+
 using namespace std;
 
 #if defined(BLITZMAX_DEBUG)
@@ -61,13 +63,15 @@ int Instr(const string& s1,const string& s2,int offset){
 }
 
 string Upper(const string& s){
-	//transform(s.begin(),s.end(),s.begin(),toupper);
-	return s;
+	string r;
+	transform(s.begin(),s.end(),r.begin(),::toupper);
+	return r;
 }
 
 string Lower(const string& s){
-	//transform(s.begin(),s.end(),s.begin(),tolower);
-	return s;
+	string r;
+	transform(s.begin(),s.end(),r.begin(),::tolower);
+	return r;
 }
 
 string Trim(string s){

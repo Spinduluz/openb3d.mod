@@ -5,8 +5,7 @@ Strict
 
 Framework Openb3d.B3dglgraphics
 
-Graphics3D 800,600,0,2
-
+Graphics3D 800,600,0,GRAPHICS_BACKBUFFER|GRAPHICS_ALPHABUFFER|GRAPHICS_DEPTHBUFFER|GRAPHICS_STENCILBUFFER|GRAPHICS_ACCUMBUFFER|$40|$400
 
 Local cpivot:TPivot=CreatePivot()
 Local camera:TCamera=CreateCamera(cpivot)
@@ -81,7 +80,7 @@ Local spectex:TTexture=LoadTexture("media/07_DISP.jpg")
 'Local reftest:TTexture=LoadTexture("media/07_DIFFUSE.jpg")
 
 ' bumpmap 1 - one light, directional or point
-Local shader:TShader=LoadShader("","shaders/bumpmap.vert.glsl","shaders/bumpmap.frag.glsl")
+Local shader:TShader=LoadShader("bumpmap","shaders/bumpmap.vert.glsl","shaders/bumpmap.frag.glsl")
 ShaderTexture(shader,colortex,"colorMap",0)
 ShaderTexture(shader,normaltex,"normalMap",1)
 
@@ -89,7 +88,7 @@ SetFloat3(shader,"vTangent",0.1,0.1,0.1)
 SetFloat(shader,"invRadius",0.01)
 
 ' bumpmap 2 - no directional, multiple point lights
-Local shader2:TShader=LoadShader("","shaders/bumpmap2.vert.glsl","shaders/bumpmap2.frag.glsl")
+Local shader2:TShader=LoadShader("bumpmap2","shaders/bumpmap2.vert.glsl","shaders/bumpmap2.frag.glsl")
 ShaderTexture(shader2,colortex,"colorMap",0)
 ShaderTexture(shader2,normaltex,"normalMap",1)
 
@@ -98,7 +97,7 @@ SetFloat3(shader2,"emission",0.0015,0.0015,0.0015)
 SetFloat(shader2,"attspec",0.01)
 
 ' bumpmap 3 - multiple lights, directional or point
-Local shader3:TShader=LoadShader("","shaders/bumpmap3.vert.glsl","shaders/bumpmap3.frag.glsl")
+Local shader3:TShader=LoadShader("bumpmap3","shaders/bumpmap3.vert.glsl","shaders/bumpmap3.frag.glsl")
 ShaderTexture(shader3,colortex,"colorMap",0)
 ShaderTexture(shader3,normaltex,"normalMap",1)
 ShaderTexture(shader3,spectex,"specularMap",2)
@@ -264,8 +263,10 @@ Function MouseLook( pivot:TPivot,camera:TCamera,time%,elapsed% )
 	
 	Local x_speed#,y_speed#
 	
-	x_speed=((MouseX()-320)-x_speed)/4+x_speed
-	y_speed=((MouseY()-240)-y_speed)/4+y_speed
+	'x_speed=((MouseX()-320)-x_speed)/4+x_speed
+	'y_speed=((MouseY()-240)-y_speed)/4+y_speed
+	x_speed=MouseXSpeed()/4
+	y_speed=MouseYSpeed()/4
 	MoveMouse 320,240
 
 	TurnEntity pivot,0,-x_speed,0	'turn player Left/Right

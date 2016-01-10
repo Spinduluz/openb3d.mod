@@ -237,6 +237,9 @@ void Mesh::FreeEntity(){
 
 	if (no_surfs>=0){
 		list<Surface*>::iterator surf_it;
+#if defined(BLITZMAX_DEBUG)
+		DebugLog("Mesh::FreeEntity");
+#endif
 
 		for(surf_it=surf_list.begin();surf_it!=surf_list.end();surf_it++){
 			Surface* surf=*surf_it;
@@ -259,12 +262,9 @@ void Mesh::FreeEntity(){
 		Bone* bone=*bone_it;
 		delete bone;
 	}*/
-	bones.clear();
-
-	
+	bones.clear();	
 
 	Entity::FreeEntity();
-
 	delete this;
 
 	return;
@@ -390,7 +390,7 @@ Mesh* Mesh::LoadMesh(string filename,Entity* parent_ent){
 	entity_list.push_back(mesh);
 
 	//update matrix
-	if(mesh->parent!=0){
+	if(mesh->parent){
 		mesh->mat.Overwrite(mesh->parent->mat);
 		mesh->UpdateMat();
 	}else{
@@ -431,9 +431,13 @@ Mesh* Mesh::LoadMeshB3D(FilePtr file,Entity* parent_ent){
 }
 
 Mesh* Mesh::LoadAnimMesh(string filename,Entity* parent_ent){
-
+#if 0
 	if(Right(filename,4)==".3ds") return load3ds::Load3ds(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
 	if(Right(filename,4)==".md2") return loadMD2::LoadMD2(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
+#else
+	if(!strncasecmp(filename.c_str()+filename.length()-4,".3ds",4)) return load3ds::Load3ds(filename,parent_ent);
+	if(!strncasecmp(filename.c_str()+filename.length()-4,".md2",4)) return loadMD2::LoadMD2(filename,parent_ent);
+#endif
 
 	return LoadAnimB3D(filename,parent_ent);
 }

@@ -88,4 +88,5 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 	
 Wend
+FreeEntity ent
 End

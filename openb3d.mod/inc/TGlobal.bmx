@@ -99,8 +99,8 @@ Type TGlobal
 				flags=GRAPHICS_BACKBUFFER|GRAPHICS_STENCILBUFFER
 			Case -6 ' accum
 				flags=GRAPHICS_BACKBUFFER|GRAPHICS_ACCUMBUFFER
-			Default ' none
-				flags=GRAPHICS_BACKBUFFER
+			'Default ' none
+			'	flags=GRAPHICS_BACKBUFFER
 		End Select
 		
 		InitGlobals()

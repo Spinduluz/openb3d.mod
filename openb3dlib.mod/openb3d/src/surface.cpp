@@ -58,7 +58,8 @@ Surface::Surface(){
 
 	brush=new Brush;
 
-	for(int i=0;i<7;i++){vbo_id[i]=0;}
+	//for(int i=0;i<7;i++){vbo_id[i]=0;}
+	memset(vbo_id,0,sizeof(vbo_id));
 
 	vert_array_size=1;
 	tri_array_size=1;
@@ -78,7 +79,6 @@ Surface::Surface(){
 Surface::~Surface(){
 
 	FreeVBO();
-
 	delete brush;
 
 }
@@ -117,6 +117,8 @@ Surface* Surface::Copy(){
 	surf->reset_vbo=-1;
 
 	surf->ShaderMat=ShaderMat;
+
+	surf->vbo_id[0]=0;
 
 	return surf;
 
@@ -630,8 +632,8 @@ float Surface::TriangleNZ(int tri_no){
 void Surface::UpdateVBO(){
 
 	if(vbo_id[0]==0){
-		glGenBuffers(6,&vbo_id[0]);
-
+		//glGenBuffers(6,&vbo_id[0]);
+		glGenBuffers(6,vbo_id);
 	}
 
 	if (reset_vbo==-1) reset_vbo=1|2|4|8|16;

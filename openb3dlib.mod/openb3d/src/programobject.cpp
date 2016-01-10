@@ -36,13 +36,17 @@ ProgramObject* ProgramObject::Create(string name){
 }
 
 ProgramObject::~ProgramObject(){
-	glUseProgram(0);
+	glUseProgram(0); // Ensure the shader is not used
 	for(ShaderObject *shader : shaderobjects){
-		glDetachShader(program,shader->object);
+		/*glDetachShader(program,shader->object);
 		shader->attached.remove(this);
-		shader->DestroyRef();
+		shader->DestroyRef();*/
+		DetachShader(shader);
 	}
 	glDeleteProgram(program);
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Deleted ProgramObject %s",name.c_str());
+#endif
 }
 
 void ProgramObject::Activate(){
@@ -394,7 +398,10 @@ bool ProgramObject::AttachShader(ShaderObject *shader){
 	int linked;
 	glValidateProgram(program);
 	glGetProgramiv(program,GL_LINK_STATUS,&linked);
+	// FIXME: Get error
 	if(!linked) return false;
+
+	shader->AddRef(); // Add reference count
 
 	shaderobjects.push_back(shader);
 	shader->attached.push_back(this);
@@ -405,7 +412,7 @@ bool ProgramObject::AttachShader(ShaderObject *shader){
 
 void ProgramObject::DetachShader(ShaderObject* shader){
 	if(!shader) return;
-
+#if 0
 	list<ShaderObject*>::iterator i,b,e;
 	
 	b=shaderobjects.begin();
@@ -417,9 +424,13 @@ void ProgramObject::DetachShader(ShaderObject* shader){
 			// Remove references
 			shaderobjects.remove(shader);
 			shader->attached.remove(this);
-			// Let this one go out of scope
-			if(!shader->attached.size()) ShaderObject::Delete(shader);
+			shader->DestroyRef(); // Decrease reference count
 			break;
 		}
 	}
+#else
+	shaderobjects.remove(shader);
+	shader->attached.remove(this);
+	shader->DestroyRef();
+#endif
 }

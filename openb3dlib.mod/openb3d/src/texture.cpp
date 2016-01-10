@@ -39,7 +39,6 @@ static int gl_cube_faces[]={
 };
 
 inline void TextureDeleteFrames(unsigned int *frames){
-	// This is a problem. None of the underlying textures are actually deleted
 	if(frames){
 		for(unsigned int *i=frames; *i; i++){
 			glDeleteTextures(1,&*i);
@@ -54,21 +53,20 @@ inline void TextureDeleteFrames(unsigned int *frames){
 inline void GL_DeleteTextures(unsigned int* name){
 	if(name){
 		glDeleteTextures(1,name);
-		delete name;
+		Texture::name_list.remove(*name);
 #if defined(BLITZMAX_DEBUG)
-		DebugLog("GL_DeleteTextures");
+		DebugLog("GL_DeleteTextures [%i]",Texture::name_list.size());
 #endif
 	}
 }
 
 inline void GL_GenTextures(Texture *tex){
-	// FIXME: fixed list to avoid allocations
-	unsigned int *name=new unsigned int;
-	// Bail out with exception
-	if(!name) return;
+	unsigned int id;
 
-	glGenTextures(1,name);
-	tex->texture_ref=GLTextureName(name,GL_DeleteTextures);
+	glGenTextures(1,&id);
+	Texture::name_list.push_back(id);
+
+	tex->texture_ref=tex_name_t(&Texture::name_list.back(),GL_DeleteTextures);
 	tex->texture=*tex->texture_ref;
 }
 
@@ -87,7 +85,7 @@ inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buff
 	if(Global::gl_ext_framebuffer_object){
 		glGenerateMipmap(target);
 	}
-	if(!Global::gl_sgis_generate_mipmap){
+	if(Global::glu_build_mipmaps){
 		gluBuild2DMipmaps(target,GL_RGBA,width,height,GL_RGBA,GL_UNSIGNED_BYTE,buffer);
 	}
 }
@@ -147,7 +145,9 @@ void stbi_free_pixbuf(unsigned char *buf){
 // ==========================================================================================================
 
 list<Texture*> Texture::tex_list;
+list<unsigned int> Texture::name_list;
 
+// FIXME: Remove these
 Texture::LoadPixbuf Texture::loadpixbuf = stbi_load_pixbuf;
 Texture::FreePixbuf Texture::freepixbuf = stbi_free_pixbuf;
 
@@ -201,7 +201,8 @@ Texture* Texture::LoadTexture(string filename,int flags){
 	if(filename.empty()) return NULL;
 
 	// Try to load DDS file first
-	if(is_dds(filename)){
+	//if(is_dds(filename)){
+	if(CheckExtension(filename,".dds")){
 		// Check this stuff here to avoid unnecessary allocations/deallocations
 		size_t hash=StringHash(filename);
 		FilterFlags(filename,flags);
@@ -331,13 +332,14 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 			tex->frames[i]=id;
 		}
 		tex->texture=tex->frames[0];
-		tex->texture_ref=GLTextureName(new unsigned int(tex->texture),GL_DeleteTextures);
+		name_list.push_back(tex->texture);
+		tex->texture_ref=tex_name_t(&name_list.back(),GL_DeleteTextures);
 
 		tex->width=frame_width;
 		tex->height=frame_height;
 
 		tex->frames[frame_count]=0;
-		tex->frames_ref=TextureFrames(tex->frames,TextureDeleteFrames);
+		tex->frames_ref=tex_frames_t(tex->frames,TextureDeleteFrames);
 
 		delete dstbuffer;
 	}
@@ -428,9 +430,24 @@ Texture* Texture::TexInList(size_t hash,int flags){
 
 	// FIXME: See model.cpp
 	for(Texture* tex : tex_list){
-		if(hash==tex->file_hash && flags==tex->flags){
-			tex->AddRef();
-			return tex;
+		if(hash==tex->file_hash){
+			if(flags==tex->flags){
+				tex->AddRef();
+				return tex;
+			}
+
+			Texture* newtex=new Texture;
+			newtex->flags=flags;
+			newtex->FilterFlags();
+
+			newtex->texture_ref=tex->texture_ref;
+			newtex->texture=*newtex->texture_ref;
+			newtex->frames=tex->frames;
+			newtex->frames_ref=tex->frames_ref;
+#if defined(BLITZMAX_DEBUG)
+			DebugLog("texture_ref count %i",newtex->texture_ref.use_count());
+#endif
+			return newtex;
 		}
 	}
 	return NULL;
@@ -443,8 +460,10 @@ Texture* Texture::TexInList(size_t hash,int flags,int blend,int coords,float u_p
 				tex->AddRef();
 				return tex;
 			}
+
 			Texture *newtex=new Texture;
 			newtex->flags=flags;
+			newtex->FilterFlags();
 			newtex->blend=blend;
 			newtex->coords=coords;
 			newtex->u_pos=u_pos;
@@ -455,7 +474,6 @@ Texture* Texture::TexInList(size_t hash,int flags,int blend,int coords,float u_p
 
 			newtex->texture_ref=tex->texture_ref;
 			newtex->texture=*newtex->texture_ref;
-
 			newtex->frames=tex->frames;
 			newtex->frames_ref=tex->frames_ref;
 #if defined(BLITZMAX_DEBUG)
@@ -622,7 +640,8 @@ void Texture::DepthBufferToTex(Camera* cam=0 ){
 }
 
 
-void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeight, unsigned int srcX, unsigned int srcY, unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel) {
+void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeight, unsigned int srcX, unsigned int srcY, 
+	unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel) {
 	// Copy image data line by line
 	unsigned int y;
 	for (y = 0; y < dstHeight; y++)

@@ -63,7 +63,7 @@ main:$(OBJECTS)
 ifeq ($(shell uname), Linux)
 	$(CC) -shared -o libOpenB3D.so $(OBJECTS) -lGL -lGLU
 else
-	$(CC) -shared -o openb3d.dll $(OBJECTS) -Llib -lz -lglew32 -lopengl32 -lglu32 -lGDI32
+	$(CC) -shared -o openb3d.dll $(OBJECTS) -Llib/win32 -lz -lglew32 -lopengl32 -lglu32 -lGDI32
 endif
 
 

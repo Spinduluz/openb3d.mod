@@ -30,8 +30,8 @@ inline int strncasecmp(const char *s1,const char *s2,int n) {
 
 inline int strcasecmp(const char *s1,const char *s2){
 	while(1){
-		int c1=*s1++;
-		int c2=*s2++;
+		int c1=::tolower(*s1++);
+		int c2=::tolower(*s2++);
 
 		if(c1!=c2) return c1-c2;
 		if(!c1) return 0;
@@ -69,6 +69,12 @@ inline char *RequestTempString(int maxsize){
 
 inline void HandleRequestedTempString(char *tmp,int maxsize){
 	if(maxsize>=MAX_TEMP_STRING_LEN) delete[] tmp;
+}
+
+inline bool CheckExtension(const string& filename,const string& ext){
+	size_t p=filename.find_last_of('.');
+	if(p==string::npos) return false;
+	return (strncasecmp(filename.c_str()+p,ext.c_str(),4)==0);
 }
  
 // FIXME: Inline this crap or replace it....

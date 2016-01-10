@@ -2252,6 +2252,20 @@ End Function
 Rem
 bbdoc: undocumented
 End Rem
+Function DetachShaderObject( shader:TShader,shaderobject:TShaderObject )
+	shader.DetachShaderObject( shaderobject )
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
+Function FreeShaderObject( shaderobject:TShaderObject )
+	shaderobject.Free
+End Function
+
+Rem
+bbdoc: undocumented
+End Rem
 Function LoadShaderObject:TShaderObject( shadertype:Int,filename:String )
 	Return TShaderObject.LoadShaderObject( shadertype,filename )
 End Function

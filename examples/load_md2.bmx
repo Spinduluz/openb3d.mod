@@ -17,6 +17,9 @@ Local light:TLight=CreateLight()
 Local ent:TMesh=LoadAnimMesh("media/tris.md2")
 RotateEntity ent,-90,180,0
 
+Local cube:TMesh=CreateCube()
+PositionEntity cube,-5,10,-50
+
 Local tex:TTexture=LoadTexture("media/skin.jpg")
 EntityTexture ent,tex
 

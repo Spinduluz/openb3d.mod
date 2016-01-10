@@ -343,5 +343,11 @@
     <ClInclude Include="..\refobject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\functions_cpp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\functions_c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

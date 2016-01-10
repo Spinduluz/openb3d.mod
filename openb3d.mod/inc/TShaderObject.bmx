@@ -35,4 +35,9 @@ Type TShaderObject
 		MemFree nam
 		Return obj
 	End Function
+	
+	Method Free()
+		FreeShaderObject_( instance )
+	End Method
+
 End Type

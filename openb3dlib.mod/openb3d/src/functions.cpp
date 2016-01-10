@@ -53,7 +53,7 @@ void BackBufferToTex(Texture* tex,int frame){
 	tex->BackBufferToTex(frame);
 }
 
-void CameraToTex(Texture* tex, Camera* cam, int frame){
+void CameraToTex(Texture* tex,Camera* cam,int frame){
 	tex->CameraToTex(cam,frame);
 }
 
@@ -2229,8 +2229,17 @@ ShaderObject* CreateShaderObject(int type,const char*source,const char *name){
 	return ShaderObject::Create(target,source,name);
 }
 
-void AttachShaderObject(Shader *shader, ShaderObject *object){
+void AttachShaderObject(Shader *shader,ShaderObject *object){
 	shader->arb_program->AttachShader(object);
+}
+
+void DetachShaderObject(Shader *shader,ShaderObject *object){
+	glUseProgram(0); // Prevent program from being used
+	shader->arb_program->DetachShader(object);
+}
+
+void FreeShaderObject(ShaderObject *object){
+	object->DestroyRef();
 }
 	
 } /* extern "C" */

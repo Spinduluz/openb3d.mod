@@ -64,7 +64,7 @@ int Global::blend_mode=-1;
 int Global::fx1=-1;
 int Global::fx2=-1;
 
-Pivot* Global::root_ent=new Pivot();
+Pivot* Global::root_ent=new Pivot(); // Ever released? Probably not
 Camera* Global::camera_in_use;
 
 void Global::Graphics(){
@@ -200,6 +200,7 @@ void Global::ClearWorld(int entities,int brushes,int textures){
 		//	Entity* ent=*it;
 		//	ent->FreeEntity();
 		//}
+		// Uh oh... is anything freed at all?
 		Global::root_ent->FreeEntity();
 		Entity::entity_list.clear();
 		Entity::animate_list.clear();
@@ -218,7 +219,9 @@ void Global::ClearWorld(int entities,int brushes,int textures){
 		}*/
 		// Not necessary to free texture by texture when using shared/unique pointers.
 		// They will delete themselves when they go out of scope. i.e. deleted
-		Texture::tex_list.clear(); // Should be enough to release shared/unique pointers
+		for(Texture *tex : Texture::tex_list){
+			while(tex->DestroyRef());
+		}
 	}
 }
 

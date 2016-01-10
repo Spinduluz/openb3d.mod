@@ -5,7 +5,7 @@ Strict
 
 Framework Openb3d.B3dglgraphics
 
-Graphics3D 800,600,0,2
+Graphics3D 800,600,0,2,60,GRAPHICS_BACKBUFFER|GRAPHICS_ALPHABUFFER|GRAPHICS_DEPTHBUFFER|GRAPHICS_STENCILBUFFER|GRAPHICS_ACCUMBUFFER|$40|$400
 
 
 Local camera:TCamera=CreateCamera()
@@ -42,8 +42,8 @@ ShadeEntity(cube2,shader2)
 EntityFX(cube2,32)
 End Rem
 
-Local shader:TShader=CreateShader()
-Local shader2:TShader=CreateShader()
+Local shader:TShader=CreateShader( "shader" )
+Local shader2:TShader=CreateShader( "shader2" )
 
 Local vert:TShaderObject=LoadShaderObject( 0,"shaders/alphamap.vert.glsl" )
 Local frag:TShaderObject=LoadShaderObject( 1,"shaders/alphamap.frag.glsl" )
@@ -95,4 +95,10 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 
 Wend
+' Even if we free the shader objects here they
+' will not be deleted until all references are deleted
+FreeShaderObject vert
+FreeShaderObject frag
+FreeShader shader
+FreeShader shader2 'ShaderObject(s) will be finally deleted here
 End

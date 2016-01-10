@@ -134,6 +134,12 @@ Type TShader
 		
 	End Method
 	
+	Method DetachShaderObject( obj:TShaderObject )
+	
+		DetachShaderObject_( instance,obj.instance )
+	
+	End Method 
+	
 	Method ShadeSurface( surf:TSurface )
 	
 		ShadeSurface_( TSurface.GetInstance(surf),GetInstance(Self) )

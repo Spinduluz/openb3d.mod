@@ -116,6 +116,9 @@ Shader::~Shader(){
 		if(shader_texture[i]) delete shader_texture[i];
 	}
 	if(arb_program) arb_program->DestroyRef();
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Deleted shader %s",name.c_str());
+#endif
 }
 
 // internal 
@@ -604,12 +607,18 @@ void Shader::AddShader(string vsfilename, string fsfilename){
 	
 	if (!vsfilename.empty()){
 		vs=ShaderObject::CreateFromFile(GL_VERTEX_SHADER,vsfilename);
-		if(vs) arb_program->AttachShader(vs);
+		if(vs){
+			arb_program->AttachShader(vs);
+			vs->DestroyRef(); // AttachShader increases the reference count by 1
+		}
 	}
 		
 	if (!fsfilename.empty()){
 		fs=ShaderObject::CreateFromFile(GL_FRAGMENT_SHADER,fsfilename);
-		if(fs) arb_program->AttachShader(fs);
+		if(fs){
+			arb_program->AttachShader(fs);
+			fs->DestroyRef(); // AttachShader increases the reference count by 1
+		}
 	}
 }
 	
@@ -621,12 +630,18 @@ void Shader::AddShaderFromString(string vssrc,string fssrc,const string& name){
 		
 	if (!vssrc.empty()){
 		vs=ShaderObject::Create(GL_VERTEX_SHADER,vssrc,name+(name.empty()?"":".vert"));
-		if(vs) arb_program->AttachShader(vs);
+		if(vs){
+			arb_program->AttachShader(vs);
+			vs->DestroyRef(); // AttachShader increases the reference count by 1
+		}
 	}
 		
 	if (!fssrc.empty()){
 		fs=ShaderObject::Create(GL_FRAGMENT_SHADER,fssrc,name+(name.empty()?"":".frag"));
-		if(fs) arb_program->AttachShader(fs);
+		if(fs){
+			arb_program->AttachShader(fs);
+			fs->DestroyRef(); // AttachShader increases the reference count by 1
+		}
 	}
 }
 

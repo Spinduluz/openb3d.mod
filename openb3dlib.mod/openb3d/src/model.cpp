@@ -356,8 +356,23 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 				size_t hash=StringHash(te_file);
 
 				Texture* new_tex=Texture::TexInList(hash,te_flags,te_blend,te_coords,te_u_pos,te_v_pos,te_u_scale,te_v_scale,te_angle);
-				if(!new_tex) new_tex=Texture::LoadTexture(te_file,te_flags);
+				if(!new_tex){
+					new_tex=Texture::LoadTexture(te_file,te_flags);
+					if(!new_tex) return NULL;
+
+					new_tex->blend=te_blend;
+					new_tex->coords=te_coords;
+					new_tex->u_pos=te_u_pos;
+					new_tex->v_pos=te_v_pos;
+					new_tex->u_scale=te_u_scale;
+					new_tex->v_scale=te_v_scale;
+					new_tex->angle=te_angle;
+				}
 #endif
+#if defined(BLITZMAX_DEBUG)
+				DebugLog("Loaded texture %s (%s)",te_file.c_str(),new_tex->file_name.c_str());
+#endif
+
 				tex_no++;
 
 				tex.push_back(new_tex);
@@ -412,7 +427,7 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 
 				}
 
-				brush_no=brush_no+1;
+				brush_no++;
 
 				brush.push_back(new_brush);
 

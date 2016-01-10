@@ -24,8 +24,8 @@ using namespace std;
 
 class Camera;
 
-typedef shared_ptr<unsigned int> GLTextureName;
-typedef shared_ptr<unsigned int> TextureFrames;
+typedef shared_ptr<unsigned int> tex_name_t;
+typedef shared_ptr<unsigned int> tex_frames_t;
 
 class Texture : public ReferencedObject{
 public:
@@ -35,9 +35,10 @@ public:
 	static LoadPixbuf loadpixbuf;
 	static FreePixbuf freepixbuf;
 	static list<Texture*> tex_list;
+	static list<unsigned int> name_list;
 
 	unsigned int texture;
-	GLTextureName texture_ref; // This is used to ensure that the opengl texture isn't released/deleted before
+	tex_name_t texture_ref; // This is used to ensure that the opengl texture isn't released/deleted before
 							   // all references are gone
 
 	string file_name;
@@ -45,7 +46,7 @@ public:
 	size_t file_hash;
 
 	unsigned int* frames;
-	TextureFrames frames_ref;  // This is used to ensure that the texture frames isn't released/deleted before
+	tex_frames_t frames_ref;  // This is used to ensure that the texture frames isn't released/deleted before
 							   // all references are gone
 	int flags;
 	int blend;
