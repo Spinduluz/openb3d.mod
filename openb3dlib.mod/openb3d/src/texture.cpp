@@ -10,7 +10,8 @@
 #include <GL/glew.h>
 
 #include "texture.h"
-#include "stb_image.h"
+//#include "stb_image.h"
+#include "image.h"
 
 #include "texture_filter.h"
 #include "string_helper.h"
@@ -72,7 +73,6 @@ inline void GL_GenTextures(Texture *tex){
 
 // ==========================================================================================================
 
-// FIXME: Cleanup.... I get a headache from my own code
 inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buffer){
 	if(!buffer) return;
 
@@ -102,10 +102,33 @@ inline void GL_CopyTexImage2D(GLenum target,int x,int y,int width,int height){
 
 // ==========================================================================================================
 
-bool is_dds(const string& filename){
-	if(!strcasecmp(filename.c_str()+filename.length()-4,".dds")) return true;
-	return false;
+// A bloated way to minimize number of allocations when using dstbuffer (See animtexture and cubemap)
+// But I seriously dont know if I will use animated textures at all.
+struct TempImageBuffer{
+	unsigned char *buf;
+	int size;
+};
+
+static TempImageBuffer destbuffer={NULL,0};
+
+#define DEST_BUFFER_GRANULARITY	16384
+
+unsigned char *AllocDestBuffer(int size){
+	size=size+DEST_BUFFER_GRANULARITY-(size%DEST_BUFFER_GRANULARITY);
+
+	if(!destbuffer.buf){
+		destbuffer.buf=new unsigned char[size];
+		destbuffer.size=size;
+	}
+	if(size>destbuffer.size){
+		delete[] destbuffer.buf;
+		destbuffer.buf=new unsigned char[size];
+		destbuffer.size=size;
+	}
+	return destbuffer.buf;
 }
+
+// ==========================================================================================================
 
 int _io_file_eof(void *ptr){
 	File *file=(File*)ptr;
@@ -194,6 +217,13 @@ Texture::Texture()
 
 Texture::~Texture(){
 	tex_list.remove(this);
+	// Delete the temp buffer when all the textures
+	// are released
+	if(!tex_list.size() && destbuffer.buf){
+		delete[] destbuffer.buf;
+		destbuffer.buf=NULL;
+		destbuffer.size=0;
+	}
 }
 
 Texture* Texture::LoadTexture(string filename,int flags){
@@ -219,7 +249,6 @@ Texture* Texture::LoadTexture(string filename,int flags){
 		tex->flags=flags;
 		tex_list.push_back(tex);
 
-		//glGenTextures(1,&tex->texture);
 		GL_GenTextures(tex);
 		glBindTexture(dds->target,tex->texture);
 		dds->UploadTexture(tex);
@@ -250,10 +279,9 @@ Texture* Texture::LoadTexture(string filename,int flags){
 		unsigned int name;
 		tex->no_frames=1;
 		tex->width=tex->width/6;
-		tex->frames=new unsigned int[6];
-
+		//tex->frames=new unsigned int[6];
+		// FIXME:
 		unsigned char* dstbuffer=new unsigned char[tex->width*tex->height*4];
-		//glGenTextures(1,&name);
 		GL_GenTextures(tex);
 		glBindTexture(GL_TEXTURE_CUBE_MAP,name);
 
@@ -274,12 +302,13 @@ Texture* Texture::LoadTexture(string filename,int flags){
 	}
 }
 
+// FIXME: Allow loading top-down animated textures as well as left-right.
+// Top down would eliminate the need for a temporary buffer
 Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int frame_height,int first_frame,int frame_count){
 	filename=File::ResourceFilePath(filename);
 	if(filename.empty()) return NULL;
 
 	// Check this stuff here to avoid unnecessary allocations/deallocations
-	// FIXME: We're double checking this stuff if this call comes from LoadTexture
 	size_t hash=StringHash(filename);
 	FilterFlags(filename,flags);
 
@@ -295,15 +324,10 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 
 	unsigned char* buffer=loadpixbuf(filename.c_str(),&tex->width,&tex->height);
 
-	//unsigned int id;
 	if (frame_count<=2){
-		//glGenTextures(1,&id);
 		GL_GenTextures(tex);
 		glBindTexture(GL_TEXTURE_2D,tex->texture);
-		//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,tex->width,tex->height,0,GL_RGBA, GL_UNSIGNED_BYTE,buffer);
 		GL_TexImage2D(GL_TEXTURE_2D,tex->width,tex->height,buffer);
-
-		//tex->texture=id;
 	} else {
 		//
 		// FIXME: DO NOT FORGET
@@ -313,7 +337,7 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 		//
 		tex->no_frames=frame_count;
 		tex->frames=new unsigned int[frame_count+1]; // Allocate an extra unsigned int so we know where the array ends
-
+		// FIXME:
 		unsigned char* dstbuffer=new unsigned char[frame_width*frame_height*4];
 		//tex.gltex=tex.gltex[..tex.no_frames]
 		int frames_in_row=tex->width/frame_width;
@@ -325,9 +349,7 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 			glGenTextures(1,&id);
 			glBindTexture(GL_TEXTURE_2D,id);
 			glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
-			//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,frame_width,frame_height,0,GL_RGBA,GL_UNSIGNED_BYTE,dstbuffer);
 			GL_TexImage2D(GL_TEXTURE_2D,frame_width,frame_height,dstbuffer);
-			//gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGBA,frame_width, frame_height,GL_RGBA,GL_UNSIGNED_BYTE,dstbuffer);
 
 			tex->frames[i]=id;
 		}
@@ -528,22 +550,13 @@ void Texture::BackBufferToTex(int frame){
 	}else{
 		glBindTexture(GL_TEXTURE_2D,texture);
 		GL_CopyTexImage2D(GL_TEXTURE_2D,0,0,width,height);
-		//glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,0,/*Global::height-height*/0,width,height,0);
-		//glGenerateMipmap(GL_TEXTURE_2D);
 	}
 }
 
 void Texture::CameraToTex(Camera* cam, int frame){
 
-	//GLenum target;
-
 	Global::camera_in_use=cam;
 
-	/*if(flags&128){
-		target=GL_TEXTURE_CUBE_MAP;
-	}else{
-		target=GL_TEXTURE_2D;
-	}*/
 	GLenum target=(flags&128)?GL_TEXTURE_CUBE_MAP:GL_TEXTURE_2D;
 	glBindTexture(target, texture);
 
@@ -553,11 +566,9 @@ void Texture::CameraToTex(Camera* cam, int frame){
 		glGenRenderbuffers(1, &framebuffer[1]);
 		if(flags&128){
 			for (int i=0;i<6;i++){
-				//GL_TexImage2D(gl_cube_faces[i],width,height,NULL);
 				glTexImage2D(gl_cube_faces[i],0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 			}
 		}else{
-			//GL_TexImage2D(GL_TEXTURE_2D,width,height,NULL);
 			glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 		}
 
@@ -584,7 +595,7 @@ void Texture::CameraToTex(Camera* cam, int frame){
 
 	//glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0); 
 
-	glBindTexture (target, texture);//
+	glBindTexture(target, texture);//
 	glGenerateMipmap(target);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -592,6 +603,7 @@ void Texture::CameraToTex(Camera* cam, int frame){
 
 
 void Texture::TexToBuffer(unsigned char* buffer, int frame){
+	// FIXME: Compressed textures
 	glBindTexture (GL_TEXTURE_2D,texture);
 	if(flags&128){
 		glGetTexImage(gl_cube_faces[cube_face], 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);

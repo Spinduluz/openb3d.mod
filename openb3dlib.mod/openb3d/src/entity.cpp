@@ -1327,6 +1327,14 @@ void Entity::UpdateMat(bool load_identity){
 	MQ_Update();
 }
 
+// FIXME:?
+// I truly don't understand this one.
+// You have an Entity pointer that are dereferenced and used in this function.
+// i.e. light.cpp line 40:
+//	light->AddParent(*parent_ent);
+//
+// It might be something that I don't know or understand.
+// But I do think that I'll change this to "AddParent(Entity* parent_ent)"
 void Entity::AddParent(Entity &parent_ent){
 	// self.parent = parent_ent
 	parent=&parent_ent;

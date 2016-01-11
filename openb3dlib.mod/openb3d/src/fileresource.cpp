@@ -27,7 +27,7 @@ FilePtr FileZipResource::ReadFile(const string& filename) const{
 	if(unzLocateFile(handle.get(),filename.c_str(),true)!=UNZ_OK) return NULL;
 	// This is a quick fix for a bug.
 	// It might be possible that we're unable to stream small packet of data
-	// directly from the ZIP stream. Doubtful that it'll be worth to fix.
+	// directly from the zlib stream. Doubtful that it'll be worth to fix.
 #if 0
 	return FilePtr(new FileUnz(handle),FreeFilePtr);
 #else // Test fix for crash

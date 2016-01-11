@@ -21,7 +21,9 @@
 list<Camera*> Camera::cam_list;
 list<Mesh*> Camera::render_list;
 
-float Camera::projected_x,Camera::projected_y,Camera::projected_z;
+float Camera::projected_x;
+float Camera::projected_y;
+float Camera::projected_z;
 
 Camera* Camera::CopyEntity(Entity* parent_ent){
 

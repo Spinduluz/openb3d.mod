@@ -503,10 +503,10 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 				piv->mat.Scale(n_sx,n_sy,n_sz);
 
 				if(piv->parent!=NULL){
-					Matrix* new_mat=piv->parent->mat.Copy();
-					new_mat->Multiply(piv->mat);
-					piv->mat.Overwrite(*new_mat);//.Multiply(mat)
-					delete new_mat;
+					Matrix new_mat=piv->parent->mat.Copy();
+					new_mat.Multiply(piv->mat);
+					piv->mat.Overwrite(new_mat);//.Multiply(mat)
+					//delete new_mat;
 				}
 
 			}
@@ -553,10 +553,10 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 			mesh->mat.Scale(n_sx,n_sy,n_sz);
 
 			if(mesh->parent!=NULL){
-				Matrix* new_mat=mesh->parent->mat.Copy();
-				new_mat->Multiply(mesh->mat);
-				mesh->mat.Overwrite(*new_mat);//.Multiply(mat)
-				delete new_mat;
+				Matrix new_mat=mesh->parent->mat.Copy();
+				new_mat.Multiply(mesh->mat);
+				mesh->mat.Overwrite(new_mat);//.Multiply(mat)
+				//delete new_mat;
 			}
 
 		}else if(tag_id==VRTS){
@@ -845,9 +845,9 @@ Mesh* LoadAnimB3D(FilePtr file,Entity* parent_ent_ext){
 			bo_bone->mat.grid[3][2]=bo_bone->n_pz;
 
 			if(bo_bone->parent!=NULL && dynamic_cast<Bone*>(bo_bone->parent)!=NULL){ // And... onwards needed to prevent inv_mat being incorrect if external parent supplied
-				Matrix* new_mat=bo_bone->parent->mat.Copy();
-				new_mat->Multiply(bo_bone->mat);
-				bo_bone->mat.Overwrite(*new_mat);
+				Matrix new_mat=bo_bone->parent->mat.Copy();
+				new_mat.Multiply(bo_bone->mat);
+				bo_bone->mat.Overwrite(new_mat);
 			}
 
 			bo_bone->mat.GetInverse(bo_bone->inv_mat);

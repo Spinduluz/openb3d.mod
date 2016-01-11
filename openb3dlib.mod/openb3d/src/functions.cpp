@@ -1299,7 +1299,7 @@ void ResetEntity(Entity* ent){
 }
 
 void ResetShadow(ShadowObject* shad){
-	shad->VCreated=0;
+	shad->volume_created=false;
 }
 
 
@@ -1928,8 +1928,6 @@ void AmbientShader(Shader* material){
 	Global::ambient_shader=material;
 }
 
-
-
 OcTree* CreateOcTree(float w, float h, float d, Entity* parent_ent=0){
 	return OcTree::CreateOcTree(w, h, d, parent_ent);
 }
@@ -2169,14 +2167,6 @@ Mesh *LoadAnimMeshFromBuffer(const void *buffer,int len,int type,Entity *parent)
 	if(!file) return NULL;
 	mesh=_LoadAnimMesh(file,type,parent);
 	return mesh;
-}
-
-static void FreePixbuf(unsigned char *buf){
-}
-
-void SetPixbufReader(Texture::LoadPixbuf load,Texture::FreePixbuf free){
-	Texture::loadpixbuf=load;
-	Texture::freepixbuf=free?free:FreePixbuf;
 }
 
 bool AddFileResource(const char *filename,int reserved){

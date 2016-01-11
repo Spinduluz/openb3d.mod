@@ -107,6 +107,7 @@
     <ClInclude Include="..\geom.h" />
     <ClInclude Include="..\geosphere.h" />
     <ClInclude Include="..\global.h" />
+    <ClInclude Include="..\image.h" />
     <ClInclude Include="..\isosurface.h" />
     <ClInclude Include="..\light.h" />
     <ClInclude Include="..\material.h" />

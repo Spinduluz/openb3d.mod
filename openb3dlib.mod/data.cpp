@@ -411,7 +411,7 @@ char* StaticChar( int classid,int varid ){
 	switch (classid){
 		case SHADOWOBJECT_class :
 			switch (varid){
-				case SHADOWOBJECT_top_caps : return &ShadowObject::top_caps;
+				case SHADOWOBJECT_top_caps : return (char*)&ShadowObject::top_caps;
 			}
 	}
 	return NULL;
@@ -1261,9 +1261,9 @@ vector<Bone*>* MeshVectorBone( Mesh* obj,int varid ){
 
 char* ShadowObjectChar( ShadowObject* obj,int varid ){
 	switch (varid){
-		case SHADOWOBJECT_Render : return &obj->Render;
-		case SHADOWOBJECT_Static : return &obj->Static;
-		case SHADOWOBJECT_VCreated : return &obj->VCreated;
+		case SHADOWOBJECT_Render : return (char*)&obj->render;
+		case SHADOWOBJECT_Static : return (char*)&obj->static_object;
+		case SHADOWOBJECT_VCreated : return (char*)&obj->volume_created;
 	}
 	return NULL;
 }
@@ -1277,7 +1277,7 @@ int* ShadowObjectInt( ShadowObject* obj,int varid ){
 
 Mesh* ShadowObjectMesh( ShadowObject* obj,int varid ){
 	switch (varid){
-		case SHADOWOBJECT_Parent : return obj->Parent;
+		case SHADOWOBJECT_Parent : return obj->parent;
 		case SHADOWOBJECT_ShadowMesh : return obj->ShadowMesh;
 	}
 	return NULL;

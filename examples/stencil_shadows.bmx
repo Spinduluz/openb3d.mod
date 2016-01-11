@@ -235,7 +235,7 @@ While Not KeyHit(KEY_ESCAPE) And Not AppTerminate()
 	RenderWorld
 	
 	If static=0 ' render second shadow color
-		SetShadowColor(scolor[0],scolor[1],scolor[2],250) ' light2 color
+		SetShadowColor(scolor[0],scolor[1],scolor[2],50) ' light2 color
 		If light2.Hidden() Then SetShadowColor(scolor[0],scolor[1],scolor[2],100)
 		If Not light.Hidden() Or Not light2.Hidden() ' don't render if no lights
 			TShadowObject.ShadowRenderWorldZFail() ' re-render shadows

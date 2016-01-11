@@ -31,6 +31,8 @@ Import BRL.Retro			' imports BRL.Basic
 Import BRL.Map
 'Import PUB.MapStream
 
+' 2016-01-11 Removed SetPixbufReader_
+
 ' WIP
 ' CreateShaderProgram_
 ' LoadShaderObject_
@@ -219,7 +221,6 @@ Extern
 	Function SetAnimTime_( ent:Byte Ptr,time:Float,seq:Int ) = "SetAnimTime"
 	Function SetCubeFace_( tex:Byte Ptr,face:Int ) = "SetCubeFace"
 	Function SetCubeMode_( tex:Byte Ptr,Mode:Int ) = "SetCubeMode"
-	Function SetPixbufReader_( loader:Byte Ptr( filename:Byte Ptr,width:Int Var,height:Int Var), free( buf:Byte Ptr ) ) = "SetPixbufReader"
 	Function ShowEntity_( ent:Byte Ptr ) = "ShowEntity"
 	Function SpriteViewMode_( sprite:Byte Ptr,Mode:Int ) = "SpriteViewMode"
 	Function TextureBlend_( tex:Byte Ptr,blend:Int ) = "TextureBlend"

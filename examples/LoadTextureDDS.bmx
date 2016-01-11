@@ -46,10 +46,12 @@ While Not KeyHit(KEY_ESCAPE)
 	Flip
 Wend
 
-DebugLog "Free dxt1_tex"
 FreeTexture dxt1_tex
-DebugLog "Free test"
 FreeTexture test
+
+FreeTexture dxt3_tex
+FreeTexture dxt5_tex
+FreeTexture rgba_tex
 
 End
 

@@ -1181,13 +1181,6 @@ Function SetCubeMode( tex:TTexture,Mode:Int )
 End Function
 
 Rem
-bbdoc:
-End Rem
-Function SetPixbufReader( loader:Byte Ptr( filename:Byte Ptr,width:Int Var,height:Int Var ), free( buf:Byte Ptr ) )
-	SetPixbufReader_ loader,free
-End Function
-
-Rem
 bbdoc: <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=ShowEntity">Online doc</a>
 End Rem
 Function ShowEntity( ent:TEntity )

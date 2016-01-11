@@ -186,7 +186,7 @@ void MatrixLoadIdentity( Matrix* obj ){
 }
 
 Matrix* MatrixCopy( Matrix* obj ){
-	return obj->Copy();
+	return new Matrix( obj->Copy() );
 }
 
 void MatrixOverwrite( Matrix* obj,Matrix &mat ){

@@ -26,14 +26,23 @@ public:
 	static int gl_light[];
 
 	static vector<Light*> light_list;
+	//static Light* light_list[8];
 
-	char cast_shadow;
+	char light_index;
+
+	char cast_shadow; // bool...
 	char light_type;
 	float range;
-	float red,green,blue;
-	float inner_ang,outer_ang;
+	
+	float red;
+	float green;
+	float blue;
+
+	float inner_ang;
+	float outer_ang;
 	
 	Light(){
+		light_index=0;
 		cast_shadow=1;
 		light_type=0;
 		range=1.0/1000.0;

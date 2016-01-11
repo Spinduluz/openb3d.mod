@@ -45,19 +45,19 @@ End Rem
 Local shader:TShader=CreateShader( "shader" )
 Local shader2:TShader=CreateShader( "shader2" )
 
-Local vert:TShaderObject=LoadShaderObject( 0,"shaders/alphamap.vert.glsl" )
-Local frag:TShaderObject=LoadShaderObject( 1,"shaders/alphamap.frag.glsl" )
+Local vert:TShaderObject=LoadShaderObject( 0,"shaders/alphamap.vert.glsl" ) 'vert reference count=1
+Local frag:TShaderObject=LoadShaderObject( 1,"shaders/alphamap.frag.glsl" ) 'frag reference count=1
 
-AttachShaderObject( shader,vert )
-AttachShaderObject( shader,frag )
+AttachShaderObject( shader,vert ) 'vert reference count=2
+AttachShaderObject( shader,frag ) 'frag reference count=2
 
 ShaderTexture(shader,LoadTexture("media/colorkey.jpg"),"tex",0)
 ShaderTexture(shader,LoadTexture("media/spark.png"),"alphatex",1)
 ShadeEntity(cube,shader)
 EntityFX(cube,32)
 
-AttachShaderObject( shader2,vert )
-AttachShaderObject( shader2,frag )
+AttachShaderObject( shader2,vert ) 'vert reference count=3
+AttachShaderObject( shader2,frag ) 'frag reference count=3
 
 ShaderTexture(shader2,LoadTexture("media/alpha_map.png"),"tex",0)
 ShadeEntity(cube2,shader2)
@@ -97,8 +97,8 @@ While Not KeyDown(KEY_ESCAPE)
 Wend
 ' Even if we free the shader objects here they
 ' will not be deleted until all references are deleted
-FreeShaderObject vert
-FreeShaderObject frag
-FreeShader shader
-FreeShader shader2 'ShaderObject(s) will be finally deleted here
+FreeShaderObject vert 'vert reference count=2
+FreeShaderObject frag 'frag reference count=2
+FreeShader shader 'vert & frag reference count=1
+FreeShader shader2 'ShaderObject(s) will be finally deleted here (vert & frag reference count=0!)
 End

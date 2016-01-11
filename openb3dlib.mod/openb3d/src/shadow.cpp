@@ -22,15 +22,18 @@
 #include "mesh.h"
 #include "global.h"
 
-float ShadowObject::ShadowRed   =0;
-float ShadowObject::ShadowGreen =0;
-float ShadowObject::ShadowBlue  =0;
-float ShadowObject::ShadowAlpha =.5;
+float ShadowObject::ShadowRed=0;
+float ShadowObject::ShadowGreen=0;
+float ShadowObject::ShadowBlue=0;
+float ShadowObject::ShadowAlpha=.5;
 
 list<ShadowObject*> ShadowObject::shadow_list;
 
-float ShadowObject::light_x, ShadowObject::light_y, ShadowObject::light_z;
-char ShadowObject::top_caps=true;
+float ShadowObject::light_x;
+float ShadowObject::light_y;
+float ShadowObject::light_z;
+
+bool ShadowObject::top_caps=true;
 float ShadowObject::VolumeLength=1000;
 int ShadowObject::parallel;
 int ShadowObject::midStencilVal;
@@ -42,115 +45,94 @@ void ShadowObject::FreeShadow() {
 	shadow_list.remove(this);
 	ShadowMesh->FreeEntity();
 
-	vector<ShadowTriangle*>::iterator it;
-	for(it=Tri.begin();it!=Tri.end();it++){
-		delete *it;
-	}
-	if (shadow_list.size()==0) Global::Shadows_enabled=0;
+	//C++11'ify
+	for(ShadowTriangle* t : shadow_triangles) delete t;
+	if (!shadow_list.size()) Global::Shadows_enabled=0;
 
 }
 
-void ShadowObject::SetShadowColor(int R, int G, int B, int A){
-	ShadowRed   = R/255.0;
-	ShadowGreen = G/255.0;
-	ShadowBlue  = B/255.0;
-	ShadowAlpha = A/255.0;
+void ShadowObject::SetShadowColor(float red,float green,float blue,float alpha){
+	ShadowRed=red/255.0;
+	ShadowGreen=green/255.0;
+	ShadowBlue=blue/255.0;
+	ShadowAlpha=alpha/255.0;
 }
 
 void ShadowObject::ShadowInit(){
-		int StencilBits;
-		glGetIntegerv(GL_STENCIL_BITS, &StencilBits);
-		midStencilVal = (StencilBits - 1)^2;
-		glClearStencil(midStencilVal);
+	int StencilBits;
+	glGetIntegerv(GL_STENCIL_BITS, &StencilBits); // Move this to Global
+	midStencilVal = (StencilBits - 1)^2;
+	glClearStencil(midStencilVal);
 }
 
-ShadowObject* ShadowObject::Create(Mesh* Parent, char Static){
-		ShadowObject* S = new ShadowObject;
-		S->ShadowMesh=Mesh::CreateMesh();
-		Global::root_ent->child_list.remove(S->ShadowMesh);
-		S->ShadowMesh->EntityBlend(0);
-		S->ShadowMesh->EntityAlpha (0.2);
-		S->ShadowMesh->EntityColor  (255, 0, 0);
-		S->ShadowMesh->EntityFX (17);
-		S->ShadowVolume = S->ShadowMesh->CreateSurface();
-		S->Parent = Parent;
-		S->Static = Static;
-		S->VCreated=0;
-		shadow_list.push_back(S);
-		S->Init();
-		return S;
+ShadowObject* ShadowObject::Create(Mesh* parent, bool static_object){
+		ShadowObject* shadow = new ShadowObject;
+		shadow->ShadowMesh=Mesh::CreateMesh();
+		Global::root_ent->child_list.remove(shadow->ShadowMesh);
+		shadow->ShadowMesh->EntityBlend(0);
+		shadow->ShadowMesh->EntityAlpha(0.2);
+		shadow->ShadowMesh->EntityColor(255, 0, 0);
+		shadow->ShadowMesh->EntityFX(17);
+		shadow->ShadowVolume = shadow->ShadowMesh->CreateSurface();
+		shadow->parent = parent;
+		shadow->static_object = static_object;
+		shadow->volume_created=false;
+		shadow_list.push_back(shadow);
+		shadow->Init();
+		return shadow;
 }
 
-void ShadowObject::RemoveShadowfromMesh(Mesh* M) {
-	list<ShadowObject*>::iterator it;
-	for(it=shadow_list.begin();it!=shadow_list.end();it++){
-		ShadowObject* S=*it;
-		if (S->Parent == M){
-			shadow_list.remove(S);
+void ShadowObject::RemoveShadowfromMesh(Mesh* mesh) {
+	// C++11'ify
+	for(ShadowObject *shadow : shadow_list){
+		if(shadow->parent==mesh){
+			// We should not free it or something?
+			// Or can it be referenced by another mesh?
+			// I'm going to take a stab in the dark and remove it
+			shadow_list.remove(shadow);
+			shadow->FreeShadow();
 			return;
 		}
 	}
 }
 
-void ShadowObject::Update(Camera* Cam){
-	//RenderedVolumes = 0;
-	//Global::RenderWorld();
-		/*If TGlobal.Buffer <> Null
-				Cam.SaveViewport()
-				Cam.vx=0
-				Cam.vy=0
-				Cam.vwidth = TGlobal.Buffer.W
-				Cam.vheight = TGlobal.Buffer.H
-				TGlobal.Buffer.Setbuffer()
-		End If*/
-	vector<Light*>::iterator it;
-	for(it=Light::light_list.begin();it!=Light::light_list.end();++it){
-		Light* Light=*it;
-		if (Light->hide==true || Light->cast_shadow==false) continue;
+void ShadowObject::Update(Camera* cam){
+	// C++11'ify
+	for(Light* light : Light::light_list){
+		if(light->hide || !light->cast_shadow) continue;
 
-		light_x = Light->EntityX(true) * (1 + parallel * 1);
-		light_y = Light->EntityY(true) * (1 + parallel * 1);
-		light_z = Light->EntityZ(true) * (1 + parallel * 1);
+		light_x=light->EntityX(true) * (1+parallel*1);
+		light_y=light->EntityY(true) * (1+parallel*1);
+		light_z=light->EntityZ(true) * (1+parallel*1);
 
-		Cam->CameraClsMode(false,false);
-		Cam->Update();
+		cam->CameraClsMode(false,false);
+		cam->Update();
 
-		list<ShadowObject*>::iterator it2;
-		for(it2=shadow_list.begin();it2!=shadow_list.end();it2++){
-			ShadowObject* S=*it2;
-			if (S->Parent->hide==false && Light->EntityDistance(S->Parent)<1/Light->range){
-				VolumeLength=(Cam->range_far-S->Parent->EntityDistance(Cam))/(S->Parent->EntityDistance(Light)+abs(S->Parent->cull_radius));
-				S->ShadowMesh->reset_bounds = true;
-				S->ShadowMesh->GetBounds();
-				S->UpdateCaster();
-				S->Render = true;
+		for(ShadowObject *shadow : shadow_list){
+			if (!shadow->parent->hide && light->EntityDistance(shadow->parent)<1/light->range){
+				VolumeLength=(cam->range_far-shadow->parent->EntityDistance(cam))/(shadow->parent->EntityDistance(light)+abs(shadow->parent->cull_radius));
+				shadow->ShadowMesh->reset_bounds=true;
+				shadow->ShadowMesh->GetBounds();
+				shadow->UpdateCaster();
+				shadow->render=true;
 			}else{
-				S->Render = false;
+				shadow->render=false;
 			}
-			//RenderedVolumes++;
 		}
 
-		Cam->CameraClsMode(false,false);
-
+		cam->CameraClsMode(false,false);
 		ShadowRenderWorldZFail();
-
 	}
-	Cam->CameraClsMode(true , true) ;
-	/*	If TGlobal.Buffer <> Null Then
-			TGLobal.Buffer.UnSetBuffer()
-			Cam.RestoreViewPort()
-		End If
-
-	Frame++;*/
+	cam->CameraClsMode(true,true) ;
 }
 
 void ShadowObject::RenderVolume(){
 	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(0.0, 4.0);
-	list<ShadowObject*>::iterator it;
-	for(it=shadow_list.begin();it!=shadow_list.end();it++){
-		ShadowObject* S=*it;
-		if (S->Render == true) {S->ShadowMesh->UpdateShadow();}
+	glPolygonOffset(0.0,4.0);
+
+	// C++11'ify
+	for(ShadowObject* shadow : shadow_list){
+		if(shadow->render) shadow->ShadowMesh->UpdateShadow();
 	}
 	glDisable(GL_POLYGON_OFFSET_FILL);
 }
@@ -160,19 +142,19 @@ void ShadowObject::UpdateAnim(){
 	Surface* anim_surf;
 
 	list<Surface*>::iterator surf_it;
-	surf_it=Parent->surf_list.begin();
+	surf_it=parent->surf_list.begin();
 
 	list<Surface*>::iterator an_it;
-	an_it=Parent->anim_surf_list.begin();
+	an_it=parent->anim_surf_list.begin();
 
 	vector<ShadowTriangle*>::iterator it;
 
 	int cnt;
-	int cnt_surf = Parent->CountSurfaces();
-	it=Tri.begin();
+	int cnt_surf = parent->CountSurfaces();
+	it=shadow_triangles.begin();
   // for(it=Tri.begin();it!=Tri.end();it++){
 
-	for (int s = 1; s<= cnt_surf;s++){
+	for (int s=1;s<=cnt_surf;s++){
 		surf = *surf_it;
 		anim_surf = *an_it;
 		cnt = surf->CountTriangles() - 1;
@@ -201,10 +183,10 @@ void ShadowObject::UpdateAnim(){
 void ShadowObject::Init(){
 	int cnt = -1;
 	cnt_tris = - 1;
-	int cnt_surf = Parent->CountSurfaces();
+	int cnt_surf = parent->CountSurfaces();
 
 	for (int s = 1; s<= cnt_surf;s++){
-		Surface* surf = Parent->GetSurface(s);
+		Surface* surf = parent->GetSurface(s);
 		cnt = surf->CountTriangles() - 1;
 
 		for (int v = 0;v<=cnt;v++){
@@ -213,7 +195,7 @@ void ShadowObject::Init(){
 					tri = tri[..tri.length + 1]
 			}*/
 			ShadowTriangle* etet = new ShadowTriangle;
-			Tri.push_back(etet);
+			shadow_triangles.push_back(etet);
 			etet->tris = v;
 			int vert0 = surf->TriangleVertex(v, 0);
 			int vert1 = surf->TriangleVertex(v, 1);
@@ -238,7 +220,7 @@ void ShadowObject::Init(){
 	bool v1a_v2a, v1a_v2b, v1a_v2c, v1b_v2a, v1b_v2b, v1b_v2c, v1c_v2a, v1c_v2b, v1c_v2c;
 
 	for (int a = 0;a<= cnt_tris;a++){
-		ShadowTriangle* at = Tri[a];
+		ShadowTriangle* at = shadow_triangles[a];
 		v1a_x  = at->v1x;
 		v1a_y  = at->v1y;
 		v1a_z  = at->v1z;
@@ -249,7 +231,7 @@ void ShadowObject::Init(){
 		v1c_y  = at->v3y;
 		v1c_z  = at->v3z;
 		for (int b = a + 1;b<= cnt_tris; b++){
-			ShadowTriangle* bt = Tri[b];
+			ShadowTriangle* bt = shadow_triangles[b];
 			v1a_v2a = (v1a_x == bt->v1x && v1a_y == bt->v1y && v1a_z == bt->v1z);
 			v1a_v2b = (v1a_x == bt->v2x && v1a_y == bt->v2y && v1a_z == bt->v2z);
 			v1a_v2c = (v1a_x == bt->v3x && v1a_y == bt->v3y && v1a_z == bt->v3z);
@@ -306,18 +288,18 @@ void ShadowObject::InitShadow(){
 	  ShadowInit();
 	}
 	for (int v = 0;v<=cnt_tris;v++){
-		ShadowTriangle* etet = Tri[v];
-		if (etet->ta > -1) etet->id_ta = Tri[etet->ta];
-		if (etet->tb > -1) etet->id_tb = Tri[etet->tb];
-		if (etet->tc > -1) etet->id_tc = Tri[etet->tc];
+		ShadowTriangle* etet = shadow_triangles[v];
+		if (etet->ta > -1) etet->id_ta = shadow_triangles[etet->ta];
+		if (etet->tb > -1) etet->id_tb = shadow_triangles[etet->tb];
+		if (etet->tc > -1) etet->id_tc = shadow_triangles[etet->tc];
 	}
 }
 
 void ShadowObject::UpdateCaster(){
-	if (Static!=0 && VCreated!=0) return;
-	VCreated = true;
-	if (ShadowVolume!=0) {ShadowVolume->ClearSurface();}
-	if (Parent->anim!=0) {UpdateAnim();}
+	if (static_object && volume_created) return;
+	volume_created=true;
+	if (ShadowVolume) ShadowVolume->ClearSurface();
+	if (parent->anim!=0) UpdateAnim();
 
 	float e0x, e0y, e0z, e1x, e1y, e1z;
 
@@ -353,23 +335,24 @@ void ShadowObject::UpdateCaster(){
 		etet->tf_v3y= Entity::TFormedY();
 		etet->tf_v3z= Entity::TFormedZ();
 		*/
-	for(it=Tri.begin();it!=Tri.end();it++){
+	// FIXME: C++11'ify
+	for(it=shadow_triangles.begin();it!=shadow_triangles.end();it++){
 		ShadowTriangle* etet = *it;
 
 		etet->tf_v1x= etet->v1x;
 		etet->tf_v1y= etet->v1y;
 		etet->tf_v1z= etet->v1z;
-		Parent->mat.TransformVec(etet->tf_v1x, etet->tf_v1y, etet->tf_v1z, 1);
+		parent->mat.TransformVec(etet->tf_v1x, etet->tf_v1y, etet->tf_v1z, 1);
 
 		etet->tf_v2x= etet->v2x;
 		etet->tf_v2y= etet->v2y;
 		etet->tf_v2z= etet->v2z;
-		Parent->mat.TransformVec(etet->tf_v2x, etet->tf_v2y, etet->tf_v2z, 1);
+		parent->mat.TransformVec(etet->tf_v2x, etet->tf_v2y, etet->tf_v2z, 1);
 
 		etet->tf_v3x= etet->v3x;
 		etet->tf_v3y= etet->v3y;
 		etet->tf_v3z= etet->v3z;
-		Parent->mat.TransformVec(etet->tf_v3x, etet->tf_v3y, etet->tf_v3z, 1);
+		parent->mat.TransformVec(etet->tf_v3x, etet->tf_v3y, etet->tf_v3z, 1);
 
 		e0x= etet->tf_v3x - etet->tf_v2x;
 		e0y= etet->tf_v3y - etet->tf_v2y;
@@ -385,7 +368,7 @@ void ShadowObject::UpdateCaster(){
 
 //	for (int v = 0;v<=cnt_tris;v++){
 //		ShadowTriangle* etet = Tri[v];
-	for(it=Tri.begin();it!=Tri.end();it++){
+	for(it=shadow_triangles.begin();it!=shadow_triangles.end();it++){
 		ShadowTriangle* etet = *it;
 		r1x  = etet->tf_v1x  + (etet->tf_v1x  - light_x ) * VolumeLength;
 		r1y  = etet->tf_v1y  + (etet->tf_v1y  - light_y ) * VolumeLength;
@@ -428,7 +411,7 @@ void ShadowObject::UpdateCaster(){
 				ShadowVolume->AddTriangle (vert1, vert4, vert3);
 				ShadowVolume->AddTriangle (vert1, vert2, vert4);
 			}
-			if (top_caps!=0){
+			if (top_caps){
 				vert1 = ShadowVolume->AddVertex(etet->tf_v1x , etet->tf_v1y , etet->tf_v1z);
 				vert2 = ShadowVolume->AddVertex(etet->tf_v2x , etet->tf_v2y , etet->tf_v2z);
 				vert3 = ShadowVolume->AddVertex(etet->tf_v3x , etet->tf_v3y , etet->tf_v3z);
@@ -455,44 +438,44 @@ void ShadowObject::ShadowRenderWorldZFail(){
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	glDepthMask(GL_FALSE);
-	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
+	glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
 	// we wanted the first ambient pass above in the Color Buffer but we don't want the volumes in
 	// there ..removing the above line is fun though :P
-	glEnable( GL_CULL_FACE );
-	glEnable( GL_STENCIL_TEST );
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_STENCIL_TEST);
 
 	// Render the shadow volume And increment the stencil every where a front
 	// facing polygon is rendered.
 
 	// Incrementing the stencil Buffer when back face depth fails
-	glStencilFunc( GL_ALWAYS, midStencilVal, 0xffffffff); // ~0 is like 0xFFFFFFFF Or something :P
-	glStencilOp( GL_KEEP, GL_INCR_WRAP, GL_KEEP ); // incrementing on the depth fail
-	glCullFace( GL_BACK   ); // cull front facing polys For this pass
+	glStencilFunc(GL_ALWAYS,midStencilVal,0xffffffff); // ~0 is like 0xFFFFFFFF Or something :P ( eh yes. ~0 is -1 signed or 0xffffffff unsigned for a 32 bit number, 'Bitwise NOT' )
+	glStencilOp(GL_KEEP,GL_INCR_WRAP,GL_KEEP); // incrementing on the depth fail
+	glCullFace(GL_BACK); // cull front facing polys For this pass
 
 	RenderVolume();
 
 	// Render the shadow volume And decrement the stencil every where a back
 	// facing polygon is rendered.
-	glStencilOp( GL_KEEP, GL_DECR_WRAP, GL_KEEP ); // decrementing on the depth fail
-	glCullFace( GL_FRONT   ); // And now culling back facing polys
+	glStencilOp(GL_KEEP,GL_DECR_WRAP,GL_KEEP); // decrementing on the depth fail
+	glCullFace(GL_FRONT); // And now culling back facing polys
 
 	RenderVolume();
 
 	// When done, set the states back To something more typical.
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	glEnable(GL_LIGHTING);
 	glDepthMask(GL_TRUE);
 
-	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
+	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 
 	//
 	// Render the lit part...
 	//
-	glStencilFunc( GL_EQUAL, midStencilVal, 0xffffffff); // again with the ~0 :P
+	glStencilFunc(GL_EQUAL,midStencilVal,0xffffffff); // again with the ~0 :P
 	// When done, set the states back To something more typical.
 	glEnable(GL_DEPTH_TEST);
-	glCullFace( GL_BACK   ); // cull front facing polys For this pass
+	glCullFace(GL_BACK); // cull front facing polys For this pass
 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glEnable(GL_LIGHTING);
@@ -500,60 +483,61 @@ void ShadowObject::ShadowRenderWorldZFail(){
 
 	glCullFace(GL_BACK);
 	glStencilFunc(GL_NOTEQUAL, midStencilVal, 0xffffff);
-	glStencilOp(GL_KEEP , GL_KEEP , GL_KEEP);
+	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 
 // NOTE: is it the projektion matrix ?
 	glPushMatrix();
-	  glLoadIdentity();
-	  glMatrixMode(GL_MODELVIEW);
-	  glPushMatrix();
-	    glLoadIdentity();
-	    glOrtho(0 , 1 , 1 , 0 , 0 , 1);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 
-	    //float no_mat[]={0.0,0.0};
-	    float mat_ambient[]={ShadowRed,ShadowGreen,ShadowBlue,1.0};
-	    float mat_diffuse[]={0,0,0,ShadowAlpha};
-	    float mat_specular[]={0,0,0,0.5};
-	    float mat_shininess[]={0.0}; // upto 128
+	glOrtho(0,1,1,0,0,1);
 
-	    glMaterialfv(GL_FRONT,GL_AMBIENT,mat_ambient);
-	    glMaterialfv(GL_FRONT,GL_DIFFUSE,mat_diffuse);
-	    glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
-	    glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
+	//float no_mat[]={0.0,0.0};
+	float mat_ambient[]={ShadowRed,ShadowGreen,ShadowBlue,1.0};
+	float mat_diffuse[]={0,0,0,ShadowAlpha};
+	float mat_specular[]={0,0,0,0.5};
+	float mat_shininess[]={0.0}; // upto 128
 
-	    glEnable(GL_BLEND);
-	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	    glDisable(GL_DEPTH_TEST);
-	    glColor4f(0.0, 0.0, 0.0, 1.0);
+	glMaterialfv(GL_FRONT,GL_AMBIENT,mat_ambient);
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,mat_diffuse);
+	glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
 
-	    /*glBegin(GL_QUADS);
-		    glVertex2i(0, 0);
-		    glVertex2i(0, 1);
-		    glVertex2i(1, 1);
-		    glVertex2i(1, 0);
-	    glEnd();*/
-	    if(Global::fx1!=true){
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glColor4f(0.0,0.0,0.0,1.0);
+
+	/*glBegin(GL_QUADS);
+		glVertex2i(0, 0);
+		glVertex2i(0, 1);
+		glVertex2i(1, 1);
+		glVertex2i(1, 0);
+	glEnd();*/
+	if(Global::fx1!=true){
 		Global::fx1=true;
 		glDisableClientState(GL_NORMAL_ARRAY);
-	    }
-	    if(Global::fx2!=false){
+	}
+	if(Global::fx2!=false){
 		Global::fx2=false;
 		glDisableClientState(GL_COLOR_ARRAY);
-	    }
+	}
 
-	    GLfloat q3[] = {0,0,0,1,1,1,1,0};
+	GLfloat q3[] = {0,0,0,1,1,1,1,0};
 	 
-	    glVertexPointer(2, GL_FLOAT, 0, q3);
-	    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+	glVertexPointer(2,GL_FLOAT,0,q3);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 
-	    glEnable(GL_DEPTH_TEST);
-	  glPopMatrix();
-	  // NOTE: is it the projektion matrix ?
-	  glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_DEPTH_TEST);
+	glPopMatrix();
+	// NOTE: is it the projektion matrix ?
+	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
-	glCullFace( GL_BACK   ); // cull front facing polys For this pass
+	glCullFace(GL_BACK); // cull front facing polys For this pass
 	glDisable(GL_STENCIL_TEST);
 
 }

@@ -32,14 +32,14 @@ public:
 	typedef unsigned char *(*LoadPixbuf)(const char *filename,int *width,int *height);
 	typedef void (*FreePixbuf)(unsigned char *buf);
 
-	static LoadPixbuf loadpixbuf;
-	static FreePixbuf freepixbuf;
+	static LoadPixbuf loadpixbuf; // Remove
+	static FreePixbuf freepixbuf; // Remove
 	static list<Texture*> tex_list;
 	static list<unsigned int> name_list;
 
 	unsigned int texture;
 	tex_name_t texture_ref; // This is used to ensure that the opengl texture isn't released/deleted before
-							   // all references are gone
+							// all references are gone
 
 	string file_name;
 	string file_abs;
@@ -47,7 +47,7 @@ public:
 
 	unsigned int* frames;
 	tex_frames_t frames_ref;  // This is used to ensure that the texture frames isn't released/deleted before
-							   // all references are gone
+							  // all references are gone
 	int flags;
 	int blend;
 	int coords;

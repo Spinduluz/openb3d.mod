@@ -27,7 +27,7 @@ struct DXT5AlphaBlock {
 
 typedef void (*FlipDXT)(DXTColorBlock *line,unsigned int num);
 
-#define DXT_MASK	0x00000007
+enum{ DXT_MASK=0x00000007 };
 
 inline void DXT_FlipAlphaDXT5(DXT5AlphaBlock *block){
 	unsigned char bits[4][4];
@@ -331,6 +331,16 @@ inline int DDS_GetPitch(int width,unsigned int format,int components){
 	return width * components;
 }
 
+// FIXME:
+//	It it might not be much point in doing this.
+inline DirectDrawSurface* GetDirectDrawSurfacePtr(){
+	static DirectDrawSurface dds[16];
+	static int index=0;
+
+	DirectDrawSurface* s=&dds[index++ & 15];
+	return s;
+}
+
 DirectDrawSurface *DirectDrawSurface::LoadSurface(const string& filename,bool flip){
 	unsigned char *buffer,*buf;
 	DDSHeader *dds;
@@ -449,6 +459,19 @@ DirectDrawSurface::DirectDrawSurface()
 
 void DirectDrawSurface::FreeDirectDrawSurface(){
 	if(buffer) delete[] buffer;
+	// If we're using for GetDirectDrawSurfacePtr
+	mipmaps.clear();
+	width=0;
+	height=0;
+	depth=0;
+	mipmapcount=0;
+	pitch=0;
+	size=0;
+	dxt=NULL;
+	format=0;
+	components=0;
+	target=0;
+
 	delete this;
 }
 

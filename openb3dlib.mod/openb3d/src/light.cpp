@@ -10,6 +10,10 @@
 #include "light.h"
 #include "pick.h"
 
+#if defined(BLITZMAX_DEBUG)
+#include "bmaxdebug.h"
+#endif
+
 int Light::light_no=0;
 int Light::no_lights=0;
 int Light::max_lights=8;
@@ -17,6 +21,7 @@ int Light::max_lights=8;
 int Light::gl_light[]={GL_LIGHT0,GL_LIGHT1,GL_LIGHT2,GL_LIGHT3,GL_LIGHT4,GL_LIGHT5,GL_LIGHT6,GL_LIGHT7};
 
 vector<Light*> Light::light_list;
+//Light* light_list[8];
 
 Light* Light::CopyEntity(Entity* parent_ent){
 
@@ -109,7 +114,7 @@ Light* Light::CopyEntity(Entity* parent_ent){
 void Light::FreeEntity(){
 
 	Entity::FreeEntity();
-
+#if 1
 	int erased=0;
 
 	for (int i=0; i<no_lights;i++){
@@ -119,13 +124,12 @@ void Light::FreeEntity(){
 			erased=1;
 		}
 	}
-
-	no_lights=no_lights-1;
-
-	
+#else // Wont work since erasing a light will change the index nr for remaining lights
+	glDisable(gl_light[light_index]);
+	light_list.erase(light_list.begin()+light_index);
+#endif
+	no_lights--;	
 	delete this;
-	
-	return;
 
 }
 
@@ -160,6 +164,8 @@ Light* Light::CreateLight(int l_type,Entity* parent_ent){
 		float exponent[]={10.0};
 		glLightfv(gl_light[no_lights-1],GL_SPOT_EXPONENT,exponent);
 	}
+
+	light->light_index=no_lights-1;
 	
 	light_list.push_back(light);
 	light->AddParent(*parent_ent);
@@ -200,7 +206,7 @@ void Light::LightConeAngles(float inner,float outer){
 	
 void Light::Update(){
 
-	light_no=light_no+1;
+	light_no++;
 	if(light_no>no_lights) light_no=1;
 	
 	
@@ -214,7 +220,6 @@ void Light::Update(){
 	/*glEnable(gl_light[light_no-1]);*/
 
 	glPushMatrix();
-
 	glMultMatrixf(&mat.grid[0][0]);
 		
 	float z=1.0;
