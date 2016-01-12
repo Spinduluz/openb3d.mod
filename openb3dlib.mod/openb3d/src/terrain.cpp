@@ -37,6 +37,8 @@
 #include "tree.h"
 
 
+CLASS_ALLOCATOR_IMPL(Terrain);
+
 int Terrain::triangleindex;
 
 static Line Ray;
@@ -183,7 +185,6 @@ Terrain* Terrain::CreateTerrain(int tsize, Entity* parent_ent){
 	}
 
 	return terr;
-
 }
 
 void Terrain::UpdateTerrain(){

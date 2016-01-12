@@ -5,6 +5,7 @@
 // There be monsters here, aka memory leaks
 //
 // This will probably have to be rewritten. I'm not sure it can be salvaged.
+// 2016-01-12 It is salvaged...
 
 
 //#include "global.h"
@@ -71,9 +72,11 @@ struct Sampler{
 	bool is_texture3d; // -> BOOL=false/true <-
 
 	Sampler(string name="",int slot=0,Texture *tex=NULL):is_used(false),name(name),slot(slot),texture(tex),is_texture3d(false) {
+		texture->AddRef();
 	}
 
 	~Sampler(){
+		texture->DestroyRef();
 	}
 	
 	static Sampler* Create(string name, int slot, Texture* tex);

@@ -41,6 +41,15 @@ Brush* Brush::Copy(){
 	brush->tex[6]=tex[6];
 	brush->tex[7]=tex[7];
 
+	if(brush->tex[0]) brush->tex[0]->AddRef();
+	if(brush->tex[1]) brush->tex[1]->AddRef();
+	if(brush->tex[2]) brush->tex[2]->AddRef();
+	if(brush->tex[3]) brush->tex[3]->AddRef();
+	if(brush->tex[4]) brush->tex[4]->AddRef();
+	if(brush->tex[5]) brush->tex[5]->AddRef();
+	if(brush->tex[6]) brush->tex[6]->AddRef();
+	if(brush->tex[7]) brush->tex[7]->AddRef();
+
 	return brush;
 
 }

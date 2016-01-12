@@ -62,6 +62,7 @@ public:
 	static int Shadows_enabled;
 	static float anim_speed;
 	static int fog_enabled; // used to keep track of whether fog is enabled between camera update and mesh render
+	static Pivot root_ent_f;
 	static Pivot* root_ent;
 	static Camera* camera_in_use;
 

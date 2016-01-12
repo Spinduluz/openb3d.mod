@@ -17,8 +17,8 @@
 using namespace std;
 
 class Pivot : public Entity{
- 
 public:
+	CLASS_ALLOCTOR_DECL(Pivot)
 	
 	Pivot(){};
 	

@@ -42,9 +42,9 @@ static float radius;
 
 static vector<float> vertices;
 
+CLASS_ALLOCATOR_IMPL(Geosphere);
 
 Geosphere* Geosphere::CopyEntity(Entity* parent_ent){
-
 	// new terr
 	Geosphere* geo=new Geosphere;
 

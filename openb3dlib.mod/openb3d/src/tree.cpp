@@ -104,6 +104,12 @@ bool MeshCollider::collide( const Box &line_box,const Line &line,float radius,co
 	return hit;
 }
 
+MeshCollider* MeshCollider::Copy( MeshCollider *other ){
+	MeshCollider *c=new MeshCollider;
+
+	return NULL;
+}
+
 Box MeshCollider::nodeBox( const vector<int> &tris ){
 	Box box;
 	for(unsigned  int k=0;k<tris.size();++k ){

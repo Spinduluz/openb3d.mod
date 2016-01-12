@@ -43,8 +43,8 @@ Type TTerrain Extends TEntity
 		vsize=TerrainFloat_( GetInstance(Self),TERRAIN_vsize )
 		level2dzsize=TerrainFloat_( GetInstance(Self),TERRAIN_level2dzsize )
 		height=TerrainFloat_( GetInstance(Self),TERRAIN_height )
-		
-		' camera_
+
+		' camera
 		Local inst:Byte Ptr=TerrainCamera_( GetInstance(Self),TERRAIN_eyepoint )
 		eyepoint=TCamera( TEntity.GetObject(inst) )
 		If eyepoint=Null And inst<>Null Then eyepoint=TCamera.CreateObject(inst)

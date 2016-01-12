@@ -2,6 +2,7 @@
 #define OBJECTALLOC_H
 
 #include <memory.h>
+#include <stdlib.h>
 //#include <string>
 #include "bmaxdebug.h"
 
@@ -61,8 +62,8 @@ public:
 
 	void remove(void* ptr){
 		for(int i=0;i<size;i++){
-			if(array[i].item_ptr==(type*)ptr){
-				array[i].item_ptr->~type();
+			if(array[i].item_ptr==ptr){
+				array[i].item.~type();
 				array[i].item_ptr=NULL;
 				count--;
 				return;
@@ -122,7 +123,7 @@ public:
 	void remove(void* ptr){
 		for(int i=0;i<array.capacity();i++){
 			if(array[i].item_ptr==ptr){
-				array[i].item_ptr->~type();
+				array[i].item.~type();
 				array[i].item_ptr=NULL;
 				count--;
 				return;
@@ -145,13 +146,12 @@ public:
 
 	void* alloc(){
 		count++;
-		type *r=::new type;
-		return (void*)r;
+		return malloc(sizeof(type));
 	}
 
 	void remove(void* ptr){
 		count--;
-		::delete ((type*)ptr);
+		free(ptr);
 	}
 };
 
@@ -160,65 +160,69 @@ public:
 // I don't reallt wan't to redesign the classes too much right now
 // especially since I plan to implement these on all core classes
 
-class Texture;
-class Shader;
-class ProgramObject;
-class ShaderObject;
-class Mesh;
-class Brush;
-class Surface;
-
 #if defined(MAX_TEXTURE_COUNT)
-typedef ObjectArrayAlloc<Texture,MAX_TEXTURE_COUNT> TextureAlloc;
+typedef ObjectArrayAlloc<class Texture,MAX_TEXTURE_COUNT> TextureAlloc;
 #elif defined(TEXTURE_VECTOR_ALLOC)
-typedef ObjectVectorAlloc<Texture> TextureAlloc;
+typedef ObjectVectorAlloc<class Texture> TextureAlloc;
 #else
-typedef ObjectStandardAlloc<Texture> TextureAlloc;
+typedef ObjectStandardAlloc<class Texture> TextureAlloc;
 #endif
 
 #if defined(MAX_SHADER_COUNT)
-typedef ObjectArrayAlloc<Shader,MAX_SHADER_COUNT> ShaderAlloc;
+typedef ObjectArrayAlloc<class Shader,MAX_SHADER_COUNT> ShaderAlloc;
 #elif defined(SHADER_VECTOR_ALLOC)
-typedef ObjectVectorAlloc<Shader> ShaderAlloc;
+typedef ObjectVectorAlloc<class Shader> ShaderAlloc;
 #else
-typedef ObjectStandardAlloc<Shader> ShaderAlloc;
+typedef ObjectStandardAlloc<class Shader> ShaderAlloc;
 #endif
 
 #if defined(MAX_PROGRAMOBJECT_COUNT)
-typedef ObjectArrayAlloc<ProgramObject,MAX_PROGRAMOBJECT_COUNT> ProgramObjectAlloc;
+typedef ObjectArrayAlloc<class ProgramObject,MAX_PROGRAMOBJECT_COUNT> ProgramObjectAlloc;
 #elif defined(PROGRAMOBJECT_VECTOR_ALLOC)
-typedef ObjectVectorAlloc<ProgramObject> ProgramObjectAlloc;
+typedef ObjectVectorAlloc<class ProgramObject> ProgramObjectAlloc;
 #else
-typedef ObjectStandardAlloc<ProgramObject> ProgramObjectAlloc;
+typedef ObjectStandardAlloc<class ProgramObject> ProgramObjectAlloc;
 #endif
 
 #if defined(MAX_SHADEROBJECT_COUNT)
-typedef ObjectArrayAlloc<ShaderObject,MAX_SHADEROBJECT_COUNT> ShaderObjectAlloc;
+typedef ObjectArrayAlloc<class ShaderObject,MAX_SHADEROBJECT_COUNT> ShaderObjectAlloc;
 #elif defined(SHADEROBJECT_VECTOR_ALLOC)
-typedef ObjectVectorAlloc<ShaderObject> ShaderObjectAlloc;
+typedef ObjectVectorAlloc<class ShaderObject> ShaderObjectAlloc;
 #else
-typedef ObjectStandardAlloc<ShaderObject> ShaderObjectAlloc;
+typedef ObjectStandardAlloc<class ShaderObject> ShaderObjectAlloc;
 #endif
 
-typedef ObjectStandardAlloc<Mesh> MeshAlloc;
-typedef ObjectStandardAlloc<Brush> BrushAlloc;
-typedef ObjectStandardAlloc<Surface> SurfaceAlloc;
+#define TYPEDEF_STANDARD_ALLOC(CLASS) typedef ObjectStandardAlloc<class CLASS> CLASS##Alloc
 
-#define CLASS_ALLOCTOR_DECL(CLASS)			\
-	static CLASS##Alloc objectAlloc;		\
-	void* operator new (size_t){			\
-		return objectAlloc.alloc();			\
-	}										\
-	void operator delete(void* ptr){		\
-		objectAlloc.remove(ptr);			\
+TYPEDEF_STANDARD_ALLOC(Mesh);
+TYPEDEF_STANDARD_ALLOC(Brush);
+TYPEDEF_STANDARD_ALLOC(Surface);
+TYPEDEF_STANDARD_ALLOC(Light);
+TYPEDEF_STANDARD_ALLOC(Camera);
+TYPEDEF_STANDARD_ALLOC(Pivot);
+TYPEDEF_STANDARD_ALLOC(Terrain);
+TYPEDEF_STANDARD_ALLOC(Sprite);
+TYPEDEF_STANDARD_ALLOC(VoxelSprite);
+TYPEDEF_STANDARD_ALLOC(Fluid);
+TYPEDEF_STANDARD_ALLOC(Geosphere);
+TYPEDEF_STANDARD_ALLOC(ParticleBatch);
+TYPEDEF_STANDARD_ALLOC(ParticleEmitter);
+
+#define CLASS_ALLOCTOR_DECL(CLASS)					\
+	static CLASS##Alloc object##CLASS##Alloc;		\
+	void* operator new (size_t){					\
+		return object##CLASS##Alloc.alloc();		\
+	}												\
+	void operator delete(void* ptr){				\
+		object##CLASS##Alloc.remove(ptr);			\
 	}
 
 #if defined(BLITZMAX_DEBUG) || defined(_DEBUG)
-#define CLASS_ALLOCATOR_IMPL(CLASS)			\
-	CLASS##Alloc CLASS::objectAlloc(#CLASS)
+#define CLASS_ALLOCATOR_IMPL(CLASS)					\
+	CLASS##Alloc CLASS::object##CLASS##Alloc(#CLASS)
 #else
-#define CLASS_ALLOCATOR_IMPL(CLASS)			\
-	CLASS##Alloc CLASS::objectAlloc;
+#define CLASS_ALLOCATOR_IMPL(CLASS)					\
+	CLASS##Alloc CLASS::object##CLASS##Alloc;
 #endif
 
 #endif // OBJECTALLOC_H

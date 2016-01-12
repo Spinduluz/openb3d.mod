@@ -35,10 +35,10 @@ ModuleInfo "Copyright: Openb3d - Angelo Rosina"
 ModuleInfo "History: 1.00 Initial Release"
 ModuleInfo "CC_OPTS: -std=c++11"
 ?debug
-ModuleInfo "CC_OPTS: -DMAX_SHADER_COUNT=64"
-ModuleInfo "CC_OPTS: -DMAX_PROGRAMOBJECT_COUNT=128"
-ModuleInfo "CC_OPTS: -DMAX_SHADEROBJECT_COUNT=512"
-ModuleInfo "CC_OPTS: -DMAX_TEXTURE_COUNT=2048"
+'ModuleInfo "CC_OPTS: -DMAX_SHADER_COUNT=64"
+'ModuleInfo "CC_OPTS: -DMAX_PROGRAMOBJECT_COUNT=128"
+'ModuleInfo "CC_OPTS: -DMAX_SHADEROBJECT_COUNT=512"
+'ModuleInfo "CC_OPTS: -DMAX_TEXTURE_COUNT=2048"
 'ModuleInfo "CC_OPTS: -DTEXTURE_VECTOR_ALLOC"
 ?
 ?Win32

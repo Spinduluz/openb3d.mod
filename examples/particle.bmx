@@ -91,3 +91,17 @@ While Not KeyHit(KEY_ESCAPE)
 	
 	Flip
 Wend
+
+DebugLog "Particle" ; FreeEntity p
+DebugLog "Particle" ; FreeEntity p2
+DebugLog "Sprite" ; FreeEntity sprite
+DebugLog "Camera" ; FreeEntity camera
+DebugLog "Pivot" ; FreeEntity pivot
+DebugLog "light" ; FreeEntity light
+DebugLog "Sphere" ; FreeEntity lastsphere
+FreeEntity cube
+FreeEntity cone
+FreeEntity ground
+
+FreeTexture noisetex
+FreeTexture ground_tex

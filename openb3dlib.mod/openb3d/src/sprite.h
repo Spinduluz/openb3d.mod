@@ -16,8 +16,8 @@
 using namespace std;
 
 class Sprite : public Mesh{
-
 public:
+	CLASS_ALLOCTOR_DECL(Sprite)
 
 	float angle;
 	float scale_x,scale_y;
@@ -44,6 +44,8 @@ public:
 		view_mode=1;
 		render_mode=1;
 	
+	}
+	~Sprite(){
 	}
 
 	void FreeEntity(void);

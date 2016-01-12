@@ -81,7 +81,7 @@ Surface::Surface(){
 
 Surface::~Surface(){
 	FreeVBO();
-	//if(brush) delete brush;
+	if(brush) delete brush;
 
 }
 
@@ -673,23 +673,10 @@ void Surface::UpdateVBO(){
 }
 
 void Surface::FreeVBO(){
-	// Ensure none of the buffers are bound.
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER,0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-#if defined(BLITZMAX_DEBUG)
-	DebugLog("FreeVBO - begin");
-#endif
 	if(vbo_id[0]!=0){
 		glDeleteBuffers(6,&vbo_id[0]);
 		vbo_id[0]=0;
 	}
-#if defined(BLITZMAX_DEBUG)
-	DebugLog("FreeVBO - end");
-#endif
 }
 
 // removes a tri from a surface

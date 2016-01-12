@@ -23,6 +23,8 @@
 #include "surface.h"
 #include "pick.h"
 
+CLASS_ALLOCATOR_IMPL(ParticleBatch);
+
 list<ParticleBatch*> ParticleBatch::particle_batch_list;
 list<ParticleEmitter*> ParticleEmitter::emitter_list;
 
@@ -185,12 +187,13 @@ void ParticleBatch::Render(){
 
 }
 
+CLASS_ALLOCATOR_IMPL(ParticleEmitter);
 
 void ParticleEmitter::Update(){
 	list<ParticleData>::iterator it;
 
 	rate_counter++;
-	if (hide==false && rate_counter>rate){
+	if (!hide && rate_counter>rate){
 		rate_counter=0;
 		ParticleData particle;
 		particle.ent=particle_base->CopyEntity(0);
@@ -203,6 +206,15 @@ void ParticleEmitter::Update(){
 		particle.ent->px=mat.grid[3][0];
 		particle.ent->py=mat.grid[3][1];
 		particle.ent->pz=-mat.grid[3][2];
+
+		if(particle.ent->brush.tex[0]) particle.ent->brush.tex[0]->AddRef();
+		if(particle.ent->brush.tex[1]) particle.ent->brush.tex[1]->AddRef();
+		if(particle.ent->brush.tex[2]) particle.ent->brush.tex[2]->AddRef();
+		if(particle.ent->brush.tex[3]) particle.ent->brush.tex[3]->AddRef();
+		if(particle.ent->brush.tex[4]) particle.ent->brush.tex[4]->AddRef();
+		if(particle.ent->brush.tex[5]) particle.ent->brush.tex[5]->AddRef();
+		if(particle.ent->brush.tex[6]) particle.ent->brush.tex[6]->AddRef();
+		if(particle.ent->brush.tex[7]) particle.ent->brush.tex[7]->AddRef();
 
 		if (variance>.000000001){
 			particle.vx+=static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/variance))-variance/2;
@@ -372,8 +384,6 @@ void ParticleEmitter::FreeEntity (){
 
 	Entity::FreeEntity();
 	delete this;
-return;
-	return;
 }
 
 void ParticleEmitter::EmitterVector(float x, float y, float z){

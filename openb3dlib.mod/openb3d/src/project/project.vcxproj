@@ -116,6 +116,7 @@
     <ClInclude Include="..\md2.h" />
     <ClInclude Include="..\mesh.h" />
     <ClInclude Include="..\model.h" />
+    <ClInclude Include="..\objectalloc.h" />
     <ClInclude Include="..\octree.h" />
     <ClInclude Include="..\particle.h" />
     <ClInclude Include="..\physics.h" />

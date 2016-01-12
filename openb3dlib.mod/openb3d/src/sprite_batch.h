@@ -19,7 +19,6 @@
 using namespace std;
 
 class SpriteBatch{
-
 public:
 
 	static list<SpriteBatch*> sprite_batch_list;

@@ -7,8 +7,8 @@
 using namespace std;
 
 class VoxelSprite : public Mesh{
-
 public:
+	CLASS_ALLOCTOR_DECL(VoxelSprite)
 
 	Material* material[8];
 	int no_mats;

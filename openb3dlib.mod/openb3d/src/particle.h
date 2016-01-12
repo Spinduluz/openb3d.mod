@@ -18,9 +18,10 @@ using namespace std;
 
 
 
-class ParticleBatch: public Mesh{
 
+class ParticleBatch: public Mesh{
 public:
+	CLASS_ALLOCTOR_DECL(ParticleBatch)
 
 	static list<ParticleBatch*> particle_batch_list;
 
@@ -41,6 +42,8 @@ public:
 		
 		min_x=-999999999;;min_y=-999999999;;min_z=-999999999;;max_x=999999999;;max_y=999999999;;max_z=999999999;;
 	};
+	~ParticleBatch(){
+	}
 	
 	static ParticleBatch* GetParticleBatch(Texture* tex,int blend,int order){
 	
@@ -66,20 +69,16 @@ public:
 		Global::root_ent->child_list.push_back(particle_batch);
 
 
+		tex->AddRef();
 		particle_batch->brush.tex[0]=tex;
 		particle_batch->brush.blend=blend;
 		particle_batch->order=order;
 		particle_batch_list.push_back(particle_batch);
 		return particle_batch;
-		
 	}
-
-
-
 };
 
 class ParticleEmitter: public Entity{
-
 private:
 	int rate_counter;
 
@@ -92,6 +91,8 @@ private:
 	list<ParticleData> particles;
 
 public:
+	CLASS_ALLOCTOR_DECL(ParticleEmitter);
+
 	static list<ParticleEmitter*> emitter_list;
 
 	Entity* particle_base;
@@ -128,8 +129,6 @@ public:
 	void EmitterParticleLife (int l);
 	void EmitterParticleSpeed (float s);
 	void EmitterParticleFunction(void (*EmitterFunction)(Entity*, int));
-
-	
 };
 
 #endif

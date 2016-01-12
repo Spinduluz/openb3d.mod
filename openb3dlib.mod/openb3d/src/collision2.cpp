@@ -257,6 +257,9 @@ void UpdateDynamicCollisions(){
 
 	Transform c_tform(c_mat,c_vec_v);
 
+	// A bunch of pointers that are never released.. Bound to this function
+	// Just effin great...
+	// I sure hope this function is never used.
 	static Pivot* piv1o=Pivot::CreatePivot();
 	static Pivot* piv1=Pivot::CreatePivot(piv1o);
 	static Pivot* piv11=Pivot::CreatePivot(piv1o);

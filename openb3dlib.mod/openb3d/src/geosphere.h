@@ -25,9 +25,8 @@ private:
 
 	void EquirectangularToTOAST();
 
-
 public:
-
+	CLASS_ALLOCTOR_DECL(Geosphere);
 	float hsize;
 
 	static Geosphere* CreateGeosphere(int tsize=0, Entity* parent_ent=NULL);
@@ -42,8 +41,6 @@ public:
 
 	void ModifyGeosphere (int x, int y, float new_height);
 	void TreeCheck(CollisionInfo* ci);
-
-
 };
 
 

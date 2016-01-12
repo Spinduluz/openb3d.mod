@@ -18,6 +18,8 @@
 #include "project.h"
 //#include "misc.h"
 
+CLASS_ALLOCATOR_IMPL(Camera);
+
 list<Camera*> Camera::cam_list;
 list<Mesh*> Camera::render_list;
 
@@ -127,15 +129,9 @@ Camera* Camera::CopyEntity(Entity* parent_ent){
 }
 
 void Camera::FreeEntity(){
-
 	Entity::FreeEntity();
-	
 	cam_list.remove(this);
-	
 	delete this;
-	
-	return;
-
 }
 
 Camera* Camera::CreateCamera(Entity* parent_ent){
@@ -682,9 +678,9 @@ void UpdateEntityRender(Entity* ent,Entity* cam){
 						surf->vert_col.push_back(sprite->brush.green);
 						surf->vert_col.push_back(sprite->brush.blue);
 						surf->vert_col.push_back(sprite->brush.alpha);
-
 				
-						return;}
+						return;
+					}
 					
 					
 				}  

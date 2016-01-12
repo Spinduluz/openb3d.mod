@@ -21,6 +21,8 @@
 #include "global.h"
 #include "camera.h"
 
+CLASS_ALLOCATOR_IMPL(VoxelSprite);
+
 void Add3DVertex(Surface* surf, float x, float y, float z,float u,float v,float w){
 	surf->no_verts++;
 

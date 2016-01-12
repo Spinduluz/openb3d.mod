@@ -11,7 +11,6 @@ class FieldArray;
 
 class Fluid : public Mesh{
 friend class VoxelTerrain;
-
 private:
 	int* buffercenter;
 	float ***xzbuffer;
@@ -21,14 +20,13 @@ private:
 	void ResetBuffers();
 
 	void MarchingCube(float x, float y, float z, float x1, float y1, float z1, float F[8]);
-
 	float MiddlePoint (float A, float B, float C, float D);
-
 	void BuildCubeGrid (float x, float y, float z, float l,
 		float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8);
-
 	float (*ScalarField)(float x, float y, float z);
 public:
+	CLASS_ALLOCTOR_DECL(Fluid)
+
 	list<Blob*> metaball_list;
 
 	int render_mode;

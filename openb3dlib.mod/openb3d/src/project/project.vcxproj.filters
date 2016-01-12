@@ -352,5 +352,8 @@
     <ClInclude Include="..\image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\objectalloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

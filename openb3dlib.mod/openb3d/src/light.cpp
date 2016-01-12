@@ -14,6 +14,8 @@
 #include "bmaxdebug.h"
 #endif
 
+CLASS_ALLOCATOR_IMPL(Light);
+
 int Light::light_no=0;
 int Light::no_lights=0;
 int Light::max_lights=8;
@@ -112,7 +114,6 @@ Light* Light::CopyEntity(Entity* parent_ent){
 }
 
 void Light::FreeEntity(){
-
 	Entity::FreeEntity();
 #if 1
 	int erased=0;
@@ -130,7 +131,6 @@ void Light::FreeEntity(){
 #endif
 	no_lights--;	
 	delete this;
-
 }
 
 Light* Light::CreateLight(int l_type,Entity* parent_ent){

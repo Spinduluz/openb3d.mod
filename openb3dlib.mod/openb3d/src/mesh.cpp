@@ -56,9 +56,10 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 	Mesh* mesh=new Mesh();
 
 	// copy contents of child list before adding parent
-	list<Entity*>::iterator it;
-	for(it=child_list.begin();it!=child_list.end();it++){
-		Entity* ent=*it;
+	//list<Entity*>::iterator it;
+	//for(it=child_list.begin();it!=child_list.end();it++){
+	//	Entity* ent=*it;
+	for(Entity* ent : child_list){
 		ent->CopyEntity(mesh);
 	}
 
@@ -118,7 +119,15 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 	//mesh->fade_far=fade_far;
 
 	//mesh->brush=NULL;
-	mesh->brush=brush;
+	mesh->brush=brush; // Another possible problem. My bad. It's not pointers
+	if(mesh->brush.tex[0]) mesh->brush.tex[0]->AddRef();
+	if(mesh->brush.tex[1]) mesh->brush.tex[1]->AddRef();
+	if(mesh->brush.tex[2]) mesh->brush.tex[2]->AddRef();
+	if(mesh->brush.tex[3]) mesh->brush.tex[3]->AddRef();
+	if(mesh->brush.tex[4]) mesh->brush.tex[4]->AddRef();
+	if(mesh->brush.tex[5]) mesh->brush.tex[5]->AddRef();
+	if(mesh->brush.tex[6]) mesh->brush.tex[6]->AddRef();
+	if(mesh->brush.tex[7]) mesh->brush.tex[7]->AddRef();
 
 	mesh->anim=anim;
 	mesh->anim_render=anim_render;
@@ -159,10 +168,11 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 	mesh->no_surfs=no_surfs;
 
 	// copy surf list
-	list<Surface*>::iterator it2;
-	for(it2=surf_list.begin();it2!=surf_list.end();it2++){
+	//list<Surface*>::iterator it2;
+	//for(it2=surf_list.begin();it2!=surf_list.end();it2++){
 
-		Surface* surf=*it2;
+		//Surface* surf=*it2;
+	for(Surface* surf : surf_list){
 
 		Surface* new_surf=new Surface;
 		mesh->surf_list.push_back(new_surf);
@@ -192,9 +202,10 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 	}
 
 	// copy anim surf list
-	for(it2=anim_surf_list.begin();it2!=anim_surf_list.end();it2++){
+	//for(it2=anim_surf_list.begin();it2!=anim_surf_list.end();it2++){
 
-		Surface* surf=*it2;
+		//Surface* surf=*it2;
+	for(Surface* surf : anim_surf_list){
 
 		Surface* new_surf=new Surface;
 		mesh->anim_surf_list.push_back(new_surf);
@@ -221,35 +232,30 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 
 		new_surf->vbo_enabled=surf->vbo_enabled;
 		new_surf->reset_vbo=-1; // (-1 = all)
-
 	}
 
 	// FIXME:
 	//	This aint good. When one of these meshes are freed then program will crash when
 	//	trying to use the other. ObjectReference perhaps?
+	//	Can't be arsed right now. Need to make a copy function but MeshCollider has
+	//	double linked lists.... BTW MeshCollides is in tree.h & tree.cpp just to make
+	//	it *sooo* convenient to find it............
 	mesh->c_col_tree=c_col_tree;
-
+	
 	mesh->reset_bounds=reset_bounds;
 
 	//mesh->no_bones=no_bones;
 	CopyBonesList(mesh,mesh->bones);
 
 	return mesh;
-
 }
 
 void Mesh::FreeEntity(){
 
 	if (no_surfs>=0){
+		// FIXME: C++11'ify
 		list<Surface*>::iterator surf_it;
-#if defined(BLITZMAX_DEBUG)
-		DebugLog("Mesh::FreeEntity");
-#endif
-
 		if (surf_list.size()){
-#if defined(BLITZMAX_DEBUG)
-	DebugLog("Surface count=%i\n",surf_list.size());
-#endif
 			for(surf_it=surf_list.begin();surf_it!=surf_list.end();surf_it++){
 				Surface* surf=*surf_it;
 				if(surf){
@@ -258,11 +264,8 @@ void Mesh::FreeEntity(){
 				}
 			}
 		}
-
 		if(anim_surf_list.size()){
-#if defined(BLITZMAX_DEBUG)
-	DebugLog("Anim surface count=%i\n",anim_surf_list.size());
-#endif
+
 			for(surf_it=anim_surf_list.begin();surf_it!=anim_surf_list.end();surf_it++){
 				Surface* anim_surf=*surf_it;
 				if(anim_surf){
@@ -271,14 +274,13 @@ void Mesh::FreeEntity(){
 				}
 			}
 		}
-
 		if(c_col_tree) delete c_col_tree;
 		c_col_tree=NULL;
 	}
 	// No point in clearing these lists
 	// It will take care of it self when the object goes out of scope (deleted)
-	surf_list.clear();
-	anim_surf_list.clear();
+	// surf_list.clear();
+	// anim_surf_list.clear();
 
 	//vector<Bone*>::iterator bone_it;
 
@@ -286,7 +288,8 @@ void Mesh::FreeEntity(){
 		Bone* bone=*bone_it;
 		delete bone;
 	}*/
-	bones.clear();	
+	// Same thing as surf*list
+	//bones.clear();	
 
 	Entity::FreeEntity();
 	delete this;

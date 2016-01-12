@@ -15,7 +15,6 @@
 using namespace std;
 
 class Touch{
-
 public:
 
 	//static int no_touches;

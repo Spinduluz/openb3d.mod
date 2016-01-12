@@ -18,6 +18,8 @@ using namespace std;
  
 class Light : public Entity{
 public:
+	CLASS_ALLOCTOR_DECL(Light)
+
 	static int light_no;
 	static int no_lights;
 	static int max_lights;

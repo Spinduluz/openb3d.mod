@@ -387,6 +387,8 @@ float ArraysField (float x, float y, float z){
 
 }
 
+CLASS_ALLOCATOR_IMPL(Fluid);
+
 Fluid* Fluid::CreateFluid(){
 	Fluid* fluid=new Fluid();
 	fluid->class_name="Fluid";

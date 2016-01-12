@@ -14,6 +14,8 @@
 #include "pick.h"
 #include "texture.h"
 
+CLASS_ALLOCATOR_IMPL(Sprite);
+
 Sprite* Sprite::CopyEntity(Entity* parent_ent){
 
 	// new sprite
@@ -108,13 +110,9 @@ Sprite* Sprite::CopyEntity(Entity* parent_ent){
 }
 
 void Sprite::FreeEntity(){
-
 	Entity::FreeEntity();
 
 	delete this;
-
-	return;
-
 }
 
 Sprite* Sprite::CreateSprite(Entity* parent_ent){

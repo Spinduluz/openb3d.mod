@@ -64,7 +64,9 @@ int Global::blend_mode=-1;
 int Global::fx1=-1;
 int Global::fx2=-1;
 
-Pivot* Global::root_ent=new Pivot(); // Ever released? Probably not
+Pivot Global::root_ent_f;
+Pivot* Global::root_ent=&root_ent_f;
+//Pivot* Global::root_ent=new Pivot(); // Ever released? Probably not
 Camera* Global::camera_in_use;
 
 void Global::Graphics(){
@@ -231,8 +233,9 @@ void Global::UpdateWorld(float anim_speed){
 	// particles
 	list<ParticleEmitter*>::iterator it2;
 
-	for(it2=ParticleEmitter::emitter_list.begin();it2!=ParticleEmitter::emitter_list.end();it2++){
-		ParticleEmitter* emitter=*it2;
+	//for(it2=ParticleEmitter::emitter_list.begin();it2!=ParticleEmitter::emitter_list.end();it2++){
+	//	ParticleEmitter* emitter=*it2;
+	for(ParticleEmitter* emitter : ParticleEmitter::emitter_list){
 		emitter->Update();
 	}
 

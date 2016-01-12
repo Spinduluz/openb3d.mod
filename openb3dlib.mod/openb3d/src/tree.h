@@ -1,3 +1,5 @@
+// Thank you for the logical naming....
+
 #ifndef MESHCOLLIDER_H
 #define MESHCOLLIDER_H
 
@@ -30,6 +32,8 @@ public:
 	
 	MeshCollider(){
 	}
+
+	static MeshCollider* Copy( MeshCollider *other );
 
 private:
 	vector<Vertex> vertices;

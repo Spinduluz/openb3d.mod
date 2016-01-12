@@ -16,7 +16,6 @@
 using namespace std;
 
 class Tilt{
-
 public:
 
 	static float x,y,z;

@@ -10,6 +10,8 @@
 #include "pivot.h"
 #include "pick.h"
 
+CLASS_ALLOCATOR_IMPL(Pivot);
+
 Pivot* Pivot::CopyEntity(Entity* parent_ent){
 
 	if(parent_ent==NULL) parent_ent=Global::root_ent;
@@ -88,7 +90,7 @@ Pivot* Pivot::CopyEntity(Entity* parent_ent){
 }
 
 void Pivot::FreeEntity(){
-
+	if(this==Global::root_ent) return;
 	Entity::FreeEntity();
 	
 	delete this;

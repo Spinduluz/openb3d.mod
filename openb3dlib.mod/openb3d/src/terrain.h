@@ -27,6 +27,8 @@ private:
 	float xcf,ycf,zcf; 			//used to store camera position
 
 public:
+	CLASS_ALLOCTOR_DECL(Terrain)
+
 	static list<Terrain*> terrain_list;
 	static int triangleindex;
 	static MeshInfo* mesh_info;
@@ -60,10 +62,8 @@ public:
 	float TerrainY (float x, float y, float z);
 	float TerrainZ (float x, float y, float z);
 
-	Terrain(){
-		size=0;
-		ShaderMat=0;
-	};
+	Terrain():size(0),vsize(0),level2dzsize(),height(NULL),c_col_tree(NULL),eyepoint(NULL),ShaderMat(NULL){
+	}
 };
 
 #endif

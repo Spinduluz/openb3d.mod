@@ -21,8 +21,8 @@
 using namespace std;
 
 class Camera : public Entity{
-
 public:
+	CLASS_ALLOCTOR_DECL(Camera)
 
 	static list<Camera*> cam_list;
 	static list<Mesh*> render_list;
