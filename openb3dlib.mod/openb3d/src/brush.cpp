@@ -9,6 +9,8 @@
 
 #include "brush.h"
 
+CLASS_ALLOCATOR_IMPL(Brush);
+
 Brush* Brush::Copy(){
 
 	Brush* brush=new Brush();
@@ -105,6 +107,7 @@ void Brush::BrushTexture(Texture* texture, int frame, int index){
     // brush.tex[index]=texture;
 
 	}
+	texture->AddRef();
 	// if(frame<0) frame=0;
 	// if(frame>texture->no_frames-1) frame=texture->no_frames-1;
 	// tex_frame=frame;

@@ -4,6 +4,8 @@
 
 #include "string_helper.h"
 
+CLASS_ALLOCATOR_IMPL(ProgramObject);
+
 int ProgramObject::default_program=0;
 list<ProgramObject*> ProgramObject::programobjects;
 
@@ -36,17 +38,18 @@ ProgramObject* ProgramObject::Create(string name){
 }
 
 ProgramObject::~ProgramObject(){
+	if(!program) return;
 	glUseProgram(0); // Ensure the shader is not used
 	for(ShaderObject *shader : shaderobjects){
-		/*glDetachShader(program,shader->object);
 		shader->attached.remove(this);
-		shader->DestroyRef();*/
-		DetachShader(shader);
+		shader->DestroyRef();
 	}
+	shaderobjects.clear();
 	glDeleteProgram(program);
 #if defined(BLITZMAX_DEBUG)
 	DebugLog("Deleted ProgramObject %s",name.c_str());
 #endif
+	program=0;
 }
 
 void ProgramObject::Activate(){

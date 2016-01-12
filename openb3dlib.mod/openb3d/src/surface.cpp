@@ -30,6 +30,8 @@
 #include "global.h"
 #include "geom.h"
 
+#include "bmaxdebug.h"
+
 #include <vector>
 #include <map>
 using namespace std;
@@ -50,6 +52,7 @@ Method Compare(other:Object)
 
 End Method
 */
+CLASS_ALLOCATOR_IMPL(Surface);
 
 Surface::Surface(){
 
@@ -77,9 +80,8 @@ Surface::Surface(){
 }
 
 Surface::~Surface(){
-
 	FreeVBO();
-	delete brush;
+	//if(brush) delete brush;
 
 }
 
@@ -632,8 +634,8 @@ float Surface::TriangleNZ(int tri_no){
 void Surface::UpdateVBO(){
 
 	if(vbo_id[0]==0){
-		//glGenBuffers(6,&vbo_id[0]);
-		glGenBuffers(6,vbo_id);
+		glGenBuffers(6,&vbo_id[0]);
+		//glGenBuffers(6,vbo_id);
 	}
 
 	if (reset_vbo==-1) reset_vbo=1|2|4|8|16;
@@ -671,11 +673,23 @@ void Surface::UpdateVBO(){
 }
 
 void Surface::FreeVBO(){
-
+	// Ensure none of the buffers are bound.
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER,0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("FreeVBO - begin");
+#endif
 	if(vbo_id[0]!=0){
-		glDeleteBuffers(6,vbo_id);
+		glDeleteBuffers(6,&vbo_id[0]);
+		vbo_id[0]=0;
 	}
-
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("FreeVBO - end");
+#endif
 }
 
 // removes a tri from a surface

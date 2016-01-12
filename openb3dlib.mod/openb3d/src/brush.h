@@ -19,8 +19,8 @@
 using namespace std;
 
 class Brush{
-
 public:
+	CLASS_ALLOCTOR_DECL(Brush)
 
 	int no_texs;
 	string name;
@@ -50,6 +50,7 @@ public:
 	~Brush(){ // Objects should always be deleted.
 		for(int i=0;i<8;i++){
 			if(tex[i]) tex[i]->DestroyRef();
+			tex[i]=NULL;
 		}
 	}
 

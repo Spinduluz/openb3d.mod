@@ -45,16 +45,16 @@ inline void TextureDeleteFrames(unsigned int *frames){
 			glDeleteTextures(1,&*i);
 		}
 		delete[] frames;
-	}
 #if defined(BLITZMAX_DEBUG)
 	DebugLog("TextureDeleteFrames");
 #endif
+	}
 }
 
 inline void GL_DeleteTextures(unsigned int* name){
 	if(name){
 		glDeleteTextures(1,name);
-		Texture::name_list.remove(*name);
+		if(Texture::name_list.size()) Texture::name_list.remove(*name);
 #if defined(BLITZMAX_DEBUG)
 		DebugLog("GL_DeleteTextures [%i]",Texture::name_list.size());
 #endif
@@ -166,6 +166,7 @@ void stbi_free_pixbuf(unsigned char *buf){
 }
 
 // ==========================================================================================================
+CLASS_ALLOCATOR_IMPL(Texture);
 
 list<Texture*> Texture::tex_list;
 list<unsigned int> Texture::name_list;
@@ -178,12 +179,12 @@ Texture::FreePixbuf Texture::freepixbuf = stbi_free_pixbuf;
 
 Texture::Texture()
 :texture(0)
-,texture_ref()
+,texture_ref(NULL,GL_DeleteTextures)
 ,file_name()
 ,file_abs()
 ,file_hash(0)
 ,frames(NULL)
-,frames_ref()
+,frames_ref(NULL,TextureDeleteFrames)
 ,flags(0)
 ,blend(2)
 ,coords(0)
@@ -216,14 +217,17 @@ Texture::Texture()
 };
 
 Texture::~Texture(){
+	if(!tex_list.size()) return;
 	tex_list.remove(this);
 	// Delete the temp buffer when all the textures
 	// are released
+#if 0 // Scrap this
 	if(!tex_list.size() && destbuffer.buf){
 		delete[] destbuffer.buf;
 		destbuffer.buf=NULL;
 		destbuffer.size=0;
 	}
+#endif
 }
 
 Texture* Texture::LoadTexture(string filename,int flags){

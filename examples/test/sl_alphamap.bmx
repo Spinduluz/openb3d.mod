@@ -95,10 +95,17 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 
 Wend
+'ShadeEntity_(cube,Null)
+'ShadeEntity_(cube2,Null)
 ' Even if we free the shader objects here they
 ' will not be deleted until all references are deleted
 FreeShaderObject vert 'vert reference count=2
 FreeShaderObject frag 'frag reference count=2
 FreeShader shader 'vert & frag reference count=1
 FreeShader shader2 'ShaderObject(s) will be finally deleted here (vert & frag reference count=0!)
+
+FreeEntity cube
+FreeEntity cube2
+FreeEntity cone
+FreeEntity plane
 End

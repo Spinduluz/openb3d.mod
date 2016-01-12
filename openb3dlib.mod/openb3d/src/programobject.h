@@ -6,6 +6,8 @@
 #include <map>
 #include <memory>
 
+#include "objectalloc.h"
+
 #if defined(BLITZMAX_DEBUG)
 #include "bmaxdebug.h"
 #endif
@@ -14,8 +16,22 @@ using namespace std;
 
 class ShaderObject;
 
+#if defined(_MSC_VER)
+#	define MAX_PROGRAMOBJECT_COUNT 512
+#endif
+
+// New implementation of custom allocators (not required)
+//	This is implemetation is twofold.
+//	One: 
+//	All objects are kept on the stack. 
+//	This limits the number of ShaderObjects that can be created but removes the need for allocations/deallocations
+//  Two:
+//	Debugging. Using this I can see how many objects that are still allocated on application exit
+//	Set ModuleInfo "CCFLAGS: -DMAX_SPROGRAMOBJECT_COUNT=[value] in openb3dlib/openb3dlib.bmx to enable this
+
 class ProgramObject : public ReferencedObject{
 public:
+	CLASS_ALLOCTOR_DECL(ProgramObject)
 #if defined(BLITZMAX_DEBUG)
 	static int debug_count;
 #endif

@@ -33,8 +33,8 @@ using namespace std;
 class MeshCollider;
 
 class Mesh : public Entity{
-	
 public:
+	CLASS_ALLOCTOR_DECL(Mesh)
 
 	int no_surfs;
 	

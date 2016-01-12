@@ -45,9 +45,12 @@ Sampler* Sampler::Create(string name,int slot,Texture* tex){
 }
 
 // ==========================================================================================================
+CLASS_ALLOCATOR_IMPL(Shader);
+
 #if defined(BLITZMAX_DEBUG)
 int Shader::debug_count=0;
 #endif
+
 int Shader::ShaderIDCount;
 	
 Shader* Shader::CreateShaderMaterial(const string& name){
@@ -112,13 +115,17 @@ Shader::Shader():shader_texture(),arb_program(NULL),id(0),name(),updatesampler(f
 }
 
 Shader::~Shader(){
+	if(!arb_program) return;
+	glUseProgram(0);
 	for(int i=0; i<255; i++){
 		if(shader_texture[i]) delete shader_texture[i];
+		shader_texture[i]=NULL;
 	}
 	if(arb_program) arb_program->DestroyRef();
 #if defined(BLITZMAX_DEBUG)
-	DebugLog("Deleted shader %s",name.c_str());
+	if(arb_program) DebugLog("Deleted shader %s",name.c_str());
 #endif
+	arb_program=NULL;
 }
 
 // internal 

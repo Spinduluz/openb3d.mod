@@ -48,6 +48,8 @@
 #include <map>
 using namespace std;
 
+CLASS_ALLOCATOR_IMPL(Mesh);
+
 Mesh* Mesh::CopyEntity(Entity* parent_ent){
 
 	// new mesh
@@ -222,6 +224,9 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 
 	}
 
+	// FIXME:
+	//	This aint good. When one of these meshes are freed then program will crash when
+	//	trying to use the other. ObjectReference perhaps?
 	mesh->c_col_tree=c_col_tree;
 
 	mesh->reset_bounds=reset_bounds;
@@ -241,18 +246,37 @@ void Mesh::FreeEntity(){
 		DebugLog("Mesh::FreeEntity");
 #endif
 
-		for(surf_it=surf_list.begin();surf_it!=surf_list.end();surf_it++){
-			Surface* surf=*surf_it;
-			delete surf;
+		if (surf_list.size()){
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Surface count=%i\n",surf_list.size());
+#endif
+			for(surf_it=surf_list.begin();surf_it!=surf_list.end();surf_it++){
+				Surface* surf=*surf_it;
+				if(surf){
+					if(surf->ShaderMat) surf->ShaderMat->TurnOff();
+					delete surf;
+				}
+			}
 		}
 
-		for(surf_it=anim_surf_list.begin();surf_it!=anim_surf_list.end();surf_it++){
-			Surface* anim_surf=*surf_it;
-			delete anim_surf;
+		if(anim_surf_list.size()){
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Anim surface count=%i\n",anim_surf_list.size());
+#endif
+			for(surf_it=anim_surf_list.begin();surf_it!=anim_surf_list.end();surf_it++){
+				Surface* anim_surf=*surf_it;
+				if(anim_surf){
+					if(anim_surf->ShaderMat) anim_surf->ShaderMat->TurnOff();
+					delete anim_surf;
+				}
+			}
 		}
 
-		delete c_col_tree;
+		if(c_col_tree) delete c_col_tree;
+		c_col_tree=NULL;
 	}
+	// No point in clearing these lists
+	// It will take care of it self when the object goes out of scope (deleted)
 	surf_list.clear();
 	anim_surf_list.clear();
 
@@ -1147,6 +1171,7 @@ Mesh* Mesh::RepeatMesh(Entity* parent_ent){
 	}*/
 
 	TreeCheck();
+	// And again
 	mesh->c_col_tree=c_col_tree;
 
 	mesh->reset_bounds=reset_bounds;

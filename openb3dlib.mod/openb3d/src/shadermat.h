@@ -15,6 +15,7 @@
 #include "programobject.h"
 
 #include "refobject.h"
+#include "objectalloc.h"
 
 #include <string>
 #include <sstream>
@@ -101,8 +102,24 @@ public:
 
 // ==========================================================================================================
 
+#if defined(_MSC_VER)
+#	define MAX_SHADER_COUNT 256
+#endif
+
+// New implementation of custom allocators (not required)
+//	This is implemetation is twofold.
+//	One: 
+//	All objects are kept on the stack. 
+//	This limits the number of ShaderObjects that can be created but removes the need for allocations/deallocations
+//  Two:
+//	Debugging. Using this I can see how many objects that are still allocated on application exit
+//	Set ModuleInfo "CCFLAGS: -DMAX_SHADER_COUNT=[value] in openb3dlib/openb3dlib.bmx to enable this
+
+// FIXME: Stackbased allocation unstable for Shader class for some reason
+
 class Shader : public ReferencedObject {
 public: 
+	CLASS_ALLOCTOR_DECL(Shader)
 // Move this to make all members public.
 // Does not matter much since all other classes have their members public
 	static int ShaderIDCount;

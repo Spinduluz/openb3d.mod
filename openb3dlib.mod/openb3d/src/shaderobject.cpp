@@ -17,17 +17,21 @@ int ShaderObject::debug_count=0;
 int ProgramObject::debug_count=0;
 #endif
 
+CLASS_ALLOCATOR_IMPL(ShaderObject);
+
 list<ShaderObject*> ShaderObject::shaderobjects;
 
-ShaderObject::ShaderObject(){
+ShaderObject::ShaderObject():object(0),type(0),name(),hash(0){
 }
 
 ShaderObject::~ShaderObject(){
+	if(!object) return;
 	ShaderObject::shaderobjects.remove(this);
 	glDeleteShader(object);
 #if defined(BLITZMAX_DEBUG)
-	DebugLog("Deleted ShaderObject %s",name.c_str());
+	if(object) DebugLog("Deleted ShaderObject %s",name.c_str());
 #endif
+	object=0;
 }
 
 ShaderObject* ShaderObject::Create(GLenum type, const string& src,const string& name){

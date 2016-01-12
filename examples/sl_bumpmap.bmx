@@ -230,7 +230,9 @@ While Not KeyDown(KEY_ESCAPE)
 	
 Wend
 FreeTexture colortex
-'FreeTexture reftest
+FreeTexture normaltex
+FreeTexture spectex
+FreeTexture tex
 FreeShader Shader
 FreeShader Shader2
 FreeShader Shader3
@@ -263,11 +265,13 @@ Function MouseLook( pivot:TPivot,camera:TCamera,time%,elapsed% )
 	
 	Local x_speed#,y_speed#
 	
-	'x_speed=((MouseX()-320)-x_speed)/4+x_speed
-	'y_speed=((MouseY()-240)-y_speed)/4+y_speed
-	x_speed=MouseXSpeed()/4
-	y_speed=MouseYSpeed()/4
+	x_speed=((MouseX()-320)-x_speed)/4+x_speed
+	y_speed=((MouseY()-240)-y_speed)/4+y_speed
+	'x_speed=MouseXSpeed()/4
+	'y_speed=MouseYSpeed()/4
 	MoveMouse 320,240
+	'DebugLog DesktopWidth()+"x"+DesktopHeight()
+	'MoveMouse DesktopWidth()/2,DesktopHeight()/2
 
 	TurnEntity pivot,0,-x_speed,0	'turn player Left/Right
 	TurnEntity camera,y_speed,0,0	'tilt camera

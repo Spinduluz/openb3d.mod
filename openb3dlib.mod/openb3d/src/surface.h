@@ -17,8 +17,8 @@
 using namespace std;
 
 class Surface{
-
 public:
+	CLASS_ALLOCTOR_DECL(Surface)
 
 	// no of vertices and triangles in surface
 
