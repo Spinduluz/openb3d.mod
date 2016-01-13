@@ -108,7 +108,9 @@ Surface* Surface::Copy(){
 	surf->vert_weight3=vert_weight3;
 	surf->vert_weight4=vert_weight4;
 
-	surf->brush=brush->Copy();
+	//delete surf->brush;
+	//surf->brush=brush->Copy();
+	brush->CopyTo(surf->brush);
 
 	surf->vert_array_size=vert_array_size;
 	surf->tri_array_size=tri_array_size;
@@ -119,7 +121,7 @@ Surface* Surface::Copy(){
 	surf->reset_vbo=-1;
 
 	surf->ShaderMat=ShaderMat;
-
+	if(surf->ShaderMat) surf->ShaderMat->AddRef();
 	surf->vbo_id[0]=0;
 
 	return surf;
@@ -128,7 +130,7 @@ Surface* Surface::Copy(){
 
 void Surface::ClearSurface(int clear_verts,int clear_tris){
 
-	if(clear_verts==true){
+	if(clear_verts){
 
 		no_verts=0;
 
@@ -389,6 +391,7 @@ void Surface::PaintSurface(Brush* bru){
 	brush->fx=bru->fx;
 	for(int i=0;i<7;i++){
 		brush->tex[i]=bru->tex[i];
+		if(brush->tex[i]) brush->tex[i]->AddRef();
 		brush->cache_frame[i]=bru->cache_frame[i];
 	}
 

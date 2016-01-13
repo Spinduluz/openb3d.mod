@@ -10,6 +10,7 @@ using namespace std;
 
 #include "collision.h"
 #include "geom.h"
+#include "refobject.h"
 
 class Collision;
 
@@ -33,7 +34,7 @@ public:
 	MeshCollider(){
 	}
 
-	static MeshCollider* Copy( MeshCollider *other );
+	MeshCollider* Copy();
 
 private:
 	vector<Vertex> vertices;

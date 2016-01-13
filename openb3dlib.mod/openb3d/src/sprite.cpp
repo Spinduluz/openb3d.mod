@@ -17,7 +17,6 @@
 CLASS_ALLOCATOR_IMPL(Sprite);
 
 Sprite* Sprite::CopyEntity(Entity* parent_ent){
-
 	// new sprite
 	Sprite* sprite=new Sprite;
 
@@ -75,6 +74,8 @@ Sprite* Sprite::CopyEntity(Entity* parent_ent){
 	sprite->hide=false;
 
 	sprite->brush=brush;
+	//brush.CopyTo(&sprite->brush);
+	//for(int i=0;i<8;i++) if(sprite->brush.tex[i]) sprite->brush.tex[i]->AddRef();
 
 	sprite->cull_radius=cull_radius;
 	sprite->radius_x=radius_x;
@@ -92,7 +93,10 @@ Sprite* Sprite::CopyEntity(Entity* parent_ent){
 	// copy mesh info
 
 	sprite->no_surfs=no_surfs;
-	sprite->surf_list=surf_list; // pointer to surf list
+	//sprite->surf_list=surf_list; // pointer to surf list
+	for(Surface *surf : surf_list){
+		sprite->surf_list.push_back(surf->Copy());
+	}
 
 	// copy sprite info
 
@@ -106,13 +110,34 @@ Sprite* Sprite::CopyEntity(Entity* parent_ent){
 	sprite->render_mode=render_mode;
 
 	return sprite;
-
 }
 
 void Sprite::FreeEntity(){
+	//for(int i=0;i<8;i++) if(brush.tex[i]) brush.tex[i]->DestroyRef();
+#if 1
+	if (no_surfs>=0){
+		// FIXME: C++11'ify
+		list<Surface*>::iterator surf_it;
+		if (surf_list.size()){
+			for(surf_it=surf_list.begin();surf_it!=surf_list.end();surf_it++){
+				Surface* surf=*surf_it;
+				if(surf){
+					if(surf->ShaderMat) surf->ShaderMat->TurnOff();
+					delete surf;
+				}
+			}
+		}
+
+		if(c_col_tree) delete c_col_tree;
+		c_col_tree=NULL;
+	}
+	
 	Entity::FreeEntity();
 
 	delete this;
+#else
+	Mesh::FreeEntity();
+#endif
 }
 
 Sprite* Sprite::CreateSprite(Entity* parent_ent){

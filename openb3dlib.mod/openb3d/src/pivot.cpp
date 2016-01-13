@@ -18,6 +18,9 @@ Pivot* Pivot::CopyEntity(Entity* parent_ent){
 
 	// new piv
 	Pivot* piv=new Pivot;
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Pivot::CopyEntity");
+#endif
 
 	// copy contents of child list before adding parent
 	list<Entity*>::iterator it;
@@ -105,6 +108,10 @@ Pivot* Pivot::CreatePivot(Entity* parent_ent){
 
 	Pivot* piv=new Pivot;
 	piv->class_name="Pivot";
+
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Pivot::CreatePivot");
+#endif
 		
 	piv->AddParent(*parent_ent);
 	entity_list.push_back(piv);

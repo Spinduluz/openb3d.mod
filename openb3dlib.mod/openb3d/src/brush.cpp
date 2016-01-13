@@ -11,6 +11,40 @@
 
 CLASS_ALLOCATOR_IMPL(Brush);
 
+void Brush::CopyTo(Brush *brush){
+	for(int i=0;i<8;i++){
+		if(tex[i]) tex[i]->DestroyRef();
+	}
+
+	brush->no_texs=no_texs;
+	brush->name=name;
+	brush->red=red;
+	brush->green=green;
+	brush->blue=blue;
+	brush->alpha=alpha;
+	brush->shine=shine;
+	brush->blend=blend;
+	brush->fx=fx;
+	brush->cache_frame[0]=cache_frame[0];
+	brush->cache_frame[1]=cache_frame[1];
+	brush->cache_frame[2]=cache_frame[2];
+	brush->cache_frame[3]=cache_frame[3];
+	brush->cache_frame[4]=cache_frame[4];
+	brush->cache_frame[5]=cache_frame[5];
+	brush->cache_frame[6]=cache_frame[6];
+	brush->cache_frame[7]=cache_frame[7];
+	brush->tex[0]=tex[0];
+	brush->tex[1]=tex[1];
+	brush->tex[2]=tex[2];
+	brush->tex[3]=tex[3];
+	brush->tex[4]=tex[4];
+	brush->tex[5]=tex[5];
+	brush->tex[6]=tex[6];
+	brush->tex[7]=tex[7];
+
+	for(int i=0;i<8;i++) if(brush->tex[i]) brush->tex[i]->AddRef();
+}
+
 Brush* Brush::Copy(){
 
 	Brush* brush=new Brush();
@@ -41,17 +75,9 @@ Brush* Brush::Copy(){
 	brush->tex[6]=tex[6];
 	brush->tex[7]=tex[7];
 
-	if(brush->tex[0]) brush->tex[0]->AddRef();
-	if(brush->tex[1]) brush->tex[1]->AddRef();
-	if(brush->tex[2]) brush->tex[2]->AddRef();
-	if(brush->tex[3]) brush->tex[3]->AddRef();
-	if(brush->tex[4]) brush->tex[4]->AddRef();
-	if(brush->tex[5]) brush->tex[5]->AddRef();
-	if(brush->tex[6]) brush->tex[6]->AddRef();
-	if(brush->tex[7]) brush->tex[7]->AddRef();
+	for(int i=0;i<8;i++) if(brush->tex[i]) brush->tex[i]->AddRef();
 
 	return brush;
-
 }
 
 void Brush::FreeBrush(){
@@ -116,7 +142,7 @@ void Brush::BrushTexture(Texture* texture, int frame, int index){
     // brush.tex[index]=texture;
 
 	}
-	texture->AddRef();
+	tex[index]->AddRef();
 	// if(frame<0) frame=0;
 	// if(frame>texture->no_frames-1) frame=texture->no_frames-1;
 	// tex_frame=frame;

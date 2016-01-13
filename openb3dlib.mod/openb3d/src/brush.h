@@ -47,13 +47,14 @@ public:
 
 	};
 
-	~Brush(){ // Objects should always be deleted.
+	virtual ~Brush(){ // Objects should always be deleted.
 		for(int i=0;i<8;i++){
 			if(tex[i]) tex[i]->DestroyRef();
 			tex[i]=NULL;
 		}
 	}
 
+	void CopyTo(Brush *brush);
 	Brush* Copy();
 	void FreeBrush();
 
@@ -70,6 +71,28 @@ public:
 	Texture* GetBrushTexture(int index=0);
 	static int CompareBrushes(Brush* brush1,Brush* brush2);
 
+	Brush& operator=(const Brush& other){
+		no_texs=other.no_texs;
+		name=other.name;
+		red=other.red;
+		green=other.green;
+		blue=other.blue;
+		alpha=other.alpha;
+		shine=other.shine;
+		blend=other.blend;
+		fx=other.fx;
+		for(int i=0;i<8;i++){
+			cache_frame[i]=other.cache_frame[i];
+			if(other.tex[i]){
+				tex[i]=other.tex[i];
+				tex[i]->AddRef();
+			}
+		}
+		glBlendFunc[0]=other.glBlendFunc[0];
+		glBlendFunc[1]=other.glBlendFunc[1];
+
+		return *this;
+	}
 };
 
 #endif

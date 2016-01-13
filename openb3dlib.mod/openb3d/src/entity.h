@@ -15,6 +15,7 @@
 #include "brush.h"
 #include "texture.h"
 #include "collision2.h"
+#include "refobject.h"
 
 #include <vector>
 #include <list>
@@ -26,7 +27,7 @@ using namespace std;
 
 class CollisionImpact;
 
-class Entity{	
+class Entity : public ReferencedObject{	
 public:
 	typedef unique_ptr<CollisionImpact> CollisionImpactPtr;
 		

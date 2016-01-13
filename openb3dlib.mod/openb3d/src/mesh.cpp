@@ -120,14 +120,7 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 
 	//mesh->brush=NULL;
 	mesh->brush=brush; // Another possible problem. My bad. It's not pointers
-	if(mesh->brush.tex[0]) mesh->brush.tex[0]->AddRef();
-	if(mesh->brush.tex[1]) mesh->brush.tex[1]->AddRef();
-	if(mesh->brush.tex[2]) mesh->brush.tex[2]->AddRef();
-	if(mesh->brush.tex[3]) mesh->brush.tex[3]->AddRef();
-	if(mesh->brush.tex[4]) mesh->brush.tex[4]->AddRef();
-	if(mesh->brush.tex[5]) mesh->brush.tex[5]->AddRef();
-	if(mesh->brush.tex[6]) mesh->brush.tex[6]->AddRef();
-	if(mesh->brush.tex[7]) mesh->brush.tex[7]->AddRef();
+	//for(int i=0;i<8;i++) if(mesh->brush.tex[i]) mesh->brush.tex[i]->AddRef();
 
 	mesh->anim=anim;
 	mesh->anim_render=anim_render;
@@ -189,6 +182,8 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 		new_surf->tris=surf->tris;
 
 		// copy brush
+		//surf->brush->CopyTo(new_surf->brush);
+		delete new_surf->brush;
 		new_surf->brush=surf->brush->Copy();
 
 		new_surf->vert_array_size=surf->vert_array_size;
@@ -240,7 +235,7 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 	//	Can't be arsed right now. Need to make a copy function but MeshCollider has
 	//	double linked lists.... BTW MeshCollides is in tree.h & tree.cpp just to make
 	//	it *sooo* convenient to find it............
-	mesh->c_col_tree=c_col_tree;
+	if(c_col_tree) mesh->c_col_tree=c_col_tree->Copy();
 	
 	mesh->reset_bounds=reset_bounds;
 
@@ -293,9 +288,6 @@ void Mesh::FreeEntity(){
 
 	Entity::FreeEntity();
 	delete this;
-
-	return;
-
 }
 
 Mesh* Mesh::CreateMesh(Entity* parent_ent){
@@ -2024,7 +2016,7 @@ int Mesh::Alpha(){
 
 
 
-
+// Nice linefeed madness
 
 
 

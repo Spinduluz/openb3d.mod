@@ -245,6 +245,12 @@ void UpdateStaticCollisions(){
 	} // end of collision pair loop
 }
 
+inline void FreePivotPtr(Pivot *p){
+	if(p) p->FreeEntity();
+}
+
+typedef shared_ptr<Pivot> PivotPtr;
+
 // dynamic to dynamic
 void UpdateDynamicCollisions(){
 
@@ -260,6 +266,8 @@ void UpdateDynamicCollisions(){
 	// A bunch of pointers that are never released.. Bound to this function
 	// Just effin great...
 	// I sure hope this function is never used.
+	// Well it was used so will use shared pointers instead
+#if 0
 	static Pivot* piv1o=Pivot::CreatePivot();
 	static Pivot* piv1=Pivot::CreatePivot(piv1o);
 	static Pivot* piv11=Pivot::CreatePivot(piv1o);
@@ -267,6 +275,15 @@ void UpdateDynamicCollisions(){
 
 	static Pivot* piv2o=Pivot::CreatePivot();
 	static Pivot* piv2=Pivot::CreatePivot(piv2o);
+#else
+	static PivotPtr piv1o=PivotPtr(Pivot::CreatePivot(),FreePivotPtr);
+	static PivotPtr piv1=PivotPtr(Pivot::CreatePivot(piv1o.get()),FreePivotPtr);
+	static PivotPtr piv11=PivotPtr(Pivot::CreatePivot(piv1o.get()),FreePivotPtr);
+	static PivotPtr piv111=PivotPtr(Pivot::CreatePivot(piv1o.get()),FreePivotPtr);
+
+	static PivotPtr piv2o=PivotPtr(Pivot::CreatePivot(),FreePivotPtr);
+	static PivotPtr piv2=PivotPtr(Pivot::CreatePivot(piv2o.get()),FreePivotPtr);
+#endif
 
 	/*static Mesh* sphere=Mesh::CreateSphere();
 	sphere->HideEntity();*/

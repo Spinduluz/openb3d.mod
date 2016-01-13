@@ -181,7 +181,6 @@ Terrain* Terrain::CreateTerrain(int tsize, Entity* parent_ent){
 		terr->vsize=30;
 		terr->height=new float[(tsize+1)*(tsize+1)];
 		terr->NormalsMap=new float[(tsize+1)*(tsize+1)*3];
-
 	}
 
 	return terr;

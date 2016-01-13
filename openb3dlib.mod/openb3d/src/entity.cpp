@@ -38,7 +38,7 @@ void Entity::FreeEntity(void){
 	}
 
 	// free self from parent's child_list
-	if(parent!=NULL){
+	if(parent!=NULL){ // NOTE: I probably have to have a reference count on entities. Bummer.
 		parent->child_list.remove(this);
 	}else{
 		Global::root_ent->child_list.remove(this);
@@ -569,6 +569,8 @@ void Entity::EntityTexture(Texture* texture,int frame,int index,int recursive){
 	brush.cache_frame[index]=texture->texture;
 	if(index+1>brush.no_texs)
 	  brush.no_texs=index+1;
+
+	brush.tex[index]->AddRef();
 
 	if (texture->no_frames>2){
 		if(frame<0) frame=0;

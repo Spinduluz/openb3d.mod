@@ -51,6 +51,8 @@ vertices(verts),triangles(tris){
 }
 
 MeshCollider::~MeshCollider(){
+	// FIXME:
+	//	There should be more leafs to be deleted
 	delete tree;
 }
 
@@ -104,10 +106,9 @@ bool MeshCollider::collide( const Box &line_box,const Line &line,float radius,co
 	return hit;
 }
 
-MeshCollider* MeshCollider::Copy( MeshCollider *other ){
-	MeshCollider *c=new MeshCollider;
-
-	return NULL;
+MeshCollider* MeshCollider::Copy(){
+	MeshCollider *c=new MeshCollider(vertices,triangles);
+	return c;
 }
 
 Box MeshCollider::nodeBox( const vector<int> &tris ){

@@ -22,15 +22,25 @@ PositionEntity pivot,0,2,0
 Local t_sphere:TMesh=CreateSphere(8)
 EntityShininess t_sphere,0.2
 
+Local spheres:TEntity[]=New TEntity[20]
+Local scount=0;
+
+For Local sp:TEntity=EachIn spheres
+	sp=Null
+Next
+
 Local lastsphere:TEntity
 For Local t%=0 To 359 Step 36
 	Local sphere:TEntity=CopyEntity(t_sphere,pivot)
 	EntityColor sphere,Rnd(255),Rnd(255),Rnd(255)
 	TurnEntity sphere,0,t,0
 	MoveEntity sphere,0,2,10
+	spheres[scount]=sphere
 	lastsphere=sphere
+	scount:+1
 Next
-FreeEntity t_sphere
+'FreeEntity t_sphere
+DebugLog "Count="+scount
 
 Local cube:TMesh=CreateCube()
 PositionEntity cube,0,7,0
@@ -84,7 +94,7 @@ While Not KeyHit(KEY_ESCAPE)
 	TurnEntity pivot,0,1,0
 	
 	PositionEntity p2,EntityX(lastsphere,1),5,EntityZ(lastsphere,1)
-	
+
 	UpdateWorld ' update particles
 	
 	RenderWorld
@@ -92,16 +102,19 @@ While Not KeyHit(KEY_ESCAPE)
 	Flip
 Wend
 
-DebugLog "Particle" ; FreeEntity p
+FreeEntity t_sphere
+For Local sp:TMesh=EachIn spheres
+	If sp FreeEntity sp
+Next
+DebugLog "Pivot" 	; FreeEntity pivot
+DebugLog "Sprite" 	; FreeEntity sprite
+DebugLog "Camera" 	; FreeEntity camera
+DebugLog "light" 	; FreeEntity light
+DebugLog "Cube"		; FreeEntity cube
+DebugLog "Cone"		; FreeEntity cone
+DebugLog "Ground"	; FreeEntity ground
 DebugLog "Particle" ; FreeEntity p2
-DebugLog "Sprite" ; FreeEntity sprite
-DebugLog "Camera" ; FreeEntity camera
-DebugLog "Pivot" ; FreeEntity pivot
-DebugLog "light" ; FreeEntity light
-DebugLog "Sphere" ; FreeEntity lastsphere
-FreeEntity cube
-FreeEntity cone
-FreeEntity ground
+DebugLog "Particle" ; FreeEntity p
 
 FreeTexture noisetex
 FreeTexture ground_tex

@@ -654,8 +654,7 @@ void UpdateEntityRender(Entity* ent,Entity* cam){
 					case (1):{
 						dynamic_cast<Camera*>(cam)->UpdateSprite(*sprite);
 						break;}
-
-			
+		
 					case (2):{ // sprite batch rendering
 						dynamic_cast<Camera*>(cam)->UpdateSprite(*sprite);
 
@@ -680,8 +679,7 @@ void UpdateEntityRender(Entity* ent,Entity* cam){
 						surf->vert_col.push_back(sprite->brush.alpha);
 				
 						return;
-					}
-					
+					}			
 					
 				}  
 				

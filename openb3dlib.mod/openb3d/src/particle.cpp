@@ -161,7 +161,6 @@ void ParticleBatch::Render(){
 			surf->vert_coords[i*3]+=px;
 			surf->vert_coords[i*3+1]+=py;
 			surf->vert_coords[i*3+2]+=pz;
-
 		}
 	}
 
@@ -196,7 +195,7 @@ void ParticleEmitter::Update(){
 	if (!hide && rate_counter>rate){
 		rate_counter=0;
 		ParticleData particle;
-		particle.ent=particle_base->CopyEntity(0);
+		particle.ent=particle_base->CopyEntity(NULL);
 		particle.ent->hide=false;
 		particle.particleLife=lifetime;
 		particle.vx=0;
@@ -207,14 +206,7 @@ void ParticleEmitter::Update(){
 		particle.ent->py=mat.grid[3][1];
 		particle.ent->pz=-mat.grid[3][2];
 
-		if(particle.ent->brush.tex[0]) particle.ent->brush.tex[0]->AddRef();
-		if(particle.ent->brush.tex[1]) particle.ent->brush.tex[1]->AddRef();
-		if(particle.ent->brush.tex[2]) particle.ent->brush.tex[2]->AddRef();
-		if(particle.ent->brush.tex[3]) particle.ent->brush.tex[3]->AddRef();
-		if(particle.ent->brush.tex[4]) particle.ent->brush.tex[4]->AddRef();
-		if(particle.ent->brush.tex[5]) particle.ent->brush.tex[5]->AddRef();
-		if(particle.ent->brush.tex[6]) particle.ent->brush.tex[6]->AddRef();
-		if(particle.ent->brush.tex[7]) particle.ent->brush.tex[7]->AddRef();
+		//for(int i=0;i<8;i++) if(particle.ent->brush.tex[i]) particle.ent->brush.tex[i]->AddRef();
 
 		if (variance>.000000001){
 			particle.vx+=static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/variance))-variance/2;
@@ -230,13 +222,12 @@ void ParticleEmitter::Update(){
 
 		if (particle.particleLife<=0){
 			particle.ent->FreeEntity();
-
 			it=particles.erase(it);
 			continue;
 		}
 
-		if (UpdateParticle!=0){
-			UpdateParticle (particle.ent, particle.particleLife);
+		if (UpdateParticle){
+			UpdateParticle(particle.ent, particle.particleLife);
 		}
 
 		particle.vx+=gx;
@@ -257,8 +248,9 @@ ParticleEmitter* ParticleEmitter::CreateParticleEmitter(Entity* particle, Entity
 	if(parent_ent==NULL) parent_ent=Global::root_ent;
 
 	ParticleEmitter* emitter=new ParticleEmitter;
-
-	emitter->particle_base=particle;
+	// This is a quick fix instead of a reference counted object
+	// This enables us to free the "particle" entity before freeing this object
+	emitter->particle_base=particle->CopyEntity(NULL);
 
 	emitter->class_name="Emitter";
 		
@@ -284,8 +276,9 @@ ParticleEmitter* ParticleEmitter::CopyEntity(Entity* parent_ent){
 	ParticleEmitter* emitter=new ParticleEmitter;
 
 	list<Entity*>::iterator it;
-	for(it=child_list.begin();it!=child_list.end();it++){
-		Entity* ent=*it;
+	//for(it=child_list.begin();it!=child_list.end();it++){
+	//	Entity* ent=*it;
+	for(Entity* ent : child_list){
 		ent->CopyEntity(emitter);
 	}
 
@@ -349,8 +342,9 @@ ParticleEmitter* ParticleEmitter::CopyEntity(Entity* parent_ent){
 
 	emitter_list.push_back(emitter);
 
-	emitter->particle_base=particle_base;
-
+	emitter->particle_base=particle_base->CopyEntity(NULL);
+	//for(int i=0;i<8;i++) if(emitter->particle_base->brush.tex[i]) emitter->particle_base->brush.tex[i]->AddRef();
+	
 
 	emitter->rate=rate;
 	emitter->lifetime=lifetime;
@@ -371,8 +365,8 @@ ParticleEmitter* ParticleEmitter::CopyEntity(Entity* parent_ent){
 void ParticleEmitter::FreeEntity (){
 	emitter_list.remove(this);
 
+#if 0
 	list<ParticleData>::iterator it;
-
 	for(it=particles.begin();it!=particles.end();it++){
 		ParticleData &particle=*it;
 
@@ -380,7 +374,16 @@ void ParticleEmitter::FreeEntity (){
 
 	}
 	particles.clear();
+#else
+	if(particles.size()){
+		for(ParticleData& particle : particles){
+			if(particle.ent) particle.ent->FreeEntity();
+		}
+	}
+	//particles.clear();
+#endif
 
+	if(particle_base) particle_base->FreeEntity();
 
 	Entity::FreeEntity();
 	delete this;

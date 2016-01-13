@@ -86,6 +86,12 @@ private:
 		Entity* ent;
 		int particleLife;
 		float vx,vy,vz;
+
+		ParticleData():ent(NULL),particleLife(0),vx(0),vy(0),vz(0){
+		}
+		~ParticleData(){
+			//if(ent) ent->FreeEntity();
+		}
 	};
 
 	list<ParticleData> particles;
