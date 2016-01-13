@@ -2130,6 +2130,13 @@ Function CreateShadow:TShadowObject( parent:TMesh,Static:Int=False )
 End Function
 
 Rem
+bbdoc: Free stencil
+End Rem
+Function FreeStencil( stencil:TStencil )
+	stencil.FreeStencil
+End Function
+
+Rem
 bbdoc: Frees stencil shadow
 End Rem
 Function FreeShadow( shad:TShadowObject )

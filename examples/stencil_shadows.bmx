@@ -270,6 +270,27 @@ While Not KeyHit(KEY_ESCAPE) And Not AppTerminate()
 	
 Wend
 
+Rem
+For Local i%=0 To numshadows-1
+	If light1shadows[i] Then 
+		FreeShadow light1shadows[i] 
+		'DebugLog "FreeShadow1"
+	EndIf
+	If light2shadows[i] Then 
+		FreeShadow light2shadows[i]
+		'DebugLog "FreeShadow2" 
+	EndIf
+Next
+End Rem
+For Local i%=0 To numshadows-1
+	If light1shadows[i] FreeShadow(light1shadows[i])
+	If light2shadows[i] FreeShadow(light2shadows[i])
+Next
+For Local i%=0 To animnumshadows-1
+	If animlight1shadows[i] FreeShadow(animlight1shadows[i])
+	If animlight2shadows[i] FreeShadow(animlight2shadows[i])
+Next
+
 
 Function HideStaticLights( light:TLight,light2:TLight,light1hid%,light2hid% )
 

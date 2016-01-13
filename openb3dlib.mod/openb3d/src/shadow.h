@@ -49,6 +49,8 @@ class Edge{
 
 class ShadowObject{
 public:
+	CLASS_ALLOCTOR_DECL(ShadowObject)
+
 	static list<ShadowObject*> shadow_list;
 
 	// FIXME: 

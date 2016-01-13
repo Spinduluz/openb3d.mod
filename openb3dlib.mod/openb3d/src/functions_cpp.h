@@ -348,6 +348,10 @@ bbStencil* DLL_EXPORT CreateStencil();
 
 /*
 */
+void DLL_EXPORT FreeStencil(bbStencil *stencil);
+
+/*
+*/
 bbTerrain* DLL_EXPORT CreateTerrain(int size, bbEntity* parent);
 
 /*

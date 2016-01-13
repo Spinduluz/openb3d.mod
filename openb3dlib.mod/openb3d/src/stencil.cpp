@@ -21,6 +21,8 @@
 #include "mesh.h"
 #include "global.h"
 
+CLASS_ALLOCATOR_IMPL(Stencil);
+
 int Stencil::midStencilVal;
 
 Stencil* Stencil::CreateStencil(){
@@ -34,7 +36,7 @@ Stencil* Stencil::CreateStencil(){
 }
 
 void Stencil::StencilMesh(Mesh* mesh, int mode){
-	if (mesh->parent != 0) {
+	if (mesh->parent) {
 		mesh->parent->child_list.remove(mesh);
 	}else{
 		Global::root_ent->child_list.remove(mesh);

@@ -31,13 +31,15 @@ Import BRL.Retro			' imports BRL.Basic
 Import BRL.Map
 'Import PUB.MapStream
 
+' 2016-01-13 FreeStencil_
 ' 2016-01-11 Removed SetPixbufReader_
 
-' WIP
-' CreateShaderProgram_
-' LoadShaderObject_
-' CreateShaderObject_
-' AttachShaderObject_
+' 2016-01-?? CreateShaderProgram_
+' 2016-01-?? LoadShaderObject_
+' 2016-01-?? CreateShaderObject_
+' 2016-01-?? AttachShaderObject_
+' 2016-01-?? FreeShaderObject_
+' 2016-01-?? FreeShader
 
 ' 
 ' 2016-01-06 Added FreeShader_
@@ -373,6 +375,7 @@ Extern
 	
 	' *** Stencil
 	Function CreateStencil_:Byte Ptr() = "CreateStencil"
+	Function FreeStencil_( stencil:Byte Ptr) = "FreeStencil"
 	Function StencilAlpha_( stencil:Byte Ptr,a:Float ) = "StencilAlpha"
 	Function StencilClsColor_( stencil:Byte Ptr,r:Float,g:Float,b:Float ) = "StencilClsColor"
 	Function StencilClsMode_( stencil:Byte Ptr,cls_depth:Int,cls_zbuffer:Int ) = "StencilClsMode"

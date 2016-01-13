@@ -31,6 +31,10 @@ Type TStencil
 		
 	End Function
 	
+	Method FreeStencil()
+		FreeStencil_( GetInstance(Self) )
+	End Method
+	
 	Method StencilAlpha( a:Float )
 	
 		StencilAlpha_( GetInstance(Self),a )

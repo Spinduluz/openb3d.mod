@@ -22,6 +22,8 @@
 #include "mesh.h"
 #include "global.h"
 
+CLASS_ALLOCATOR_IMPL(ShadowObject);
+
 float ShadowObject::ShadowRed=0;
 float ShadowObject::ShadowGreen=0;
 float ShadowObject::ShadowBlue=0;
@@ -48,7 +50,8 @@ void ShadowObject::FreeShadow() {
 	//C++11'ify
 	for(ShadowTriangle* t : shadow_triangles) delete t;
 	if (!shadow_list.size()) Global::Shadows_enabled=0;
-
+	
+	delete this;
 }
 
 void ShadowObject::SetShadowColor(float red,float green,float blue,float alpha){

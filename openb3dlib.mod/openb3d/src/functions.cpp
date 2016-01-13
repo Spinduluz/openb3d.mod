@@ -2231,6 +2231,10 @@ void DetachShaderObject(Shader *shader,ShaderObject *object){
 void FreeShaderObject(ShaderObject *object){
 	object->DestroyRef();
 }
+
+void FreeStencil(Stencil *stencil){
+	delete stencil;
+}
 	
 } /* extern "C" */
 

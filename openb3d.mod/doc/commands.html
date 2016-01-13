@@ -476,6 +476,9 @@ undocumented.
 <tr><td class=docleft width=1%><a href=#FreeShadow>FreeShadow</a></td><td class=docright>
 Frees stencil shadow.
 </td></tr>
+<tr><td class=docleft width=1%><a href=#FreeStencil>FreeStencil</a></td><td class=docright>
+Free stencil.
+</td></tr>
 <tr><td class=docleft width=1%><a href=#FreeTexture>FreeTexture</a></td><td class=docright>
 <a href="http://www.blitzbasic.com/b3ddocs/command.php?name=FreeTexture">Online doc</a>
 </td></tr>
@@ -748,9 +751,6 @@ Set a shader variable name of a uniform ivec3 type to 3 integer values.
 </td></tr>
 <tr><td class=docleft width=1%><a href=#SetInteger4>SetInteger4</a></td><td class=docright>
 Set a shader variable name of a uniform ivec4 type to 4 integer values.
-</td></tr>
-<tr><td class=docleft width=1%><a href=#SetPixbufReader>SetPixbufReader</a></td><td class=docright>
-&nbsp;
 </td></tr>
 <tr><td class=docleft width=1%><a href=#SetShadowColor>SetShadowColor</a></td><td class=docright>
 Sets color R/G/B range 0..255 and A range 0..1.
@@ -1839,6 +1839,11 @@ Voxelsprite mesh entity.
 <tr><td class=docleft width=1%>Description</td><td class=docright>Frees stencil shadow.</td></tr>
 </table>
 <br>
+<table class=doc width=100% cellspacing=3 id=FreeStencil>
+<tr><td class=doctop colspan=2>Function FreeStencil( stencil:TStencil )</td></tr>
+<tr><td class=docleft width=1%>Description</td><td class=docright>Free stencil.</td></tr>
+</table>
+<br>
 <table class=doc width=100% cellspacing=3 id=FreeTexture>
 <tr><td class=doctop colspan=2>Function FreeTexture( tex:TTexture )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright><a href="http://www.blitzbasic.com/b3ddocs/command.php?name=FreeTexture">Online doc</a></td></tr>
@@ -2291,10 +2296,6 @@ Voxelsprite mesh entity.
 <table class=doc width=100% cellspacing=3 id=SetInteger4>
 <tr><td class=doctop colspan=2>Function SetInteger4( material:TShader,name:String,v1:Int,v2:Int,v3:Int,v4:Int )</td></tr>
 <tr><td class=docleft width=1%>Description</td><td class=docright>Set a shader variable name of a uniform ivec4 type to 4 integer values.</td></tr>
-</table>
-<br>
-<table class=doc width=100% cellspacing=3 id=SetPixbufReader>
-<tr><td class=doctop colspan=2>Function SetPixbufReader( loader:Byte Ptr( filename:Byte Ptr,width:Int Var,height:Int Var ), free( buf:Byte Ptr ) )</td></tr>
 </table>
 <br>
 <table class=doc width=100% cellspacing=3 id=SetShadowColor>

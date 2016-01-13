@@ -39,7 +39,7 @@ For Local t%=0 To 359 Step 36
 	lastsphere=sphere
 	scount:+1
 Next
-'FreeEntity t_sphere
+FreeEntity t_sphere
 DebugLog "Count="+scount
 
 Local cube:TMesh=CreateCube()
@@ -102,7 +102,7 @@ While Not KeyHit(KEY_ESCAPE)
 	Flip
 Wend
 
-FreeEntity t_sphere
+'FreeEntity t_sphere
 For Local sp:TMesh=EachIn spheres
 	If sp FreeEntity sp
 Next

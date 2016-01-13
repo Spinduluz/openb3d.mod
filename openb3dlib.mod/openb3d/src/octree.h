@@ -7,16 +7,15 @@
 using namespace std;
 
 class OcTreeChild{
-
 public:
+	CLASS_ALLOCTOR_DECL(OcTreeChild)
+
 	OcTreeChild* child[8];
 	int isBlock;
 	float x,y,z, width, height, depth;
 	float near,far;
 
 	Mesh* mesh;
-
-
 
 	void AddToOctree(Mesh* mesh1, int level, float X, float Y, float Z, float Near, float Far, int block);
 	void FreeChild();
@@ -29,6 +28,7 @@ public:
 class OcTree : public Terrain{
 
 public:
+	CLASS_ALLOCTOR_DECL(OcTree)
 	OcTreeChild child;
 
 	list<Mesh*> Rendered_Blocks;

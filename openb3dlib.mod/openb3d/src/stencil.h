@@ -13,9 +13,12 @@
 #include "mesh.h"
 //#include "surface.h"
 
-class Stencil{
-	public:
+// No way to delete?
+// Awesome
 
+class Stencil{
+public:
+	CLASS_ALLOCTOR_DECL(Stencil)
 	static int midStencilVal;
 
 	list<Mesh*> StencilMesh_list;

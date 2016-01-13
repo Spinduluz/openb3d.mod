@@ -157,7 +157,7 @@ public:
 
 // Ok, this is messy.
 // But it works as a quick and dirty solution.
-// I don't reallt wan't to redesign the classes too much right now
+// I don't want to redesign the classes too much right now
 // especially since I plan to implement these on all core classes
 
 #if defined(MAX_TEXTURE_COUNT)
@@ -207,6 +207,10 @@ TYPEDEF_STANDARD_ALLOC(Fluid);
 TYPEDEF_STANDARD_ALLOC(Geosphere);
 TYPEDEF_STANDARD_ALLOC(ParticleBatch);
 TYPEDEF_STANDARD_ALLOC(ParticleEmitter);
+TYPEDEF_STANDARD_ALLOC(ShadowObject);
+TYPEDEF_STANDARD_ALLOC(Stencil);
+TYPEDEF_STANDARD_ALLOC(OcTree);
+TYPEDEF_STANDARD_ALLOC(OcTreeChild);
 
 #define CLASS_ALLOCTOR_DECL(CLASS)					\
 	static CLASS##Alloc object##CLASS##Alloc;		\

@@ -10,7 +10,6 @@ namespace CSG{
 	void ScanObject(Mesh* mesh);
 	void SplitTriangles(Mesh* obj1);
 	void RebuildMesh(Mesh* mesh, Mesh* mesh2, int invert, int keepshared);
-
 }
 
 static Camera* EyePoint;
@@ -22,10 +21,10 @@ static float radius;
 static MeshInfo* Mesh_info;
 static int total_verts;
 static float Xcf, Ycf, Zcf;
-
+// FIXME:
 static list<Mesh*>* delete_list;
 
-
+CLASS_ALLOCATOR_IMPL(OcTreeChild);
 
 void OcTreeChild::AddToOctree(Mesh* mesh1, int level, float X, float Y, float Z, float Near, float Far, int block){
 
@@ -191,6 +190,8 @@ void OcTreeChild::FreeChild(){
 /*void OcTreeChild::FreeOctreeNode(int level, float X, float Y, float Z){
 }*/
 
+CLASS_ALLOCATOR_IMPL(OcTree);
+
 void OcTree::OctreeMesh(Mesh* mesh, int level, float X, float Y, float Z, float Near, float Far){
 	mesh->EntityParent(this);
 	mesh->HideEntity();
@@ -277,8 +278,6 @@ void OcTree::UpdateTerrain(){
 	float crs=radius*radius;
 	radius=sqrt(crs+crs+crs)/child.width;
 
-
-
 	EyePoint=eyepoint;
 	Mat=&mat;
 	child.RenderChild();
@@ -359,8 +358,6 @@ void OcTreeChild::RenderChild(){
 					mesh_temp->anim_surf_list=mesh->anim_surf_list;
 				}
 				mesh_temp->surf_list=mesh->surf_list;
-				
-
 
 				mesh_temp->mat=mat2;
 				mesh_temp->alpha_order=EyePoint->EntityDistanceSquared(mesh);
@@ -421,7 +418,7 @@ void OcTree::TreeCheck(CollisionInfo* ci){
 		}
 	}
 
-	if(c_col_tree!=NULL){
+	if(c_col_tree){
 		C_DeleteColTree(c_col_tree);
 		c_col_tree=NULL;
 	}
@@ -608,22 +605,17 @@ void OcTree::FreeEntity(){
 		Rendered_Blocks.clear();
 	}
 
-
 	delete c_col_tree;
 
 	if (child.child[0]!=0){
-	
 		for(int i=0;i<=7;i++){
 			//child[i]->mat=mat;
-
 			child.child[i]->FreeChild();
 		}
-
 	}
 
 
 	Entity::FreeEntity();
-
 	delete this;
 
 	return;
