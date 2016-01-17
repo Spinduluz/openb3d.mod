@@ -457,7 +457,7 @@ Texture* Texture::TexInList(size_t hash,int flags){
 	// FIXME: See model.cpp
 	for(Texture* tex : tex_list){
 		if(hash==tex->file_hash){
-			if(flags==tex->flags){
+			if(flags==tex->flags && !(tex->flags & 2048)){
 				tex->AddRef();
 				return tex;
 			}
@@ -470,9 +470,7 @@ Texture* Texture::TexInList(size_t hash,int flags){
 			newtex->texture=*newtex->texture_ref;
 			newtex->frames=tex->frames;
 			newtex->frames_ref=tex->frames_ref;
-#if defined(BLITZMAX_DEBUG)
-			DebugLog("texture_ref count %i",newtex->texture_ref.use_count());
-#endif
+
 			return newtex;
 		}
 	}
@@ -502,9 +500,7 @@ Texture* Texture::TexInList(size_t hash,int flags,int blend,int coords,float u_p
 			newtex->texture=*newtex->texture_ref;
 			newtex->frames=tex->frames;
 			newtex->frames_ref=tex->frames_ref;
-#if defined(BLITZMAX_DEBUG)
-			DebugLog("texture_ref count %i",newtex->texture_ref.use_count());
-#endif
+
 			return newtex;
 		}
 	}

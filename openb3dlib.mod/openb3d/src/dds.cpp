@@ -129,8 +129,6 @@ inline void DXT_FlipBlocksDXTC1(DXTColorBlock *line,unsigned int num){
 
 	current=line;
 	for(i=0; i<num; i++){
-		//DXT_SwapPointer(&current->row[0],&current->row[3],1);
-		//DXT_SwapPointer(&current->row[1],&current->row[2],1);
 		swap(current->row[0],current->row[3]);
 		swap(current->row[1],current->row[2]);
 
@@ -148,15 +146,11 @@ inline void DXT_FlipBlocksDXTC3(DXTColorBlock *line,unsigned int num){
 	for(i=0; i<num; i++){
 		block=(DXT3AlphaBlock*)current;
 
-		//DXT_SwapPointer(&block->row[0],&block->row[3],2);
-		//DXT_SwapPointer(&block->row[1],&block->row[2],2);
 		swap(block->row[0],block->row[3]);
 		swap(block->row[1],block->row[2]);
 
 		current++;
 
-		//DXT_SwapPointer(&current->row[0],&current->row[3],1);
-		//DXT_SwapPointer(&current->row[1],&current->row[2],1);
 		swap(current->row[0],current->row[3]);
 		swap(current->row[1],current->row[2]);
 
@@ -177,8 +171,6 @@ inline void DXT_FlipBlocksDXTC5(DXTColorBlock *line,unsigned int num){
 
 		current++;
 
-		//DXT_SwapPointer(&current->row[0],&current->row[3],1);
-		//DXT_SwapPointer(&current->row[1],&current->row[2],1);
 		swap(current->row[0],current->row[3]);
 		swap(current->row[1],current->row[2]);
 

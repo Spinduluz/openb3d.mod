@@ -163,4 +163,7 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 	
 Wend
+
+FreeStencil stencil
+
 End
