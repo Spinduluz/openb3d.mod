@@ -61,9 +61,6 @@ public:
 // ==========================================================================================================
 
 struct Sampler{
-#if defined(BLITZMAX_DEBUG)
-	static int debug_count;
-#endif
 	bool is_used; // FIXME:
 
 	string name;
@@ -135,19 +132,13 @@ public:
 	string name;
 	size_t hash;
 
-	bool updatesampler; // Change from char to bool and lowercased the string
+	bool updatesampler; // Change from char to bool and lowercased the name
 
 	vector<ShaderData> parameters;
 
 	//-------------------------------------------------------------------------------	
 	
 	//void UpdateData(Surface* surf);
-	
-	// internal 
-#if defined(BLITZMAX_DEBUG)
-	static int debug_count;
-#endif
-
 	static Shader* CreateShaderMaterial(const string& name="");
 
 	Shader();
@@ -215,19 +206,5 @@ public:
 	void SetParameter4D(string name, double v1, double v2, double v3, double v4);*/
 
 };
-
-#if defined(BLITZMAX_DEBUG)
-class _AllocatedStuff{
-public:
-	_AllocatedStuff(){
-	}
-	~_AllocatedStuff(){
-		DebugLog("Shaders        [%i]",Shader::debug_count);
-		DebugLog("Samplers       [%i]",Sampler::debug_count);
-		DebugLog("ProgramObjects [%i]",ProgramObject::debug_count);
-		DebugLog("ShaderObjects  [%i]",ShaderObject::debug_count);
-	}
-};
-#endif
 
 #endif

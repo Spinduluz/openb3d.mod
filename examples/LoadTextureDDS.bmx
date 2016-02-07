@@ -53,5 +53,13 @@ FreeTexture dxt3_tex
 FreeTexture dxt5_tex
 FreeTexture rgba_tex
 
+FreeEntity camera
+FreeEntity light
+
+FreeEntity dxt1
+FreeEntity dxt3
+FreeEntity dxt5
+FreeEntity rgba
+
 End
 

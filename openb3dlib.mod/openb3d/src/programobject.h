@@ -32,9 +32,6 @@ class ShaderObject;
 class ProgramObject : public ReferencedObject{
 public:
 	CLASS_ALLOCTOR_DECL(ProgramObject)
-#if defined(BLITZMAX_DEBUG)
-	static int debug_count;
-#endif
 	static int default_program;
 	static list<ProgramObject*> programobjects;
 

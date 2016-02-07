@@ -30,9 +30,6 @@ class Surface;
 class ShaderObject : public ReferencedObject {
 public:
 	CLASS_ALLOCTOR_DECL(ShaderObject)
-#if defined(BLITZMAX_DEBUG)
-	static int debug_count;
-#endif
 	static list<ShaderObject*> shaderobjects;
 
 	int object;

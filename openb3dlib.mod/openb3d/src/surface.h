@@ -16,7 +16,7 @@
 #include <vector>
 using namespace std;
 
-class Surface{
+class Surface : public ReferencedObject{
 public:
 	CLASS_ALLOCTOR_DECL(Surface)
 

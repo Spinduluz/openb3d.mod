@@ -12,11 +12,6 @@ using namespace std;
 
 string tempname="";
 
-#if defined(BLITZMAX_DEBUG)
-int ShaderObject::debug_count=0;
-int ProgramObject::debug_count=0;
-#endif
-
 CLASS_ALLOCATOR_IMPL(ShaderObject);
 
 list<ShaderObject*> ShaderObject::shaderobjects;

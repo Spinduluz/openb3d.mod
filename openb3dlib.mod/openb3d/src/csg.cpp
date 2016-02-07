@@ -519,17 +519,17 @@ Mesh* CopyMeshAt(Mesh* mesh){
 
 		for(int v=0;v<=surf->CountVertices()-1;v++){
 
-			real vx=surf->vert_coords[v*3];
+			real vx=surf->vert_coords[v*3+0];
 			real vy=surf->vert_coords[v*3+1];
 			real vz=-surf->vert_coords[v*3+2];
 
 			Entity::TFormPoint (vx,vy,vz,mesh,0);
 
-			surf->vert_coords[v*3] = Entity::tformed_x;
+			surf->vert_coords[v*3+0] = Entity::tformed_x;
 			surf->vert_coords[v*3+1] = Entity::tformed_y;
 			surf->vert_coords[v*3+2] = -Entity::tformed_z;
 
-			real nx=surf->vert_norm[v*3];
+			real nx=surf->vert_norm[v*3+0];
 			real ny=surf->vert_norm[v*3+1];
 			real nz=-surf->vert_norm[v*3+2];
 
@@ -806,7 +806,7 @@ void RebuildMesh(Mesh* mesh, Mesh* mesh2, int invert = false, int keepshared = f
 
 			CSGTriangle* c=*ic;
 
-			if (c->surf == surf){
+			if (c->surf==surf){
 
 				//convert vertex world coords into mesh coords
 				/*Entity::TFormPoint(c->x0,c->y0,c->z0, 0, mesh);
@@ -896,15 +896,11 @@ void RebuildMesh(Mesh* mesh, Mesh* mesh2, int invert = false, int keepshared = f
 						surf->VertexNormal (v1, c->nx, c->ny, c->nz);
 						surf->VertexNormal (v2, c->nx, c->ny, c->nz);
 						surf->AddTriangle (v0, v1, v2);
-						
+
 					}
-			
 				}
-				
 			}
-		
 		}
-		
 	}
 	
 	dummy->FreeEntity();
@@ -985,4 +981,5 @@ Mesh* MeshCSG(Mesh* m1, Mesh* m2, int method){
 	return mesh1;
 
 }
-}
+
+} // namespace CSG

@@ -255,7 +255,7 @@ void Mesh::FreeEntity(){
 				Surface* surf=*surf_it;
 				if(surf){
 					if(surf->ShaderMat) surf->ShaderMat->TurnOff();
-					delete surf;
+					surf->DestroyRef();
 				}
 			}
 		}
@@ -265,7 +265,7 @@ void Mesh::FreeEntity(){
 				Surface* anim_surf=*surf_it;
 				if(anim_surf){
 					if(anim_surf->ShaderMat) anim_surf->ShaderMat->TurnOff();
-					delete anim_surf;
+					anim_surf->DestroyRef();
 				}
 			}
 		}
@@ -316,7 +316,7 @@ Surface* Mesh::CreateSurface(Brush* bru){
 	Surface* surf=new Surface();
 	surf_list.push_back(surf);
 
-	no_surfs=no_surfs+1;
+	no_surfs++;
 
 	if(bru!=NULL){
 		delete surf->brush;
@@ -1304,9 +1304,8 @@ void Mesh::AddMesh(Mesh* mesh2){
 			// copy brush
 
 			if(surf1->brush){
-
-				surf->brush=surf1->brush->Copy();
-
+				surf1->brush->CopyTo(surf->brush);
+				//surf->brush=surf1->brush->Copy();
 			}
 
 			// mesh shape has changed - update reset flags

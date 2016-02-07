@@ -60,4 +60,14 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 
 Wend
+
+FreeEntity cam
+FreeEntity light
+FreeEntity cube
+FreeEntity cube2
+
+FreeEntity csg
+FreeEntity csg2
+FreeEntity csg3
+
 End

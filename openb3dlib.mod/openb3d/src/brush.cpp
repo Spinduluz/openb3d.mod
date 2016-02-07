@@ -81,9 +81,7 @@ Brush* Brush::Copy(){
 }
 
 void Brush::FreeBrush(){
-
 	delete this;
-
 }
 
 Brush* Brush::CreateBrush(float r,float g,float b){

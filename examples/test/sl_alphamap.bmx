@@ -7,6 +7,13 @@ Framework Openb3d.B3dglgraphics
 
 Graphics3D 800,600,0,2,60,GRAPHICS_BACKBUFFER|GRAPHICS_ALPHABUFFER|GRAPHICS_DEPTHBUFFER|GRAPHICS_STENCILBUFFER|GRAPHICS_ACCUMBUFFER|$40|$400
 
+DebugLog "alpha_map_test"
+Local alpha_map_test:TTexture=LoadTexture("media/alpha_map.png")
+DebugLog "alpha_map_tst2"
+Local alpha_map_tst2:TTexture=LoadTexture("media/alpha_map.png",2048)
+
+FreeTexture alpha_map_test
+FreeTexture alpha_map_tst2
 
 Local camera:TCamera=CreateCamera()
 
@@ -51,15 +58,20 @@ Local frag:TShaderObject=LoadShaderObject( 1,"shaders/alphamap.frag.glsl" ) 'fra
 AttachShaderObject( shader,vert ) 'vert reference count=2
 AttachShaderObject( shader,frag ) 'frag reference count=2
 
-ShaderTexture(shader,LoadTexture("media/colorkey.jpg"),"tex",0)
-ShaderTexture(shader,LoadTexture("media/spark.png"),"alphatex",1)
+Local colorkey:TTexture=LoadTexture("media/colorkey.jpg")
+Local spark:TTexture=LoadTexture("media/spark.png")
+
+ShaderTexture(shader,colorkey,"tex",0)
+ShaderTexture(shader,spark,"alphatex",1)
 ShadeEntity(cube,shader)
 EntityFX(cube,32)
 
 AttachShaderObject( shader2,vert ) 'vert reference count=3
 AttachShaderObject( shader2,frag ) 'frag reference count=3
 
-ShaderTexture(shader2,LoadTexture("media/alpha_map.png"),"tex",0)
+Local alpha_map:TTexture=LoadTexture("media/alpha_map.png")
+
+ShaderTexture(shader2,alpha_map,"tex",0)
 ShadeEntity(cube2,shader2)
 EntityFX(cube2,32)
 
@@ -112,4 +124,9 @@ FreeShaderObject vert 'vert reference count=2
 FreeShaderObject frag 'frag reference count=2
 FreeShader shader 'vert & frag reference count=1
 FreeShader shader2 'ShaderObject(s) will be finally deleted here (vert & frag reference count=0!)
+
+FreeTexture colorkey
+FreeTexture spark
+FreeTexture alpha_map
+
 End

@@ -425,7 +425,7 @@ Fluid* Fluid::CreateFluid(){
 
 void Fluid::FreeEntity(){
 	Surface* surf=*surf_list.begin();
-	delete surf;
+	surf->DestroyRef();
 	surf_list.clear();
 
 

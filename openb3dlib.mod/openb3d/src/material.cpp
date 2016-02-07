@@ -36,20 +36,12 @@ enum{
 // ==========================================================================================================
 //ShaderMat
 
-#if defined(BLITZMAX_DEBUG)
-int Sampler::debug_count=0;
-#endif
-
 Sampler* Sampler::Create(string name,int slot,Texture* tex){
 	return new Sampler(name,slot,tex);
 }
 
 // ==========================================================================================================
 CLASS_ALLOCATOR_IMPL(Shader);
-
-#if defined(BLITZMAX_DEBUG)
-int Shader::debug_count=0;
-#endif
 
 int Shader::ShaderIDCount;
 	
@@ -351,8 +343,7 @@ void Shader::TurnOn(Matrix& mat, Surface* surf, vector<float>* vertices){
 				glEnable(GL_ALPHA_TEST);
 			}else{
 				glDisable(GL_ALPHA_TEST);
-			}
-		
+			}		
 		
 			// clamp u flag
 			if(tex_flags&16){
@@ -660,6 +651,11 @@ void Shader::AddShaderFromString(string vssrc,string fssrc,const string& name){
 	End Method */
 
 void Shader::AddSampler2D(string name,int slot,Texture* tex){
+	if(!tex){
+		if(shader_texture[slot]) delete shader_texture[slot];
+		shader_texture[slot]=NULL;
+		return;
+	}
 	shader_texture[slot]=Sampler::Create(name,slot,tex);
 	updatesampler=true;
 	shader_texture[slot]->is_texture3d=false;
@@ -667,6 +663,11 @@ void Shader::AddSampler2D(string name,int slot,Texture* tex){
 }
 	
 void Shader::AddSampler3D(string name,int slot,Texture* tex){
+	if(!tex){
+		if(shader_texture[slot]) delete shader_texture[slot];
+		shader_texture[slot]=NULL;
+		return;
+	}
 	shader_texture[slot] = Sampler::Create(name,slot,tex);
 	updatesampler=true;
 	shader_texture[slot]->is_texture3d=true;
@@ -992,7 +993,7 @@ End Method*/
 
 void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeight, unsigned int srcX, unsigned int srcY, unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel);
 
-
+// FIXME: Remove
 Material* Material::LoadMaterial(string filename,int flags, int frame_width,int frame_height,int first_frame,int frame_count){
 
 	filename=File::ResourceFilePath(filename);
@@ -1046,8 +1047,6 @@ Material* Material::LoadMaterial(string filename,int flags, int frame_width,int 
 	for (int i=0;i<frame_count;i++){
 		CopyPixels (buffer,tex->width, tex->height,frame_width*(i%frames_in_row), frame_height*(i/frames_in_row),
 		dstbuffer+i*(frame_width * frame_height * 4), frame_width, frame_height, 4);
-
-
 	}
 
 	glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_TRUE);

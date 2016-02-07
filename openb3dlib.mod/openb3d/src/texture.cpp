@@ -85,7 +85,7 @@ inline void GL_TexImage2D(GLenum target,int width,int height,unsigned char *buff
 	if(Global::gl_ext_framebuffer_object){
 		glGenerateMipmap(target);
 	}
-	if(Global::glu_build_mipmaps){
+	if(Global::glu_build_mipmaps){ // FIXME: Build custom mipmap generator
 		gluBuild2DMipmaps(target,GL_RGBA,width,height,GL_RGBA,GL_UNSIGNED_BYTE,buffer);
 	}
 }
@@ -387,9 +387,10 @@ Texture* Texture::CreateTexture(int width,int height,int flags,int frames,string
 	tex->file_hash=StringHash(fname);
 	tex->format=GL_RGBA;
 
-	unsigned int id;
-	glGenTextures(1,&id);
-	tex->texture=id;
+	//unsigned int id;
+	//glGenTextures(1,&id);
+	//tex->texture=id;
+	GL_GenTextures(tex);
 
 	return tex;
 
@@ -462,9 +463,21 @@ Texture* Texture::TexInList(size_t hash,int flags){
 				return tex;
 			}
 
-			Texture* newtex=new Texture;
-			newtex->flags=flags;
+			// If we've flagged the texture as unique or
+			// the texture flags differ then we create a new class
+			// but continue to use the underlying gl object
+			flags &= ~2048;
+
+			Texture *newtex=new Texture;
+			newtex->flags=tex->flags;
 			newtex->FilterFlags();
+			newtex->blend=tex->blend;
+			newtex->coords=tex->coords;
+			newtex->u_pos=tex->u_pos;
+			newtex->v_pos=tex->v_pos;
+			newtex->u_scale=tex->u_scale;
+			newtex->v_scale=tex->v_scale;
+			newtex->angle=tex->angle;
 
 			newtex->texture_ref=tex->texture_ref;
 			newtex->texture=*newtex->texture_ref;
@@ -509,13 +522,39 @@ Texture* Texture::TexInList(size_t hash,int flags,int blend,int coords,float u_p
 
 Texture* Texture::TexInList(){
 	for(Texture* tex : tex_list){
-		if(file_hash==tex->file_hash && flags==tex->flags){
-			tex->AddRef();
-			return tex;
+		if(file_hash==tex->file_hash){
+			if(flags==tex->flags && !(flags & 2048)){
+				tex->AddRef();
+				return tex;
+			}
+
+			// If we've flagged the texture as unique or
+			// the texture flags differ then we create a new class
+			// but continue to use the underlying gl object
+			flags &= ~2048;
+
+			Texture *newtex=new Texture;
+			newtex->flags=tex->flags;
+			newtex->FilterFlags();
+			newtex->blend=tex->blend;
+			newtex->coords=tex->coords;
+			newtex->u_pos=tex->u_pos;
+			newtex->v_pos=tex->v_pos;
+			newtex->u_scale=tex->u_scale;
+			newtex->v_scale=tex->v_scale;
+			newtex->angle=tex->angle;
+
+			newtex->texture_ref=tex->texture_ref;
+			newtex->texture=*newtex->texture_ref;
+			newtex->frames=tex->frames;
+			newtex->frames_ref=tex->frames_ref;
+
+			return newtex;
 		}
 	}
 	return NULL;
 }
+
 void Texture::FilterFlags(const string& filename,int& flags){
 	for(TextureFilter* filter : TextureFilter::tex_filter_list){
 		if(Instr(filename,filter->text_match)) flags|=filter->flags;

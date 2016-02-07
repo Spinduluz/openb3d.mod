@@ -123,7 +123,7 @@ void Sprite::FreeEntity(){
 				Surface* surf=*surf_it;
 				if(surf){
 					if(surf->ShaderMat) surf->ShaderMat->TurnOff();
-					delete surf;
+					surf->DestroyRef();
 				}
 			}
 		}

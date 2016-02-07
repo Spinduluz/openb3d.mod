@@ -33,7 +33,7 @@ class Camera;
 //	This is implemetation is twofold.
 //	One: 
 //	All objects are kept on the stack. 
-//	This limits the number of ShaderObjects that can be created but removes the need for allocations/deallocations
+//	This limits the number of Textures that can be created but removes the need for allocations/deallocations
 //  Two:
 //	Debugging. Using this I can see how many objects that are still allocated on application exit
 //	Set ModuleInfo "CCFLAGS: -DMAX_TEXTURE_COUNT=[value] in openb3dlib/openb3dlib.bmx to enable this

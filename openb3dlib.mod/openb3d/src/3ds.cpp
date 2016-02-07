@@ -240,7 +240,7 @@ void ReadTriMesh(){
     }
     MovedTris.clear();
     if (surface->no_tris==0 && CheckSurface !=0) {
-      delete surface;
+      surface->DestroyRef();
       mesh->surf_list.remove(surface);
       mesh->no_surfs=mesh->no_surfs-1;
     }
@@ -386,7 +386,7 @@ Mesh* Load3ds(FilePtr Stream, Entity* parent_ent){
     MovedTris.clear();
 
     if (surface->no_tris==0 && CheckSurface !=0) {
-      delete surface;
+      surface->DestroyRef();
       mesh->surf_list.remove(surface);
       mesh->no_surfs=mesh->no_surfs-1;
     }

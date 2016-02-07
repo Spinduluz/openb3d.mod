@@ -82,7 +82,7 @@ Surface::Surface(){
 Surface::~Surface(){
 	FreeVBO();
 	if(brush) delete brush;
-
+	if(ShaderMat) ShaderMat->DestroyRef();
 }
 
 Surface* Surface::Copy(){
@@ -403,7 +403,7 @@ void Surface::SurfaceColor(float r,float g,float b,float a){
 	for( v=0;v<no_verts;v++ ){
 
 		vid=v*4;
-		vert_col[vid]=r/255.0;
+		vert_col[vid+0]=r/255.0;
 		vert_col[vid+1]=g/255.0;
 		vert_col[vid+2]=b/255.0;
 		vert_col[vid+3]=a;
@@ -418,7 +418,7 @@ void Surface::SurfaceColor(float r,float g,float b){
 	for( v=0;v<no_verts;v++ ){
 
 		vid=v*4;
-		vert_col[vid]=r/255.0;
+		vert_col[vid+0]=r/255.0;
 		vert_col[vid+1]=g/255.0;
 		vert_col[vid+2]=b/255.0;
 		//vert_col[vid+3]=a;
@@ -745,7 +745,7 @@ void Surface::UpdateTexCoords(){
 
 	for(int V=0;V<=CountVertices()-1;V++){
 
-		float x=vert_coords[V*3]; // surf.VertexX(v)
+		float x=vert_coords[(V*3)+0]; // surf.VertexX(v)
 		float y=vert_coords[(V*3)+1]; // surf.VertexY(v)
 		float z=-vert_coords[(V*3)+2]; // surf.VertexZ(v)
 

@@ -591,9 +591,9 @@ Mesh* LoadX(FilePtr Stream,Entity* parent_ent){
 										}
 										MovedTris.clear();
 										if (surf->no_tris==0 && CheckSurface !=0) {
-											delete surf;
 											submesh->surf_list.remove(surf);
 											submesh->no_surfs=submesh->no_surfs-1;
+											surf->DestroyRef();
 										}
 
 										delete[] Lbrushes;
