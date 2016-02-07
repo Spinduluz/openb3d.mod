@@ -76,7 +76,7 @@ Surface::Surface(){
 	// used by Compare to sort array, and TMesh.Update to enable/disable alpha blending
 	alpha_enable=false;
 	ShaderMat=Global::ambient_shader;
-
+	if(ShaderMat) ShaderMat->AddRef();
 }
 
 Surface::~Surface(){

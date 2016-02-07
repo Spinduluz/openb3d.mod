@@ -59,4 +59,11 @@ While Not KeyDown(KEY_ESCAPE)
 	Flip
 	
 Wend
+
+FreeEntity cam
+FreeEntity light
+FreeEntity ent
+FreeEntity cube
+FreeTexture tex
+
 End

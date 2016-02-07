@@ -13,7 +13,7 @@ CLASS_ALLOCATOR_IMPL(Brush);
 
 void Brush::CopyTo(Brush *brush){
 	for(int i=0;i<8;i++){
-		if(tex[i]) tex[i]->DestroyRef();
+		if(brush->tex[i]) brush->tex[i]->DestroyRef();
 	}
 
 	brush->no_texs=no_texs;

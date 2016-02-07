@@ -19,11 +19,18 @@ GL_ARB_fragment_shader
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include <GL/glew.h>
+
 #include "pivot.h"
 #include "mesh.h"
 #include "string_helper.h"
 
 class Camera;
+
+void GL_Enable(GLenum type);
+void GL_Disable(GLenum type);
+const char *GL_GetErrorString(GLenum error);
+void GL_TraverseErrors();
 
 class Global{
 public:

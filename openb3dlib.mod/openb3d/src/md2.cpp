@@ -209,6 +209,7 @@ Mesh* LoadMD2(FilePtr file,Entity* parent_ent){
 	Surface* anim_surf=new Surface();
 
 	mesh->anim_surf_list.push_back(anim_surf);
+	mesh->no_surfs++;
 	anim_surf->no_verts=surf->no_verts;
 
 	anim_surf->vert_coords.resize(num_vertices*3,0);
@@ -286,7 +287,7 @@ Mesh* LoadMD2(FilePtr file,Entity* parent_ent){
 	mesh->no_surfs=-1;
 
 
-	delete st;
+	delete[] st;
 	return mesh;
 }
 

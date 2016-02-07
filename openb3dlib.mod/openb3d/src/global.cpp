@@ -34,7 +34,7 @@ float Global::ambient_red=0.5;
 float Global::ambient_green=0.5;
 float Global::ambient_blue=0.5;
 
-Shader* Global::ambient_shader=0;
+Shader* Global::ambient_shader=NULL;
 
 int Global::vbo_enabled=true;
 int Global::vbo_min_tris=false;
@@ -110,6 +110,7 @@ void Global::Graphics(){
 	string ext=(const char*)glGetString(GL_EXTENSIONS);
 	size_t e=ext.find_first_of(' ',0);
 	size_t s=0;
+
 	if(e!=string::npos){
 		gl_extensions.push_back(ext.substr(s,e));
 		s=e+1;
@@ -466,10 +467,38 @@ void GL_Disable(GLenum type){
 	glDisable(type);
 }
 
-const char *GL_Error(GLenum error){
+const char *GL_GetErrorString(GLenum error){
 	switch(error){
+	case GL_INVALID_ENUM:
+		return "GL_INVALID_ENUM";
+	case GL_INVALID_VALUE:
+		return "GL_INVALID_VALUE";
+	case GL_STACK_OVERFLOW:
+		return "GL_STACK_OVERFLOW";
+	case GL_STACK_UNDERFLOW:
+		return "GL_STACK_UNDERFLOW";
+	case GL_INVALID_OPERATION:
+		return "GL_INVALID_OPERATION";
+	case GL_INVALID_FRAMEBUFFER_OPERATION:
+		return "GL_INVALID_FRAMEBUFFER_OPERATION";
+	case GL_OUT_OF_MEMORY:
+		return "GL_OUT_OF_MEMORY";
+	case GL_CONTEXT_LOST:
+		return "GL_CONTEXT_LOST";
+	case GL_TABLE_TOO_LARGE:
+		return "GL_TABLE_TOO_LARGE";
+
 	default:
 		return "Unknown error";
 	}
+}
+
+void GL_TraverseErrors(){
+	GLenum error;
+#if defined(BLITZMAX_DEBUG)
+	while((error=glGetError())!=GL_NO_ERROR){
+		DebugLog("glGetError:%s",GL_GetErrorString(error));
+	}
+#endif
 }
 

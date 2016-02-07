@@ -182,9 +182,9 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 		new_surf->tris=surf->tris;
 
 		// copy brush
-		//surf->brush->CopyTo(new_surf->brush);
-		delete new_surf->brush;
-		new_surf->brush=surf->brush->Copy();
+		surf->brush->CopyTo(new_surf->brush);
+		//delete new_surf->brush;
+		//new_surf->brush=surf->brush->Copy();
 
 		new_surf->vert_array_size=surf->vert_array_size;
 		new_surf->tri_array_size=surf->tri_array_size;
@@ -233,7 +233,7 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 	//	This aint good. When one of these meshes are freed then program will crash when
 	//	trying to use the other. ObjectReference perhaps?
 	//	Can't be arsed right now. Need to make a copy function but MeshCollider has
-	//	double linked lists.... BTW MeshCollides is in tree.h & tree.cpp just to make
+	//	double linked lists.... BTW MeshCollider is in tree.h & tree.cpp just to make
 	//	it *sooo* convenient to find it............
 	if(c_col_tree) mesh->c_col_tree=c_col_tree->Copy();
 	
@@ -247,31 +247,30 @@ Mesh* Mesh::CopyEntity(Entity* parent_ent){
 
 void Mesh::FreeEntity(){
 
-	if (no_surfs>=0){
-		// FIXME: C++11'ify
-		list<Surface*>::iterator surf_it;
-		if (surf_list.size()){
-			for(surf_it=surf_list.begin();surf_it!=surf_list.end();surf_it++){
-				Surface* surf=*surf_it;
-				if(surf){
-					if(surf->ShaderMat) surf->ShaderMat->TurnOff();
-					surf->DestroyRef();
-				}
-			}
-		}
-		if(anim_surf_list.size()){
+	if (surf_list.size()){
 
-			for(surf_it=anim_surf_list.begin();surf_it!=anim_surf_list.end();surf_it++){
-				Surface* anim_surf=*surf_it;
-				if(anim_surf){
-					if(anim_surf->ShaderMat) anim_surf->ShaderMat->TurnOff();
-					anim_surf->DestroyRef();
-				}
+		for(Surface* surf : surf_list){
+			if(surf){
+				if(surf->ShaderMat) surf->ShaderMat->TurnOff();
+				surf->DestroyRef();
 			}
 		}
-		if(c_col_tree) delete c_col_tree;
-		c_col_tree=NULL;
+
 	}
+
+	if(anim_surf_list.size()){
+
+		for(Surface* anim_surf : anim_surf_list){
+			if(anim_surf){
+				if(anim_surf->ShaderMat) anim_surf->ShaderMat->TurnOff();
+				anim_surf->DestroyRef();
+			}
+		}
+
+	}
+	if(c_col_tree) delete c_col_tree;
+	c_col_tree=NULL;
+
 	// No point in clearing these lists
 	// It will take care of it self when the object goes out of scope (deleted)
 	// surf_list.clear();
@@ -395,8 +394,10 @@ Bone* Mesh::CreateBone(Entity* parent_ent){
 
 Mesh* Mesh::LoadMesh(string filename,Entity* parent_ent){
 
-	if(Right(filename,4)==".3ds") return load3ds::Load3ds(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
-	if(Right(filename,2)==".x") return loadX::LoadX(filename, parent_ent);
+	/*if(Right(filename,4)==".3ds") return load3ds::Load3ds(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
+	if(Right(filename,2)==".x") return loadX::LoadX(filename, parent_ent);*/
+	if(!strncasecmp(filename.c_str()+filename.length()-4,".3ds",4)) return load3ds::Load3ds(filename,parent_ent);
+	if(!strncasecmp(filename.c_str()+filename.length()-2,".x",2)) return loadX::LoadX(filename,parent_ent);
 
 	Entity* ent=LoadAnimMesh(filename);
 	ent->HideEntity();
