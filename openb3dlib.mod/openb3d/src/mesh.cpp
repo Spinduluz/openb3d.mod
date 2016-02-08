@@ -535,7 +535,6 @@ Mesh* Mesh::CreatePlane(int divs, Entity* parent_ent){
 Mesh* Mesh::CreateCube(Entity* parent_ent){
 
 	Mesh* mesh=CreateMesh(parent_ent);
-
 	Surface* surf=mesh->CreateSurface();
 
 	surf->AddVertex(-1.0,-1.0,-1.0);
@@ -1385,6 +1384,7 @@ void Mesh::PaintMesh(Brush* bru){
 			surf->brush->tex[i]=bru->tex[i];
 			surf->brush->cache_frame[i]=bru->cache_frame[i];
 
+			if(surf->brush->tex[i]) surf->brush->tex[i]->AddRef();
 		}
 
 	}
@@ -1396,7 +1396,6 @@ void Mesh::MeshColor(float r,float g,float b,float a){
 	for(int s=1;s<=CountSurfaces();s++){
 
 		Surface* surf=GetSurface(s);
-
 		surf->SurfaceColor(r,g,b,a);
 
 	}
@@ -1409,7 +1408,6 @@ void Mesh::MeshColor(float r,float g,float b){
 	for(int s=1;s<=CountSurfaces();s++){
 
 		Surface* surf=GetSurface(s);
-
 		surf->SurfaceColor(r,g,b);
 
 	}
@@ -1421,7 +1419,6 @@ void Mesh::MeshRed(float r){
 	for(int s=1;s<=CountSurfaces();s++){
 
 		Surface* surf=GetSurface(s);
-
 		surf->SurfaceRed(r);
 
 	}
@@ -1433,7 +1430,6 @@ void Mesh::MeshGreen(float g){
 	for(int s=1;s<=CountSurfaces();s++){
 
 		Surface* surf=GetSurface(s);
-
 		surf->SurfaceGreen(g);
 
 	}
@@ -1445,7 +1441,6 @@ void Mesh::MeshBlue(float b){
 	for(int s=1;s<=CountSurfaces();s++){
 
 		Surface* surf=GetSurface(s);
-
 		surf->SurfaceBlue(b);
 
 	}
@@ -1457,7 +1452,6 @@ void Mesh::MeshAlpha(float a){
 	for(int s=1;s<=CountSurfaces();s++){
 
 		Surface* surf=GetSurface(s);
-
 		surf->SurfaceAlpha(a);
 
 	}
@@ -1613,7 +1607,7 @@ void Mesh::ScaleMesh(float sx,float sy,float sz){
 
 		for(int v=0;v<=surf->no_verts-1;v++){
 
-			surf->vert_coords[v*3]*=sx;
+			surf->vert_coords[v*3+0]*=sx;
 			surf->vert_coords[v*3+1]*=sy;
 			surf->vert_coords[v*3+2]*=sz;
 
@@ -1648,7 +1642,7 @@ void Mesh::RotateMesh(float pitch,float yaw,float roll){
 			float vy=surf->vert_coords[v*3+1];
 			float vz=surf->vert_coords[v*3+2];
 
-			surf->vert_coords[v*3] = mat.grid[0][0]*vx + mat.grid[1][0]*vy + mat.grid[2][0]*vz + mat.grid[3][0];
+			surf->vert_coords[v*3+0] = mat.grid[0][0]*vx + mat.grid[1][0]*vy + mat.grid[2][0]*vz + mat.grid[3][0];
 			surf->vert_coords[v*3+1] = mat.grid[0][1]*vx + mat.grid[1][1]*vy + mat.grid[2][1]*vz + mat.grid[3][1];
 			surf->vert_coords[v*3+2] = mat.grid[0][2]*vx + mat.grid[1][2]*vy + mat.grid[2][2]*vz + mat.grid[3][2];
 
@@ -1656,7 +1650,7 @@ void Mesh::RotateMesh(float pitch,float yaw,float roll){
 			float ny=surf->vert_norm[v*3+1];
 			float nz=surf->vert_norm[v*3+2];
 
-			surf->vert_norm[v*3] = mat.grid[0][0]*nx + mat.grid[1][0]*ny + mat.grid[2][0]*nz + mat.grid[3][0];
+			surf->vert_norm[v*3+0] = mat.grid[0][0]*nx + mat.grid[1][0]*ny + mat.grid[2][0]*nz + mat.grid[3][0];
 			surf->vert_norm[v*3+1] = mat.grid[0][1]*nx + mat.grid[1][1]*ny + mat.grid[2][1]*nz + mat.grid[3][1];
 			surf->vert_norm[v*3+2] = mat.grid[0][2]*nx + mat.grid[1][2]*ny + mat.grid[2][2]*nz + mat.grid[3][2];
 
@@ -1683,7 +1677,7 @@ void Mesh::PositionMesh(float px,float py,float pz){
 
 		for(int v=0;v<=surf->CountVertices()-1;v++){
 
-			surf->vert_coords[v*3]+=px;
+			surf->vert_coords[v*3+0]+=px;
 			surf->vert_coords[v*3+1]+=py;
 			surf->vert_coords[v*3+2]+=pz;
 
@@ -1701,16 +1695,20 @@ void Mesh::PositionMesh(float px,float py,float pz){
 }
 
 void Mesh::UpdateNormals(){
-
+#if 0
 	list<Surface*>::iterator it;
 
 	for(it=surf_list.begin();it!=surf_list.end();it++){
 
 		Surface& surf=**it;
-
 		surf.UpdateNormals();
 
 	}
+#else
+	for(Surface* surf : surf_list){
+		surf->UpdateNormals();
+	}
+#endif
 
 }
 
@@ -1747,7 +1745,7 @@ int Mesh::CountSurfaces(){
 Surface* Mesh::GetSurface(int surf_no_get){
 
 	int surf_no=0;
-
+#if 0
 	list<Surface*>::iterator it;
 
 	for(it=surf_list.begin();it!=surf_list.end();it++){
@@ -1759,6 +1757,11 @@ Surface* Mesh::GetSurface(int surf_no_get){
 		if(surf_no_get==surf_no) return surf;
 
 	}
+#else
+	for(Surface* surf : surf_list){
+		if(++surf_no==surf_no_get) return surf;
+	}
+#endif
 
 	return NULL;
 
@@ -1770,8 +1773,8 @@ void Mesh::SkinMesh(int surf_no_get, int vid, int bone1, float weight1, int bone
 
 	list<Surface*>::iterator it;
 
-	Surface* anim_surf=0;
-
+	Surface* anim_surf=NULL;
+#if 0
 	for(it=anim_surf_list.begin();it!=anim_surf_list.end();it++){
 
 		anim_surf=*it;
@@ -1781,6 +1784,12 @@ void Mesh::SkinMesh(int surf_no_get, int vid, int bone1, float weight1, int bone
 		if(surf_no_get==surf_no) break;
 
 	}
+#else
+	for(Surface* surf : surf_list){
+		anim_surf=surf;
+		if(++surf_no==surf_no_get) break;
+	}
+#endif
 
 	anim_surf->vert_bone1_no[vid]=bone1;
 	anim_surf->vert_weight1[vid]=weight1;
@@ -1851,7 +1860,7 @@ void Mesh::SkinMesh(int surf_no_get, int vid, int bone1, float weight1, int bone
 
 // used by CopyEntity
 void Mesh::CopyBonesList(Entity* ent,vector<Bone*>& bones){
-
+#if 0
 	list<Entity*>::iterator it;
 	for(it=ent->child_list.begin();it!=ent->child_list.end();it++){
 
@@ -1865,7 +1874,12 @@ void Mesh::CopyBonesList(Entity* ent,vector<Bone*>& bones){
 	}
 
 	return;
-
+#else
+	for( Entity* child_ent : ent->child_list){
+		if(dynamic_cast<Bone*>(child_ent)) bones.push_back(dynamic_cast<Bone*>(child_ent));
+		CopyBonesList(child_ent,bones);
+	}
+#endif
 }
 
 //used by LoadMesh
@@ -1910,19 +1924,19 @@ void Mesh::TransformMesh(Matrix& mat){
 
 		for(int v=0;v<=surf.no_verts-1;v++){
 
-			float vx=surf.vert_coords[v*3];
+			float vx=surf.vert_coords[v*3+0];
 			float vy=surf.vert_coords[v*3+1];
 			float vz=surf.vert_coords[v*3+2];
 
-			surf.vert_coords[v*3] = mat.grid[0][0]*vx + mat.grid[1][0]*vy + mat.grid[2][0]*vz + mat.grid[3][0];
+			surf.vert_coords[v*3+0] = mat.grid[0][0]*vx + mat.grid[1][0]*vy + mat.grid[2][0]*vz + mat.grid[3][0];
 			surf.vert_coords[v*3+1] = mat.grid[0][1]*vx + mat.grid[1][1]*vy + mat.grid[2][1]*vz + mat.grid[3][1];
 			surf.vert_coords[v*3+2] = mat.grid[0][2]*vx + mat.grid[1][2]*vy + mat.grid[2][2]*vz + mat.grid[3][2];
 
-			float nx=surf.vert_norm[v*3];
+			float nx=surf.vert_norm[v*3+0];
 			float ny=surf.vert_norm[v*3+1];
 			float nz=surf.vert_norm[v*3+2];
 
-			surf.vert_norm[v*3] = mat.grid[0][0]*nx + mat.grid[1][0]*ny + mat.grid[2][0]*nz;
+			surf.vert_norm[v*3+0] = mat.grid[0][0]*nx + mat.grid[1][0]*ny + mat.grid[2][0]*nz;
 			surf.vert_norm[v*3+1] = mat.grid[0][1]*nx + mat.grid[1][1]*ny + mat.grid[2][1]*nz;
 			surf.vert_norm[v*3+2] = mat.grid[0][2]*nx + mat.grid[1][2]*ny + mat.grid[2][2]*nz;
 
@@ -2032,7 +2046,7 @@ int Mesh::Alpha(){
 		}
 
 	}
-
+#if 0
 	// check surf brushes
 	list<Surface*>::iterator it;
 
@@ -2068,6 +2082,20 @@ int Mesh::Alpha(){
 		}
 
 	}
+#else
+	for(Surface* surf : surf_list){
+		surf->alpha_enable=false;
+		if(surf->brush->alpha<1.0 || surf->brush->blend==2 || surf->brush->blend==3 || surf->brush->fx&32){
+			alpha=true;
+		}else{
+			if(surf->brush->tex[0] && surf->brush->tex[0]->flags&2){
+				alpha=true;
+			}
+		}
+
+		if(alpha) surf->alpha_enable=true;
+	}
+#endif
 
 	return alpha;
 
@@ -2773,8 +2801,6 @@ void Mesh::Render(){
 
 		if(vbo)	{
 			glDrawElements(GL_TRIANGLES,surf.no_tris*3,GL_UNSIGNED_SHORT,NULL);
-
-
 		}else{
 			glDrawElements(GL_TRIANGLES,surf.no_tris*3,GL_UNSIGNED_SHORT,&surf.tris[0]);
 		}
@@ -2876,14 +2902,12 @@ void Mesh::UpdateShadow(){
 		}
 
 		if(anim){
-
 			// get anim_surf
 
 			//anim_surf=**anim_surf_it;
 			anim_surf_it++;
 
 			if(vbo==true){
-
 				// update vbo
 				if(anim_surf.reset_vbo!=false){
 					anim_surf.UpdateVBO();
@@ -2891,11 +2915,8 @@ void Mesh::UpdateShadow(){
 					anim_surf.reset_vbo=-1;
 					anim_surf.UpdateVBO();
 				}
-
 			}
-
 		}
-
 
 		if(vbo){
 
@@ -2908,7 +2929,6 @@ void Mesh::UpdateShadow(){
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,surf.vbo_id[5]);
-
 
 		}else{
 
@@ -2925,7 +2945,6 @@ void Mesh::UpdateShadow(){
 			glColorPointer(4,GL_FLOAT,0,&surf.vert_col[0]);
 
 //			glNormalPointer(GL_FLOAT,0,NULL);
-
 //			glColorPointer(4,GL_FLOAT,0,NULL);
 
 		}
@@ -2933,7 +2952,6 @@ void Mesh::UpdateShadow(){
 		// light + material color
 
 		glMatrixMode(GL_MODELVIEW);
-
 		glPushMatrix();
 
 		if(dynamic_cast<Sprite*>(this)==NULL){
@@ -2947,13 +2965,9 @@ void Mesh::UpdateShadow(){
 			glDrawElements(GL_TRIANGLES,surf.no_tris*3,GL_UNSIGNED_SHORT,NULL);
 			glBindBuffer(GL_ARRAY_BUFFER , 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
 		}else{
 			glDrawElements(GL_TRIANGLES,surf.no_tris*3,GL_UNSIGNED_SHORT,&surf.tris[0]);
 		}
-
-
 
 		glPopMatrix();
 

@@ -27,11 +27,6 @@ GL_ARB_fragment_shader
 
 class Camera;
 
-void GL_Enable(GLenum type);
-void GL_Disable(GLenum type);
-const char *GL_GetErrorString(GLenum error);
-void GL_TraverseErrors();
-
 class Global{
 public:
 	struct GL_Extension{
@@ -92,5 +87,11 @@ public:
 };
 
 bool CompareEntityOrder(Entity* ent1,Entity* ent2);
+
+void GL_Enable(GLenum type);
+void GL_Disable(GLenum type);
+bool GL_Error();
+const char *GL_GetErrorString(GLenum error);
+void GL_TraverseErrors();
 
 #endif

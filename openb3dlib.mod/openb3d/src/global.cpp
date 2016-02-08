@@ -57,7 +57,8 @@ vector<Global::GL_Extension> Global::gl_extensions;
 
 float Global::anim_speed=1.0;
 int Global::fog_enabled=false;
-int Global::width=640,Global::height=480;
+int Global::width=640;
+int Global::height=480;
 int Global::Shadows_enabled=false;
 int Global::alpha_enable=-1;
 int Global::blend_mode=-1;
@@ -422,11 +423,11 @@ static GLState gl_state[]={
 	{GL_LIGHT4,RENDERSTATE_UNKNOWN},
 	{GL_LIGHT5,RENDERSTATE_UNKNOWN},
 	{GL_LIGHT6,RENDERSTATE_UNKNOWN},
-	{GL_LIGHT7,RENDERSTATE_UNKNOWN}
-/*GL_COLOR_ARRAY
-GL_NORMAL_ARRAY
-GL_TEXTURE_COORD_ARRAY
-GL_VERTEX_ARRAY*/
+	{GL_LIGHT7,RENDERSTATE_UNKNOWN}/*,
+	{GL_COLOR_ARRAY,RENDERSTATE_UNKNOWN},
+	{GL_NORMAL_ARRAY,RENDERSTATE_UNKNOWN},
+	{GL_TEXTURE_COORD_ARRAY,RENDERSTATE_UNKNOWN},
+	{GL_VERTEX_ARRAY,RENDERSTATE_UNKNOWN}*/
 };
 
 #define STATE_COUNT sizeof(gl_state)/sizeof(GLState)
@@ -444,7 +445,7 @@ void GL_Enable(GLenum type){
 	}
 	// Not found. Set anyway but log occurance
 #if defined(BLITZMAX_DEBUG)
-	DebugLog("Global::Enable: Unhandled render state");
+	DebugLog("GL_Enable: Unhandled render state");
 #endif
 	glEnable(type);
 }
@@ -462,9 +463,16 @@ void GL_Disable(GLenum type){
 	}
 	// Not found. Set anyway but log occurance
 #if defined(BLITZMAX_DEBUG)
-	DebugLog("Global::Disable: Unhandled render state");
+	DebugLog("GL_Disable: Unhandled render state");
 #endif
 	glDisable(type);
+}
+
+static GLenum gl_error=GL_NO_ERROR;
+
+bool GL_Error(){
+	gl_error=glGetError();
+	return (gl_error!=GL_NO_ERROR);
 }
 
 const char *GL_GetErrorString(GLenum error){
@@ -494,11 +502,12 @@ const char *GL_GetErrorString(GLenum error){
 }
 
 void GL_TraverseErrors(){
-	GLenum error;
 #if defined(BLITZMAX_DEBUG)
-	while((error=glGetError())!=GL_NO_ERROR){
-		DebugLog("glGetError:%s",GL_GetErrorString(error));
-	}
+	if(gl_error==GL_NO_ERROR) return;
+
+	do{
+		DebugLog("glGetError:%s",GL_GetErrorString(gl_error));
+	}while((gl_error=glGetError())!=GL_NO_ERROR);
 #endif
 }
 
