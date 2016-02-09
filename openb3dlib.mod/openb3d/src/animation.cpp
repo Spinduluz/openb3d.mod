@@ -43,7 +43,6 @@ void Animation::AnimateMesh(Mesh* ent1,float framef,int start_frame,int end_fram
 
 			// cycle through all surfs
 			for(surf_it=ent1->surf_list.begin();surf_it!=ent1->surf_list.end();surf_it++){
-
 				*dst_surf_it=*src_surf_it;
 				src_surf_it++;
 				dst_surf_it++;

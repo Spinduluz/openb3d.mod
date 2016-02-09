@@ -45,6 +45,7 @@ void Entity::FreeEntity(void){
 	}
 
 	// free child entities
+#if 0
 	list<Entity*>::iterator it;
 
 	for(it=child_list.begin();it!=child_list.end();it++){
@@ -57,6 +58,12 @@ void Entity::FreeEntity(void){
 			break;
 		}
 	}
+#else
+	for(Entity* entity : child_list){
+		entity->FreeEntity();
+	}
+	child_list.clear();
+#endif
 }
 
 // relations
@@ -197,7 +204,7 @@ Entity* Entity::GetChildFromAll(int child_no,int &no_children,Entity* ent){
 
 	for(it=ent->child_list.begin();it!=ent->child_list.end();it++){
 		Entity* ent2=*it;
-		no_children=no_children+1;
+		no_children++;
 		if(no_children==child_no)
 		  return ent2;
 
@@ -888,7 +895,7 @@ void Entity::SetAnimKey(float frame, int pos_key, int rot_key, int scale_key){
 				t*=anim_surf.no_verts*3;
 
 				for(int i=0;i<anim_surf.no_verts;i++){
-					float x=surf.vert_coords[i*3];
+					float x=surf.vert_coords[i*3+0];
 					float y=surf.vert_coords[i*3+1];
 					float z=surf.vert_coords[i*3+2];
 					if (pos_key){
@@ -904,7 +911,7 @@ void Entity::SetAnimKey(float frame, int pos_key, int rot_key, int scale_key){
 					if (rot_key){
 						rotmat.TransformVec(x,y,z);
 					}
-					surf.vert_coords.insert(surf.vert_coords.begin()+i*3+t, x);
+					surf.vert_coords.insert(surf.vert_coords.begin()+i*3+0+t, x);
 					surf.vert_coords.insert(surf.vert_coords.begin()+i*3+1+t, y);
 					surf.vert_coords.insert(surf.vert_coords.begin()+i*3+2+t, z);
 

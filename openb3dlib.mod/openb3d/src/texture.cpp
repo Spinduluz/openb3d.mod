@@ -104,6 +104,8 @@ inline void GL_CopyTexImage2D(GLenum target,int x,int y,int width,int height){
 
 // A bloated way to minimize number of allocations when using dstbuffer (See animtexture and cubemap)
 // But I seriously dont know if I will use animated textures at all.
+
+// FIXME: Remove this. Not point in using it (yet)
 struct TempImageBuffer{
 	unsigned char *buf;
 	int size;
@@ -332,7 +334,7 @@ Texture* Texture::LoadAnimTexture(string filename,int flags, int frame_width,int
 		GL_GenTextures(tex);
 		glBindTexture(GL_TEXTURE_2D,tex->texture);
 		GL_TexImage2D(GL_TEXTURE_2D,tex->width,tex->height,buffer);
-	} else {
+	}else{
 		//
 		// FIXME: DO NOT FORGET
 		//	Add reference to opengl textures..
@@ -454,6 +456,9 @@ Texture* Texture::TexInList(size_t hash,int flags){
 	// It would probably be a good idea to reuse texturename though.
 
 	// check if tex already exists in list and if so increase ref count and return it
+
+	// Not flag 2048 forces the creation of a new class instance but keeps the underlying
+	// gl object
 
 	// FIXME: See model.cpp
 	for(Texture* tex : tex_list){
@@ -655,7 +660,7 @@ void Texture::TexToBuffer(unsigned char* buffer, int frame){
 void Texture::DepthBufferToTex(Camera* cam=0 ){
 
 	glBindTexture(GL_TEXTURE_2D,texture);
-	if (cam==0){
+	if (!cam){
 		//glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,Global::height-height,width,height,0);
 		//glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP_SGIS,GL_TRUE);
 		GL_CopyTexImage2D(GL_TEXTURE_2D,0,0,width,height);
@@ -695,7 +700,8 @@ void CopyPixels (unsigned char *src, unsigned int srcWidth, unsigned int srcHeig
 	unsigned char *dst, unsigned int dstWidth, unsigned int dstHeight, unsigned int bytesPerPixel) {
 	// Copy image data line by line
 	unsigned int y;
-	for (y = 0; y < dstHeight; y++)
-		memcpy (dst + y * dstWidth * bytesPerPixel, src + ((y + srcY) * srcWidth + srcX) * bytesPerPixel, dstWidth * bytesPerPixel);
+
+	for(y=0; y<dstHeight; y++)
+		memcpy (dst+y*dstWidth*bytesPerPixel,src+((y+srcY)*srcWidth+srcX)*bytesPerPixel,dstWidth*bytesPerPixel);
 }
 

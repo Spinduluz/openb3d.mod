@@ -112,7 +112,7 @@ public:
 	float MeshDepth();
 	int CountSurfaces();
 	Surface* GetSurface(int surf_no_get);
-	void SkinMesh(int surf_no_get, int vid, int bone1, float weight1=1.0, int bone2=0, float weight2=0, int bone3=0, float weight3=0, int bone4=0, float weight4=0);
+	void SkinMesh(int surf_no_get,int vid,int bone1,float weight1=1.0,int bone2=0,float weight2=0,int bone3=0,float weight3=0,int bone4=0,float weight4=0);
 
 	static void CopyBonesList(Entity* ent,vector<Bone*>& bones);
 	Mesh* CollapseAnimMesh(Mesh* mesh=NULL);

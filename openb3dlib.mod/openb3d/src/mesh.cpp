@@ -268,13 +268,12 @@ void Mesh::FreeEntity(){
 		}
 
 	}
+
 	if(c_col_tree) delete c_col_tree;
 	c_col_tree=NULL;
 
-	// No point in clearing these lists
-	// It will take care of it self when the object goes out of scope (deleted)
-	// surf_list.clear();
-	// anim_surf_list.clear();
+	surf_list.clear();
+	anim_surf_list.clear();
 
 	//vector<Bone*>::iterator bone_it;
 
@@ -282,8 +281,10 @@ void Mesh::FreeEntity(){
 		Bone* bone=*bone_it;
 		delete bone;
 	}*/
-	// Same thing as surf*list
 	//bones.clear();	
+#if defined(BLITZMAX_DEBUG)
+	DebugLog("Bones %i",bones.size());
+#endif
 
 	Entity::FreeEntity();
 	delete this;
@@ -394,10 +395,8 @@ Bone* Mesh::CreateBone(Entity* parent_ent){
 
 Mesh* Mesh::LoadMesh(string filename,Entity* parent_ent){
 
-	/*if(Right(filename,4)==".3ds") return load3ds::Load3ds(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
-	if(Right(filename,2)==".x") return loadX::LoadX(filename, parent_ent);*/
-	if(!strncasecmp(filename.c_str()+filename.length()-4,".3ds",4)) return load3ds::Load3ds(filename,parent_ent);
-	if(!strncasecmp(filename.c_str()+filename.length()-2,".x",2)) return loadX::LoadX(filename,parent_ent);
+	if(CheckExtension(filename,".3ds")) return load3ds::Load3ds(filename,parent_ent);
+	if(CheckExtension(filename,".x")) return loadX::LoadX(filename,parent_ent);
 
 	Entity* ent=LoadAnimMesh(filename);
 	ent->HideEntity();
@@ -451,13 +450,9 @@ Mesh* Mesh::LoadMeshB3D(FilePtr file,Entity* parent_ent){
 }
 
 Mesh* Mesh::LoadAnimMesh(string filename,Entity* parent_ent){
-#if 0
-	if(Right(filename,4)==".3ds") return load3ds::Load3ds(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
-	if(Right(filename,4)==".md2") return loadMD2::LoadMD2(filename, parent_ent);//filename=Replace(filename,".3ds",".b3d");
-#else
-	if(!strncasecmp(filename.c_str()+filename.length()-4,".3ds",4)) return load3ds::Load3ds(filename,parent_ent);
-	if(!strncasecmp(filename.c_str()+filename.length()-4,".md2",4)) return loadMD2::LoadMD2(filename,parent_ent);
-#endif
+
+	if(CheckExtension(filename,".3ds")) return load3ds::Load3ds(filename,parent_ent);
+	if(CheckExtension(filename,".md2")) return loadMD2::LoadMD2(filename,parent_ent);
 
 	return LoadAnimB3D(filename,parent_ent);
 }
@@ -1767,7 +1762,7 @@ Surface* Mesh::GetSurface(int surf_no_get){
 
 }
 
-void Mesh::SkinMesh(int surf_no_get, int vid, int bone1, float weight1, int bone2, float weight2, int bone3, float weight3, int bone4, float weight4){
+void Mesh::SkinMesh(int surf_no_get,int vid,int bone1,float weight1,int bone2,float weight2,int bone3,float weight3,int bone4,float weight4){
 
 	int surf_no=0;
 

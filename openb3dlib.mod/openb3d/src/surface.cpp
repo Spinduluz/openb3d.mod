@@ -147,9 +147,7 @@ void Surface::ClearSurface(int clear_verts,int clear_tris){
 	if(clear_tris==true){
 
 		no_tris=0;
-
 		tris.clear();
-
 		tri_array_size=1;
 
 	}
@@ -215,7 +213,7 @@ int Surface::CountTriangles(){
 void Surface::VertexCoords(int vid,float x,float y,float z){
 
 	vid=vid*3;
-	vert_coords[vid]=x;
+	vert_coords[vid+0]=x;
 	vert_coords[vid+1]=y;
 	vert_coords[vid+2]=z*-1; // ***ogl***
 
@@ -243,7 +241,7 @@ void Surface::VertexColor(int vid,float r,float g,float b,float a){
 	vert_col[vid]=r/255.0;
 	vert_col[vid+1]=g/255.0;
 	vert_col[vid+2]=b/255.0;
-	vert_col[vid+3]=a;
+	vert_col[vid+3]=a/255.0;
 
 	// mesh state has changed - update reset flags
 	reset_vbo=reset_vbo|8;
@@ -527,7 +525,7 @@ void Surface::UpdateNormals(){
 
 			//int v=TriangleVertex(t,c,tris);
 
-			float vx=vert_coords[v*3]; // surf.VertexX(v)
+			float vx=vert_coords[(v*3)+0]; // surf.VertexX(v)
 			float vy=vert_coords[(v*3)+1]; // surf.VertexY(v)
 			float vz=vert_coords[(v*3)+2]; // surf.VertexZ(v)
 
@@ -545,7 +543,7 @@ void Surface::UpdateNormals(){
 	int v;
 	for( v=0;v<no_verts;++v ){
 
-		float vx=vert_coords[v*3]; // surf.VertexX(v)
+		float vx=vert_coords[(v*3)+0]; // surf.VertexX(v)
 		float vy=vert_coords[(v*3)+1]; // surf.VertexY(v)
 		float vz=vert_coords[(v*3)+2]; // surf.VertexZ(v)
 

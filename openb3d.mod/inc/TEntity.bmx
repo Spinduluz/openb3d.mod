@@ -89,6 +89,7 @@ Type TEntity
 		ent_map.Insert( String(Long(inst)),obj )
 		obj.instance=inst
 		obj.InitFields()
+		
 		Return obj
 		
 	End Function

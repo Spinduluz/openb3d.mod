@@ -32,12 +32,12 @@ public:
 
 	list<Action*> nextActions;
 	
-	static Action* AddAction(Entity* ent, int action, Entity* t, float a, float b, float c, float rate);
-	static Action* AddAction(Entity* ent, int action, float a, float b, float c, float rate){
-		return AddAction(ent, action, 0, a, b, c, rate);
+	static Action* AddAction(Entity* ent,int action,Entity* t,float a,float b,float c,float rate);
+	static Action* AddAction(Entity* ent,int action,float a,float b,float c,float rate){
+		return AddAction(ent,action,NULL,a,b,c,rate);
 	};
 	static Action* AddAction(Entity* ent, int action, Entity* t, float rate){
-		return AddAction(ent, action, t, 0, 0, 0, rate);
+		return AddAction(ent,action,t,0,0,0,rate);
 	};
 	void AppendAction (Action* a);
 	void FreeAction ();

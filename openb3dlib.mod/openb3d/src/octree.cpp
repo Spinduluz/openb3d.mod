@@ -614,7 +614,6 @@ void OcTree::FreeEntity(){
 		}
 	}
 
-
 	Entity::FreeEntity();
 	delete this;
 

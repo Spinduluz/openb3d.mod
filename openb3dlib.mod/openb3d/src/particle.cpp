@@ -362,7 +362,7 @@ ParticleEmitter* ParticleEmitter::CopyEntity(Entity* parent_ent){
 
 }
 
-void ParticleEmitter::FreeEntity (){
+void ParticleEmitter::FreeEntity(){
 	emitter_list.remove(this);
 
 #if 0
@@ -395,19 +395,19 @@ void ParticleEmitter::EmitterVector(float x, float y, float z){
 	gz=z;
 }
 
-void ParticleEmitter::EmitterRate (float r){
+void ParticleEmitter::EmitterRate(float r){
 	rate=1.0/r;
 }
 
-void ParticleEmitter::EmitterVariance (float v){
+void ParticleEmitter::EmitterVariance(float v){
 	variance=v;
 }
 
-void ParticleEmitter::EmitterParticleLife (int l){
+void ParticleEmitter::EmitterParticleLife(int l){
 	lifetime=l;
 }
 
-void ParticleEmitter::EmitterParticleSpeed (float s){
+void ParticleEmitter::EmitterParticleSpeed(float s){
 	particleSpeed=s;
 }
 

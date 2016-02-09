@@ -55,7 +55,8 @@ public:
 
 	unsigned int texture;
 	tex_name_t texture_ref; // This is used to ensure that the opengl texture isn't released/deleted before
-							// all references are gone
+							// all references are gone. This also enable us to share the underlying opengl texture
+							// across classes.
 
 	string file_name;
 	string file_abs;
@@ -91,7 +92,7 @@ public:
 
 	static Texture* LoadTexture(string filename,int flags=0);
 	static Texture* LoadAnimTexture(string filename,int flags=0, int frame_width=0,int frame_height=0,int first_frame=0,int frame_count=1);
-	static Texture* CreateTexture(int width=256,int height=256,int flags=3, int frames=0,string fname="noname");
+	static Texture* CreateTexture(int width=256,int height=256,int flags=3,int frames=0,string fname="noname");
 
 	Texture();
 	~Texture();

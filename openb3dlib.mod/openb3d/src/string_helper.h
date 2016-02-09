@@ -74,7 +74,7 @@ inline void HandleRequestedTempString(char *tmp,int maxsize){
 inline bool CheckExtension(const string& filename,const string& ext){
 	size_t p=filename.find_last_of('.');
 	if(p==string::npos) return false;
-	return (strncasecmp(filename.c_str()+p,ext.c_str(),4)==0);
+	return (strncasecmp(filename.c_str()+p,ext.c_str(),ext.length())==0);
 }
  
 // FIXME: Inline this crap or replace it....

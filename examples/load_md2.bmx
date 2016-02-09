@@ -17,8 +17,8 @@ Local light:TLight=CreateLight()
 Local ent:TMesh=LoadAnimMesh("media/tris.md2")
 RotateEntity ent,-90,180,0
 
-Local cube:TMesh=CreateCube()
-PositionEntity cube,-5,10,-50
+'Local cube:TMesh=CreateCube()
+'PositionEntity cube,-5,10,-50
 
 Local tex:TTexture=LoadTexture("media/skin.jpg")
 EntityTexture ent,tex
@@ -52,10 +52,13 @@ While Not KeyDown(KEY_ESCAPE)
 		renders=0
 	EndIf
 	
-	Text 0,0,"FPS: "+fps
-	Text 0,20,"+/- to animate"
-	Text 0,40,"Arrows: turn camera, WSAD: move camera"
-	
+	'Text 0,0,"FPS: "+fps
+	'Text 0,20,"+/- to animate"
+	'Text 0,40,"Arrows: turn camera, WSAD: move camera"
+	?debug
+	BeginMax2D
+	EndMax2D
+	?
 	Flip
 	
 Wend
@@ -63,7 +66,7 @@ Wend
 FreeEntity cam
 FreeEntity light
 FreeEntity ent
-FreeEntity cube
+'FreeEntity cube
 FreeTexture tex
 
 End
